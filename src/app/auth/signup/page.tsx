@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { Box, Typography } from "@mui/material";
-import { SignupForm } from "../../../components/SignupForm/SignupForm";
+import SignupForm from "../../../components/SignupForm/SignupForm";
 import styles from "./page.module.css"; // Assuming you're using CSS Modules
 
 const SignupPage = () => {
@@ -20,7 +20,9 @@ const SignupPage = () => {
           wagr
         </Typography>
       </Box>
-      <Box className={styles.rightContainer}></Box>
+      <Box className={styles.rightContainer}>
+        <SignupForm />
+      </Box>
     </Box>
   );
 };

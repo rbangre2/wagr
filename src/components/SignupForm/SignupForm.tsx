@@ -1,68 +1,166 @@
-"use client";
+// components/SignupForm.tsx
 import React, { useState } from "react";
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
+  Link,
+  FormControl,
+  InputLabel,
+  OutlinedInput,
+  InputAdornment,
+  IconButton,
+} from "@mui/material";
+import FormTextField from "../FormTextField/FormTextField";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
-export const SignupForm = () => {
+const SignupForm = () => {
   const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
     email: "",
-    username: "",
     password: "",
     confirmPassword: "",
   });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prevState) => ({ ...prevState, [name]: value }));
+  const handleChange =
+    (prop: keyof typeof formData) =>
+    (
+      event: React.ChangeEvent<HTMLInputElement> | { target: { value: any } }
+    ) => {
+      setFormData({ ...formData, [prop]: event.target.value });
+    };
+
+  const handleClickShowPassword = () => {
+    setShowPassword(!showPassword);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Form data submitted:", formData);
-    // Add your logic to handle the form submission, like validating input and sending it to your backend
+  const handleClickShowConfirmPassword = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+  };
+
+  const handleMouseDownPassword = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    event.preventDefault();
+  };
+
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    console.log("Form data:", formData);
+    // Implement your sign-up logic here
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <label htmlFor="email">Email:</label>
-        <input
-          type="email"
-          id="email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-        />
-      </div>
-      <div>
-        <label htmlFor="username">Username:</label>
-        <input
-          type="text"
-          id="username"
-          name="username"
-          value={formData.username}
-          onChange={handleChange}
-        />
-      </div>
-      <div>
-        <label htmlFor="password">Password:</label>
-        <input
-          type="password"
-          id="password"
-          name="password"
-          value={formData.password}
-          onChange={handleChange}
-        />
-      </div>
-      <div>
-        <label htmlFor="confirmPassword">Confirm Password:</label>
-        <input
-          type="password"
-          id="confirmPassword"
-          name="confirmPassword"
-          value={formData.confirmPassword}
-          onChange={handleChange}
-        />
-      </div>
-      <button type="submit">Sign Up</button>
-    </form>
+    <Box
+      component="form"
+      onSubmit={handleSubmit}
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 2,
+        maxWidth: 400,
+        margin: "auto",
+      }}
+    >
+      <Typography variant="h4" textAlign="center" color="black" gutterBottom>
+        Welcome To Wagr
+      </Typography>
+      <Typography
+        variant="subtitle1"
+        color="black"
+        textAlign="center"
+        gutterBottom
+      >
+        Create an account to get started!
+      </Typography>
+      <FormTextField
+        idName="firstName"
+        labelName="First Name"
+        value={formData.firstName}
+        onChange={handleChange("firstName")}
+      />
+      <FormTextField
+        idName="firstName"
+        labelName="Last Name"
+        value={formData.lastName}
+        onChange={handleChange("lastName")}
+      />
+      <FormTextField
+        idName="email"
+        labelName="Email"
+        type="email"
+        value={formData.email}
+        onChange={handleChange("email")}
+      />
+      <FormTextField
+        idName="password"
+        labelName="Password"
+        type={showPassword ? "text" : "password"}
+        value={formData.password}
+        onChange={handleChange("password")}
+        endAdornment={
+          <InputAdornment position="end">
+            <IconButton
+              aria-label="toggle password visibility"
+              onClick={handleClickShowPassword}
+              onMouseDown={handleMouseDownPassword}
+              edge="end"
+            >
+              {showPassword ? <VisibilityOff /> : <Visibility />}
+            </IconButton>
+          </InputAdornment>
+        }
+      />
+
+      <FormTextField
+        idName="confirm-password"
+        labelName="Confirm Password"
+        type={showConfirmPassword ? "text" : "password"}
+        value={formData.confirmPassword}
+        onChange={handleChange("confirmPassword")}
+        endAdornment={
+          <InputAdornment position="end">
+            <IconButton
+              aria-label="toggle confirm password visibility"
+              onClick={handleClickShowConfirmPassword}
+              onMouseDown={handleMouseDownPassword}
+              edge="end"
+            >
+              {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+            </IconButton>
+          </InputAdornment>
+        }
+      />
+      <Button
+        variant="contained"
+        type="submit"
+        fullWidth
+        sx={{
+          borderRadius: "20px", // Rounded corners
+          backgroundColor: "lightblue", // Main color
+          "&:hover": {
+            backgroundColor: "lightgreen", // Hover color
+          },
+        }}
+      >
+        Continue
+      </Button>
+
+      <Typography
+        variant="body2"
+        color="black"
+        textAlign="center"
+        sx={{ mt: 2 }}
+      >
+        Already have an account? <Link href="/signin">Sign In</Link>
+      </Typography>
+    </Box>
   );
 };
+
+export default SignupForm;
