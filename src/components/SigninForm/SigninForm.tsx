@@ -16,7 +16,7 @@ import FormTextField from "../FormTextField/FormTextField";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
-const SignupForm = () => {
+const SigninForm = () => {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -68,7 +68,7 @@ const SignupForm = () => {
       }}
     >
       <Typography variant="h4" textAlign="center" color="black" gutterBottom>
-        Welcome To Wagr
+        Welcome Back!
       </Typography>
       <Typography
         variant="subtitle1"
@@ -76,20 +76,8 @@ const SignupForm = () => {
         textAlign="center"
         gutterBottom
       >
-        Create an account to get started!
+        Sign in to start placing some wagrs.
       </Typography>
-      <FormTextField
-        idName="firstName"
-        labelName="First Name"
-        value={formData.firstName}
-        onChange={handleChange("firstName")}
-      />
-      <FormTextField
-        idName="firstName"
-        labelName="Last Name"
-        value={formData.lastName}
-        onChange={handleChange("lastName")}
-      />
       <FormTextField
         idName="email"
         labelName="Email"
@@ -116,33 +104,13 @@ const SignupForm = () => {
           </InputAdornment>
         }
       />
-
-      <FormTextField
-        idName="confirm-password"
-        labelName="Confirm Password"
-        type={showConfirmPassword ? "text" : "password"}
-        value={formData.confirmPassword}
-        onChange={handleChange("confirmPassword")}
-        endAdornment={
-          <InputAdornment position="end">
-            <IconButton
-              aria-label="toggle confirm password visibility"
-              onClick={handleClickShowConfirmPassword}
-              onMouseDown={handleMouseDownPassword}
-              edge="end"
-            >
-              {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
-            </IconButton>
-          </InputAdornment>
-        }
-      />
       <Button
         variant="contained"
         type="submit"
         fullWidth
         sx={{
           borderRadius: "20px", // Rounded corners
-          backgroundColor: "#add1e6", // Main color
+          backgroundColor: "#e6bbad", // Main color
           "&:hover": {
             backgroundColor: "lightgreen", // Hover color
           },
@@ -157,11 +125,10 @@ const SignupForm = () => {
         textAlign="center"
         sx={{ mt: 2 }}
       >
-        {"Already have an account? "}
-        <Link href="/auth/signin">Sign In</Link>
+        {"Don't have an account? "} <Link href="/auth/signup">Sign Up</Link>
       </Typography>
     </Box>
   );
 };
 
-export default SignupForm;
+export default SigninForm;
