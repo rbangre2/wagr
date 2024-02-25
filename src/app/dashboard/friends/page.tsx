@@ -1,10 +1,10 @@
 "use client";
 import DashboardLayout from "../DashboardLayout";
 
-export default function Games() {
+export default function Friends() {
   return (
     <DashboardLayout>
-      <div> games </div>
+      <div> friends </div>
     </DashboardLayout>
   );
 }

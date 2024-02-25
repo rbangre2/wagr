@@ -10,6 +10,7 @@ import {
   useTheme,
 } from "@mui/material";
 import styles from "./AppDrawer.module.css";
+import { useRouter } from "next/navigation";
 import GamesIcon from "@mui/icons-material/SportsSoccer";
 import BetsIcon from "@mui/icons-material/AttachMoney";
 import FriendsIcon from "@mui/icons-material/People";
@@ -42,6 +43,13 @@ const AppDrawer: React.FC<AppDrawerProps> = ({
   appBarHeight,
 }) => {
   const theme = useTheme();
+  const router = useRouter(); // Initialize the router
+
+  // Function to handle navigation
+  const handleNavigation = (text: string) => {
+    const path = `/dashboard/${text.toLowerCase()}`;
+    router.push(path);
+  };
 
   return (
     <Drawer
@@ -69,7 +77,10 @@ const AppDrawer: React.FC<AppDrawerProps> = ({
     >
       <List sx={{ paddingTop: "22px" }}>
         {drawerItems.slice(0, 3).map((item) => (
-          <ListItemButton key={item.text}>
+          <ListItemButton
+            key={item.text}
+            onClick={() => handleNavigation(item.text)}
+          >
             <ListItemIcon sx={{ color: "#FFFFFF" }}>{item.icon}</ListItemIcon>
             <ListItemText
               primary={item.text}
@@ -86,7 +97,10 @@ const AppDrawer: React.FC<AppDrawerProps> = ({
       <Divider />
       <List>
         {drawerItems.slice(3).map((item) => (
-          <ListItemButton key={item.text}>
+          <ListItemButton
+            key={item.text}
+            onClick={() => handleNavigation(item.text)}
+          >
             <ListItemIcon sx={{ color: "#FFFFFF" }}>{item.icon}</ListItemIcon>
             <ListItemText
               primary={item.text}
