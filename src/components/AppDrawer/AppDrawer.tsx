@@ -73,7 +73,12 @@ const AppDrawer: React.FC<AppDrawerProps> = ({
             <ListItemIcon sx={{ color: "#FFFFFF" }}>{item.icon}</ListItemIcon>
             <ListItemText
               primary={item.text}
-              className={styles.signika_negative}
+              sx={{
+                "& .MuiListItemText-primary": {
+                  fontFamily: '"Signika Negative", sans-serif',
+                  fontSize: "1.2rem",
+                },
+              }}
             />
           </ListItemButton>
         ))}
@@ -85,7 +90,12 @@ const AppDrawer: React.FC<AppDrawerProps> = ({
             <ListItemIcon sx={{ color: "#FFFFFF" }}>{item.icon}</ListItemIcon>
             <ListItemText
               primary={item.text}
-              className={styles.signika_negative}
+              sx={{
+                "& .MuiListItemText-primary": {
+                  fontFamily: '"Signika Negative", sans-serif',
+                  fontSize: "1.2rem",
+                },
+              }}
             />
           </ListItemButton>
         ))}
