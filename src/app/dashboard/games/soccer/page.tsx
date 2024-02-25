@@ -1,11 +1,11 @@
 "use client";
-import { Games } from "@mui/icons-material";
 import GamesLayout from "../GamesLayout";
+import SoccerTable from "@/components/SoccerTable/SoccerTable";
 
 export default function SoccerGames() {
   return (
     <GamesLayout>
-      <div> soccer games</div>{" "}
+      <SoccerTable />
     </GamesLayout>
   );
 }
