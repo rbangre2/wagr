@@ -1,4 +1,3 @@
-// AppDrawer.tsx
 import React from "react";
 import {
   Drawer,
@@ -45,9 +44,8 @@ const AppDrawer: React.FC<AppDrawerProps> = ({
   appBarHeight,
 }) => {
   const theme = useTheme();
-  const router = useRouter(); // Initialize the router
+  const router = useRouter();
 
-  // Function to handle navigation
   const handleNavigation = (text: string) => {
     const path = `/dashboard/${text.toLowerCase()}`;
     router.push(path);
@@ -73,7 +71,7 @@ const AppDrawer: React.FC<AppDrawerProps> = ({
           }),
           display: "flex",
           flexDirection: "column",
-          justifyContent: "space-between", // This will space the items evenly
+          justifyContent: "space-between",
         },
       }}
     >
