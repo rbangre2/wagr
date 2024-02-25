@@ -1,0 +1,13 @@
+/* SportsBar.module.css */
+.bar {
+  background-color: #918a9d;
+}
+
+.tab {
+  color: #ffffff !important; /* Color of text and icon */
+}
+
+.tab.Mui-selected {
+  color: #ffffff !important; /* Color of text and icon when selected */
+  background-color: #4a90e2 !important; /* Optional: if you want to change the background of the selected tab */
+}
