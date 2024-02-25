@@ -17,6 +17,7 @@ import FriendsIcon from "@mui/icons-material/People";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import ResultsIcon from "@mui/icons-material/Insights";
 import SettingsIcon from "@mui/icons-material/Settings";
+import StakeIcon from "@mui/icons-material/CurrencyExchange";
 
 interface AppDrawerProps {
   open: boolean;
@@ -29,6 +30,7 @@ interface AppDrawerProps {
 const drawerItems = [
   { text: "Games", icon: <GamesIcon /> },
   { text: "Bets", icon: <BetsIcon /> },
+  { text: "Stake", icon: <StakeIcon /> },
   { text: "Friends", icon: <FriendsIcon /> },
   { text: "Leagues", icon: <EmojiEventsIcon /> },
   { text: "Results", icon: <ResultsIcon /> },
@@ -76,7 +78,7 @@ const AppDrawer: React.FC<AppDrawerProps> = ({
       }}
     >
       <List sx={{ paddingTop: "22px" }}>
-        {drawerItems.slice(0, 3).map((item) => (
+        {drawerItems.slice(0, 4).map((item) => (
           <ListItemButton
             key={item.text}
             onClick={() => handleNavigation(item.text)}
@@ -96,7 +98,7 @@ const AppDrawer: React.FC<AppDrawerProps> = ({
       </List>
       <Divider />
       <List>
-        {drawerItems.slice(3).map((item) => (
+        {drawerItems.slice(4).map((item) => (
           <ListItemButton
             key={item.text}
             onClick={() => handleNavigation(item.text)}
