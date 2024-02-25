@@ -9,6 +9,7 @@ import {
   Divider,
   useTheme,
 } from "@mui/material";
+import styles from "./AppDrawer.module.css";
 import GamesIcon from "@mui/icons-material/SportsSoccer";
 import BetsIcon from "@mui/icons-material/AttachMoney";
 import FriendsIcon from "@mui/icons-material/People";
@@ -66,11 +67,14 @@ const AppDrawer: React.FC<AppDrawerProps> = ({
         },
       }}
     >
-      <List>
+      <List sx={{ paddingTop: "22px" }}>
         {drawerItems.slice(0, 3).map((item) => (
           <ListItemButton key={item.text}>
             <ListItemIcon sx={{ color: "#FFFFFF" }}>{item.icon}</ListItemIcon>
-            <ListItemText primary={item.text} />
+            <ListItemText
+              primary={item.text}
+              className={styles.signika_negative}
+            />
           </ListItemButton>
         ))}
       </List>
@@ -79,7 +83,10 @@ const AppDrawer: React.FC<AppDrawerProps> = ({
         {drawerItems.slice(3).map((item) => (
           <ListItemButton key={item.text}>
             <ListItemIcon sx={{ color: "#FFFFFF" }}>{item.icon}</ListItemIcon>
-            <ListItemText primary={item.text} />
+            <ListItemText
+              primary={item.text}
+              className={styles.signika_negative}
+            />
           </ListItemButton>
         ))}
       </List>
