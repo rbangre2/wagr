@@ -12,11 +12,13 @@ import {
   InputAdornment,
   IconButton,
 } from "@mui/material";
+import { useRouter } from "next/navigation";
 import FormTextField from "../FormTextField/FormTextField";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
 const SigninForm = () => {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -107,6 +109,9 @@ const SigninForm = () => {
       <Button
         variant="contained"
         type="submit"
+        onClick={() => {
+          router.push("/dashboard/games");
+        }}
         fullWidth
         sx={{
           borderRadius: "20px", // Rounded corners
