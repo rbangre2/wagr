@@ -13,7 +13,7 @@ import styles from "./AppDrawer.module.css";
 import GamesIcon from "@mui/icons-material/SportsSoccer";
 import BetsIcon from "@mui/icons-material/AttachMoney";
 import FriendsIcon from "@mui/icons-material/People";
-import GroupsIcon from "@mui/icons-material/GroupWork";
+import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import ResultsIcon from "@mui/icons-material/Insights";
 import SettingsIcon from "@mui/icons-material/Settings";
 
@@ -29,7 +29,7 @@ const drawerItems = [
   { text: "Games", icon: <GamesIcon /> },
   { text: "Bets", icon: <BetsIcon /> },
   { text: "Friends", icon: <FriendsIcon /> },
-  { text: "Leagues/Groups", icon: <GroupsIcon /> },
+  { text: "Leagues", icon: <EmojiEventsIcon /> },
   { text: "Results", icon: <ResultsIcon /> },
   { text: "Settings", icon: <SettingsIcon /> },
 ];

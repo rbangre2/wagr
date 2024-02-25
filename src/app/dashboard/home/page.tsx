@@ -40,7 +40,16 @@ const HomePage: React.FC = () => {
           >
             <MenuIcon />
           </IconButton>
-          <Typography className={styles.alex_brush_regular} variant="h6" noWrap>
+          <Typography
+            variant="h6"
+            noWrap
+            style={{
+              fontFamily: "Alex Brush, cursive",
+              fontWeight: 400,
+              fontSize: "3rem",
+              fontStyle: "normal",
+            }}
+          >
             wagr
           </Typography>
         </Toolbar>
