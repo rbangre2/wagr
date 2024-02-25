@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import AppDrawer from "@/components/AppDrawer/AppDrawer";
+import styles from "./page.module.css";
 
 const appBarHeight = 65; // The height of your AppBar, adjust as needed
 const drawerWidth = 240;
@@ -39,7 +40,7 @@ const HomePage: React.FC = () => {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap>
+          <Typography className={styles.alex_brush_regular} variant="h6" noWrap>
             wagr
           </Typography>
         </Toolbar>

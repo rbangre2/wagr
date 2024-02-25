@@ -3,14 +3,18 @@ import React from "react";
 import {
   Drawer,
   List,
-  ListItem,
+  ListItemButton,
   ListItemIcon,
   ListItemText,
   Divider,
   useTheme,
 } from "@mui/material";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MailIcon from "@mui/icons-material/Mail";
+import GamesIcon from "@mui/icons-material/SportsSoccer";
+import BetsIcon from "@mui/icons-material/AttachMoney";
+import FriendsIcon from "@mui/icons-material/People";
+import GroupsIcon from "@mui/icons-material/GroupWork";
+import ResultsIcon from "@mui/icons-material/Insights";
+import SettingsIcon from "@mui/icons-material/Settings";
 
 interface AppDrawerProps {
   open: boolean;
@@ -19,6 +23,15 @@ interface AppDrawerProps {
   minimizedDrawerWidth: number;
   appBarHeight: number;
 }
+
+const drawerItems = [
+  { text: "Games", icon: <GamesIcon /> },
+  { text: "Bets", icon: <BetsIcon /> },
+  { text: "Friends", icon: <FriendsIcon /> },
+  { text: "Leagues/Groups", icon: <GroupsIcon /> },
+  { text: "Results", icon: <ResultsIcon /> },
+  { text: "Settings", icon: <SettingsIcon /> },
+];
 
 const AppDrawer: React.FC<AppDrawerProps> = ({
   open,
@@ -40,25 +53,34 @@ const AppDrawer: React.FC<AppDrawerProps> = ({
           width: open ? drawerWidth : minimizedDrawerWidth,
           top: appBarHeight,
           height: `calc(100% - ${appBarHeight}px)`,
-          backgroundColor: "#333740", // Set the background color to light gray
+          backgroundColor: "#333740",
           color: "#FFFFFF",
           boxSizing: "border-box",
           transition: theme.transitions.create(["width", "top"], {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.enteringScreen,
           }),
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between", // This will space the items evenly
         },
       }}
     >
+      <List>
+        {drawerItems.slice(0, 3).map((item) => (
+          <ListItemButton key={item.text}>
+            <ListItemIcon sx={{ color: "#FFFFFF" }}>{item.icon}</ListItemIcon>
+            <ListItemText primary={item.text} />
+          </ListItemButton>
+        ))}
+      </List>
       <Divider />
       <List>
-        {["Inbox", "Starred", "Send email", "Drafts"].map((text, index) => (
-          <ListItem button key={text}>
-            <ListItemIcon style={{ color: "#FFFFFF" }}>
-              {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-            </ListItemIcon>
-            <ListItemText primary={text} />
-          </ListItem>
+        {drawerItems.slice(3).map((item) => (
+          <ListItemButton key={item.text}>
+            <ListItemIcon sx={{ color: "#FFFFFF" }}>{item.icon}</ListItemIcon>
+            <ListItemText primary={item.text} />
+          </ListItemButton>
         ))}
       </List>
     </Drawer>

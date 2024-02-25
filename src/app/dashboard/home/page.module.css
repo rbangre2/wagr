@@ -1,0 +1,8 @@
+@import url("https://fonts.googleapis.com/css2?family=Alex+Brush&display=swap");
+
+.alex_brush_regular {
+  font-family: Alex Brush, cursive;
+  font-weight: 400;
+  font-size: 3rem;
+  font-style: normal;
+}
