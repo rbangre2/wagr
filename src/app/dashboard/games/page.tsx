@@ -1,10 +1,15 @@
 "use client";
-import DashboardLayout from "../DashboardLayout";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
-export default function Games() {
-  return (
-    <DashboardLayout>
-      <div> games </div>
-    </DashboardLayout>
-  );
-}
+const Games = () => {
+  const router = useRouter();
+
+  useEffect(() => {
+    router.push("/dashboard/games/soccer");
+  }, [router]);
+
+  return null;
+};
+
+export default Games;
