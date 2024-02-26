@@ -4,7 +4,7 @@ import GamesLayout from "../GamesLayout";
 export default function HockeyGames() {
   return (
     <GamesLayout>
-      <div> hockey games</div>{" "}
+      <div> hockey games</div>
     </GamesLayout>
   );
 }
