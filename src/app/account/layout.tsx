@@ -20,6 +20,7 @@ const Layout: React.FC<AccountLayoutProps> = ({ children }) => {
   const handleDrawerOpen = (): void => {
     setDrawerOpen(!drawerOpen);
   };
+  const userName = user?.user?.firstName || "";
   const balance = user?.user?.balance || 0;
 
   return (
@@ -29,6 +30,7 @@ const Layout: React.FC<AccountLayoutProps> = ({ children }) => {
         handleDrawerOpen={handleDrawerOpen}
         drawerOpen={drawerOpen}
         balance={balance}
+        userName={userName}
       />
       <AppDrawer
         open={drawerOpen}

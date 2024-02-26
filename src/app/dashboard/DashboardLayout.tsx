@@ -19,6 +19,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const handleDrawerOpen = (): void => {
     setDrawerOpen(!drawerOpen);
   };
+  const userName = user?.user?.firstName || "";
   const balance = user?.user?.balance || 0;
 
   return (
@@ -28,6 +29,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
         handleDrawerOpen={handleDrawerOpen}
         drawerOpen={drawerOpen}
         balance={balance}
+        userName={userName}
       />
       <AppDrawer
         open={drawerOpen}

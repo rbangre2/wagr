@@ -19,6 +19,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 interface HeaderProps {
   handleDrawerOpen: () => void;
   drawerOpen: boolean;
+  userName: string;
   balance: number;
 }
 
@@ -26,6 +27,7 @@ const Header: React.FC<HeaderProps> = ({
   handleDrawerOpen,
   drawerOpen,
   balance,
+  userName,
 }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const router = useRouter();
@@ -85,6 +87,9 @@ const Header: React.FC<HeaderProps> = ({
         </Typography>
 
         <Box sx={{ display: "flex", alignItems: "center" }}>
+          <Typography variant="h6" sx={{ marginRight: "20px" }}>
+            {`${userName}`}
+          </Typography>
           <Typography variant="h6" sx={{ marginRight: "20px" }}>
             {`Balance: $${balance.toFixed(2)}`}
           </Typography>
