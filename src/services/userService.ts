@@ -9,7 +9,10 @@ import {
   collection,
   query,
   where,
+  getDoc,
   getDocs,
+  updateDoc,
+  increment,
 } from "firebase/firestore";
 import { db, auth } from "../utils/firebaseConfig";
 import { User } from "@/models/User";
@@ -99,4 +102,32 @@ export const getUserByEmail = async (email: string): Promise<User | null> => {
     console.error("Error fetching user by email:", error);
     throw new Error("Failed to fetch user");
   }
+};
+
+export const updateBalance = async (
+  userId: string | undefined,
+  amount: number
+): Promise<User> => {
+  if (!userId) {
+    throw new Error("User ID is required.");
+  }
+
+  const userRef = doc(db, "users", userId);
+  await updateDoc(userRef, {
+    balance: increment(amount), // Use Firestore increment to ensure atomicity
+  });
+
+  const updatedUserSnap = await getDoc(userRef);
+  if (!updatedUserSnap.exists()) {
+    throw new Error("User not found");
+  }
+
+  const updatedUserData = updatedUserSnap.data() as User;
+  const updatedUser: User = {
+    ...updatedUserData,
+    id: updatedUserSnap.id,
+    balance: updatedUserData.balance + amount,
+  };
+
+  return updatedUser;
 };
