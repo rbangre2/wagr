@@ -43,7 +43,7 @@ export default function FormTextField({
       value={value}
       onChange={onChange}
       inputProps={{
-        endAdornment: endAdornment,
+        endadornment: endAdornment,
       }}
       label={labelName}
       onKeyDown={(event) => {

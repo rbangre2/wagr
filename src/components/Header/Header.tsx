@@ -47,6 +47,10 @@ const Header: React.FC<HeaderProps> = ({
     }
   };
 
+  const handleDeposit = async () => {
+    router.push("/account/deposit");
+  };
+
   return (
     <AppBar
       position="fixed"
@@ -121,7 +125,7 @@ const Header: React.FC<HeaderProps> = ({
           <MenuItem onClick={handleMenuClose} className={styles.menu_item}>
             Profile
           </MenuItem>
-          <MenuItem onClick={handleMenuClose} className={styles.menu_item}>
+          <MenuItem onClick={handleDeposit} className={styles.menu_item}>
             Deposit
           </MenuItem>
           <MenuItem onClick={handleMenuClose} className={styles.menu_item}>
