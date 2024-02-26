@@ -7,24 +7,31 @@ import {
   Link,
   InputAdornment,
   IconButton,
+  Snackbar,
 } from "@mui/material";
+import MuiAlert, { AlertProps } from "@mui/material/Alert";
 import { useRouter } from "next/navigation";
 import { signIn } from "@/services/userService";
 import FormTextField from "../FormTextField/FormTextField";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
+const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
+  props,
+  ref
+) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+
 const SigninForm = () => {
   const router = useRouter();
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
     email: "",
     password: "",
-    confirmPassword: "",
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [error, setError] = useState("");
+  const [openSnackbar, setOpenSnackbar] = useState(false);
 
   const handleChange =
     (prop: keyof typeof formData) =>
@@ -36,10 +43,6 @@ const SigninForm = () => {
 
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
-  };
-
-  const handleClickShowConfirmPassword = () => {
-    setShowConfirmPassword(!showConfirmPassword);
   };
 
   const handleMouseDownPassword = (
@@ -54,10 +57,20 @@ const SigninForm = () => {
       await signIn(formData.email, formData.password);
       router.push("/dashboard");
     } catch (error) {
-      if (error instanceof Error) {
-        console.log("error signing in");
-      }
+      setError("Failed to sign in. Please check your credentials.");
+      setOpenSnackbar(true);
+      setFormData({ email: "", password: "" });
     }
+  };
+
+  const handleCloseSnackbar = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpenSnackbar(false);
   };
 
   return (
@@ -132,6 +145,19 @@ const SigninForm = () => {
       >
         {"Don't have an account? "} <Link href="/auth/signup">Sign Up</Link>
       </Typography>
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity="error"
+          sx={{ width: "100%" }}
+        >
+          {error}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
