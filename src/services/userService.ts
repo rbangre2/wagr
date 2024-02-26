@@ -84,7 +84,9 @@ export const logout = async () => {
   }
 };
 
-export const getUserByEmail = async (email: string): Promise<User | null> => {
+export const getUserByEmail = async (
+  email: string | null
+): Promise<User | null> => {
   const usersRef = collection(db, "users");
   const q = query(usersRef, where("email", "==", email));
 

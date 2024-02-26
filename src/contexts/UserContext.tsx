@@ -1,5 +1,16 @@
-import React, { createContext, useContext, ReactNode, FC } from "react";
+("");
+import React, {
+  createContext,
+  useContext,
+  ReactNode,
+  useEffect,
+  useState,
+  FC,
+} from "react";
 import { User } from "@/models/User";
+import { auth } from "../utils/firebaseConfig";
+import { onAuthStateChanged } from "firebase/auth";
+import { getUserByEmail } from "@/services/userService";
 
 interface UserContextType {
   user: User | null;
@@ -15,7 +26,20 @@ interface UserProviderProps {
 }
 
 export const UserProvider: FC<UserProviderProps> = ({ children }) => {
-  const [user, setUser] = React.useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        const user = await getUserByEmail(firebaseUser.email);
+        setUser(user);
+      } else {
+        setUser(null);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const value = { user, setUser };
 
