@@ -1,5 +1,5 @@
 // components/SignupForm.tsx
-import React, { useState } from "react";
+import React, { useState, FormEvent } from "react";
 import {
   Box,
   Button,
@@ -12,6 +12,8 @@ import {
   InputAdornment,
   IconButton,
 } from "@mui/material";
+import { useRouter } from "next/navigation";
+import { signup } from "@/services/userService";
 import FormTextField from "../FormTextField/FormTextField";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
@@ -26,6 +28,7 @@ const SignupForm = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const router = useRouter();
 
   const handleChange =
     (prop: keyof typeof formData) =>
@@ -49,10 +52,19 @@ const SignupForm = () => {
     event.preventDefault();
   };
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log("Form data:", formData);
-    // Implement your sign-up logic here
+    try {
+      await signup(
+        formData.email,
+        formData.password,
+        formData.firstName,
+        formData.lastName
+      );
+      router.push("/dashboard");
+    } catch (error: any) {
+      console.log(`signup error: ${error.message}`);
+    }
   };
 
   return (

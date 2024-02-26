@@ -1,18 +1,15 @@
 // components/SignupForm.tsx
-import React, { useState } from "react";
+import React, { useState, FormEvent } from "react";
 import {
   Box,
   Button,
-  TextField,
   Typography,
   Link,
-  FormControl,
-  InputLabel,
-  OutlinedInput,
   InputAdornment,
   IconButton,
 } from "@mui/material";
 import { useRouter } from "next/navigation";
+import { signIn } from "@/services/userService";
 import FormTextField from "../FormTextField/FormTextField";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
@@ -51,10 +48,16 @@ const SigninForm = () => {
     event.preventDefault();
   };
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log("Form data:", formData);
-    // Implement your sign-up logic here
+    try {
+      await signIn(formData.email, formData.password);
+      router.push("/dashboard");
+    } catch (error) {
+      if (error instanceof Error) {
+        console.log("error signing in");
+      }
+    }
   };
 
   return (
@@ -109,15 +112,12 @@ const SigninForm = () => {
       <Button
         variant="contained"
         type="submit"
-        onClick={() => {
-          router.push("/dashboard/games");
-        }}
         fullWidth
         sx={{
-          borderRadius: "20px", // Rounded corners
-          backgroundColor: "#e6bbad", // Main color
+          borderRadius: "20px",
+          backgroundColor: "#e6bbad",
           "&:hover": {
-            backgroundColor: "lightgreen", // Hover color
+            backgroundColor: "lightgreen",
           },
         }}
       >
