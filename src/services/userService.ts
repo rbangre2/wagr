@@ -3,7 +3,14 @@ import {
   signInWithEmailAndPassword,
   signOut,
 } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
+import {
+  doc,
+  setDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore";
 import { db, auth } from "../utils/firebaseConfig";
 import { User } from "@/models/User";
 
@@ -71,5 +78,25 @@ export const logout = async () => {
     if (error instanceof Error) {
       throw error;
     }
+  }
+};
+
+export const getUserByEmail = async (email: string): Promise<User | null> => {
+  const usersRef = collection(db, "users");
+  const q = query(usersRef, where("email", "==", email));
+
+  try {
+    const querySnapshot = await getDocs(q);
+    if (!querySnapshot.empty) {
+      const userDoc = querySnapshot.docs[0];
+      const userData = userDoc.data() as User;
+      return { ...userData, id: userDoc.id };
+    } else {
+      console.log("No user found with the given email");
+      return null;
+    }
+  } catch (error) {
+    console.error("Error fetching user by email:", error);
+    throw new Error("Failed to fetch user");
   }
 };
