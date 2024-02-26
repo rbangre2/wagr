@@ -3,7 +3,7 @@ import { Tabs, Tab } from "@mui/material";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import SportsBasketballIcon from "@mui/icons-material/SportsBasketball";
 import SportsHockeyIcon from "@mui/icons-material/SportsHockey";
-import SportsCricketIcon from '@mui/icons-material/SportsCricket';
+import SportsCricketIcon from "@mui/icons-material/SportsCricket";
 import styles from "./SportsBar.module.css";
 import { useRouter, usePathname } from "next/navigation";
 
@@ -11,7 +11,7 @@ const sportsTabs = [
   { label: "Soccer", icon: <SportsSoccerIcon />, value: "soccer" },
   { label: "Basketball", icon: <SportsBasketballIcon />, value: "basketball" },
   { label: "Hockey", icon: <SportsHockeyIcon />, value: "hockey" },
-  { label: "Cricket", icon: <SportsCricketIcon />, value: "Cricket" }
+  { label: "Cricket", icon: <SportsCricketIcon />, value: "cricket" },
   // Add more sports and icons as needed
 ];
 
