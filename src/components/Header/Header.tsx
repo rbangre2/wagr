@@ -12,8 +12,9 @@ import {
 } from "@mui/material";
 import styles from "./Header.module.css";
 import { useRouter } from "next/navigation";
+import { logout } from "@/services/userService";
 import MenuIcon from "@mui/icons-material/Menu";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle"; // Icon for user settings
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
 interface HeaderProps {
   handleDrawerOpen: () => void;
@@ -30,6 +31,15 @@ const Header: React.FC<HeaderProps> = ({ handleDrawerOpen, drawerOpen }) => {
 
   const handleMenuClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      router.push("/auth/signin");
+    } catch (error: any) {
+      console.log("signout error");
+    }
   };
 
   return (
@@ -112,7 +122,7 @@ const Header: React.FC<HeaderProps> = ({ handleDrawerOpen, drawerOpen }) => {
           <MenuItem onClick={handleMenuClose} className={styles.menu_item}>
             Withdraw
           </MenuItem>
-          <MenuItem onClick={handleMenuClose} className={styles.menu_item}>
+          <MenuItem onClick={handleLogout} className={styles.menu_item}>
             Logout
           </MenuItem>
         </Menu>

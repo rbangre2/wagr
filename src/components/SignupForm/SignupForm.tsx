@@ -1,17 +1,17 @@
 // components/SignupForm.tsx
-import React, { useState } from "react";
+import React, { useState, FormEvent } from "react";
 import {
   Box,
   Button,
-  TextField,
   Typography,
   Link,
-  FormControl,
-  InputLabel,
-  OutlinedInput,
   InputAdornment,
   IconButton,
+  Snackbar,
+  Alert,
 } from "@mui/material";
+import { useRouter } from "next/navigation";
+import { signup } from "@/services/userService";
 import FormTextField from "../FormTextField/FormTextField";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
@@ -26,6 +26,18 @@ const SignupForm = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [errors, setErrors] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const router = useRouter();
+
+  type FormDataKey = keyof typeof formData;
 
   const handleChange =
     (prop: keyof typeof formData) =>
@@ -34,6 +46,41 @@ const SignupForm = () => {
     ) => {
       setFormData({ ...formData, [prop]: event.target.value });
     };
+
+  const validateForm = () => {
+    const newErrors = {
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    };
+    let isValid = true;
+
+    // Check required fields
+    Object.keys(formData).forEach((key) => {
+      const formKey = key as FormDataKey; // Assert the type of the key
+      if (!formData[formKey]) {
+        newErrors[formKey] = "This field is required";
+        isValid = false;
+      }
+    });
+
+    // Check password length
+    if (formData.password && formData.password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters";
+      isValid = false;
+    }
+
+    // Check password match
+    if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = "Passwords don't match";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
 
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
@@ -49,12 +96,30 @@ const SignupForm = () => {
     event.preventDefault();
   };
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log("Form data:", formData);
-    // Implement your sign-up logic here
+    if (!validateForm()) {
+      setOpenSnackbar(true);
+      setSnackbarMessage("Please correct the errors before submitting.");
+      return;
+    }
+    try {
+      await signup(
+        formData.email,
+        formData.password,
+        formData.firstName,
+        formData.lastName
+      );
+      router.push("/dashboard");
+    } catch (error) {
+      const errorMessage = Object.values(errors).filter(Boolean).join("\n");
+      setSnackbarMessage(errorMessage);
+      setOpenSnackbar(true);
+      return;
+    }
   };
 
+  const handleCloseSnackbar = () => setOpenSnackbar(false);
   return (
     <Box
       component="form"
@@ -160,6 +225,15 @@ const SignupForm = () => {
         {"Already have an account? "}
         <Link href="/auth/signin">Sign In</Link>
       </Typography>
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+      >
+        <Alert onClose={handleCloseSnackbar} severity="error">
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

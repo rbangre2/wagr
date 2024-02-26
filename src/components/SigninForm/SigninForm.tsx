@@ -1,33 +1,37 @@
 // components/SignupForm.tsx
-import React, { useState } from "react";
+import React, { useState, FormEvent } from "react";
 import {
   Box,
   Button,
-  TextField,
   Typography,
   Link,
-  FormControl,
-  InputLabel,
-  OutlinedInput,
   InputAdornment,
   IconButton,
+  Snackbar,
 } from "@mui/material";
+import MuiAlert, { AlertProps } from "@mui/material/Alert";
 import { useRouter } from "next/navigation";
+import { signIn } from "@/services/userService";
 import FormTextField from "../FormTextField/FormTextField";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
+const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
+  props,
+  ref
+) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+
 const SigninForm = () => {
   const router = useRouter();
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
     email: "",
     password: "",
-    confirmPassword: "",
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [error, setError] = useState("");
+  const [openSnackbar, setOpenSnackbar] = useState(false);
 
   const handleChange =
     (prop: keyof typeof formData) =>
@@ -41,20 +45,32 @@ const SigninForm = () => {
     setShowPassword(!showPassword);
   };
 
-  const handleClickShowConfirmPassword = () => {
-    setShowConfirmPassword(!showConfirmPassword);
-  };
-
   const handleMouseDownPassword = (
     event: React.MouseEvent<HTMLButtonElement>
   ) => {
     event.preventDefault();
   };
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log("Form data:", formData);
-    // Implement your sign-up logic here
+    try {
+      await signIn(formData.email, formData.password);
+      router.push("/dashboard");
+    } catch (error) {
+      setError("Failed to sign in. Please check your credentials.");
+      setOpenSnackbar(true);
+      setFormData({ email: "", password: "" });
+    }
+  };
+
+  const handleCloseSnackbar = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpenSnackbar(false);
   };
 
   return (
@@ -109,15 +125,12 @@ const SigninForm = () => {
       <Button
         variant="contained"
         type="submit"
-        onClick={() => {
-          router.push("/dashboard/games");
-        }}
         fullWidth
         sx={{
-          borderRadius: "20px", // Rounded corners
-          backgroundColor: "#e6bbad", // Main color
+          borderRadius: "20px",
+          backgroundColor: "#e6bbad",
           "&:hover": {
-            backgroundColor: "lightgreen", // Hover color
+            backgroundColor: "lightgreen",
           },
         }}
       >
@@ -132,6 +145,19 @@ const SigninForm = () => {
       >
         {"Don't have an account? "} <Link href="/auth/signup">Sign Up</Link>
       </Typography>
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity="error"
+          sx={{ width: "100%" }}
+        >
+          {error}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
