@@ -1,6 +1,7 @@
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  signOut,
 } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { db, auth } from "../utils/firebaseConfig";
@@ -56,6 +57,18 @@ export const signIn = async (
   } catch (error) {
     if (error instanceof Error) {
       console.error("Sign-in error:", error.message);
+      throw error;
+    }
+  }
+};
+
+export const logout = async () => {
+  try {
+    await signOut(auth);
+    console.log("User signed out successfully");
+  } catch (error) {
+    console.error("Sign-out error:", error);
+    if (error instanceof Error) {
       throw error;
     }
   }
