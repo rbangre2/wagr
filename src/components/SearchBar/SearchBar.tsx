@@ -47,6 +47,7 @@ export default function SearchBar({
           },
         },
         "& .MuiInputLabel-root": {
+          borderColor: "black",
           color: "grey", // Change the unfocused label color
           "&.Mui-focused": {
             color: "transparent", // Change the focused label color

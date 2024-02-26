@@ -87,11 +87,24 @@ const Header: React.FC<HeaderProps> = ({
         </Typography>
 
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          <Typography variant="h6" sx={{ marginRight: "20px" }}>
+          <Typography
+            variant="h6"
+            sx={{
+              marginRight: "20px",
+              fontFamily: "'Ubuntu', sans-serif",
+              fontWeight: 600,
+            }}
+          >
             {`${userName}`}
           </Typography>
-          <Typography variant="h6" sx={{ marginRight: "20px" }}>
-            {`Balance: $${balance.toFixed(2)}`}
+          <Typography
+            variant="h6"
+            sx={{ marginRight: "20px", fontFamily: "Ubuntu, sans-serif" }}
+          >
+            {`Balance: $${balance.toLocaleString(undefined, {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}`}
           </Typography>
           <IconButton
             size="large"
