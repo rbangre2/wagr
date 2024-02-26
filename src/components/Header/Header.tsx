@@ -82,7 +82,7 @@ const Header: React.FC<HeaderProps> = ({
 
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <Typography variant="h6" sx={{ marginRight: "20px" }}>
-            Balance: {balance}
+            {`Balance: $${balance.toFixed(2)}`}
           </Typography>
           <IconButton
             size="large"
