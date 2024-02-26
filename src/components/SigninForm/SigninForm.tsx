@@ -11,10 +11,11 @@ import {
 } from "@mui/material";
 import MuiAlert, { AlertProps } from "@mui/material/Alert";
 import { useRouter } from "next/navigation";
-import { signIn } from "@/services/userService";
+import { getUserByEmail, signIn } from "@/services/userService";
 import FormTextField from "../FormTextField/FormTextField";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import { useUser } from "@/contexts/UserContext";
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
   props,
@@ -32,6 +33,7 @@ const SigninForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [openSnackbar, setOpenSnackbar] = useState(false);
+  const { setUser } = useUser();
 
   const handleChange =
     (prop: keyof typeof formData) =>
@@ -55,6 +57,9 @@ const SigninForm = () => {
     event.preventDefault();
     try {
       await signIn(formData.email, formData.password);
+      const authUser = await getUserByEmail(formData.email);
+      console.log(authUser);
+      setUser(authUser);
       router.push("/dashboard");
     } catch (error) {
       setError("Failed to sign in. Please check your credentials.");

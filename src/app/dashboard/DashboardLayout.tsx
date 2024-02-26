@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useUser } from "@/contexts/UserContext";
 import { CssBaseline, Box } from "@mui/material";
 import Header from "@/components/Header/Header";
 import AppDrawer from "@/components/AppDrawer/AppDrawer";
@@ -13,15 +14,21 @@ const minimizedDrawerWidth = 56;
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const [drawerOpen, setDrawerOpen] = useState<boolean>(true);
+  const user = useUser();
 
   const handleDrawerOpen = (): void => {
     setDrawerOpen(!drawerOpen);
   };
+  const balance = user?.user?.balance || 0;
 
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
-      <Header handleDrawerOpen={handleDrawerOpen} drawerOpen={drawerOpen} />
+      <Header
+        handleDrawerOpen={handleDrawerOpen}
+        drawerOpen={drawerOpen}
+        balance={balance}
+      />
       <AppDrawer
         open={drawerOpen}
         handleDrawerClose={handleDrawerOpen}
