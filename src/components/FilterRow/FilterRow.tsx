@@ -9,28 +9,35 @@ import {
   Button,
   TextField,
 } from "@mui/material";
-import OddsRangeSlider from "../OddsSlider/OddsSlider";
-import { Sport, League, sportsOptions, leagueOptions } from "./types";
+import { Sport, League, Filter } from "@/app/dashboard/bets/types";
+import { leagueOptions } from "./types";
 
-const FilterRow: React.FC = () => {
+interface FilterRowProps {
+  initFilter: Filter;
+  onApplyFilters: (filters: Filter) => void;
+  onClearFilters: () => void;
+}
+
+const FilterRow: React.FC<FilterRowProps> = ({
+  initFilter,
+  onApplyFilters,
+  onClearFilters,
+}) => {
   const [selectedSport, setSelectedSport] = useState<Sport>(Sport.None);
   const [selectedLeague, setSelectedLeague] = useState<League>(League.None);
-  const [oddsRange, setOddsRange] = useState<number[]>([1.01, 5]);
-  const [amount, setAmount] = useState<number | "">("");
 
   const handleApplyFilters = () => {
-    console.log(selectedSport, selectedLeague, oddsRange, amount);
+    const newFilter: Filter = {
+      sport: selectedSport,
+      league: selectedLeague,
+    };
+    onApplyFilters(newFilter);
   };
 
   const resetFilters = () => {
     setSelectedSport(Sport.None);
     setSelectedLeague(League.None);
-    setOddsRange([1.01, 5]);
-    setAmount("");
-  };
-
-  const handleOddsRangeChange = (event: Event, newValue: number | number[]) => {
-    setOddsRange(newValue as number[]);
+    onClearFilters();
   };
 
   const availableLeagues = selectedSport

@@ -1,3 +1,5 @@
+import { Sport, League } from "./types";
+
 export const eventsData = [
   // NBA Events
   {
@@ -7,6 +9,8 @@ export const eventsData = [
     changePercent: 2,
     volume: 15000,
     supply: 50000,
+    sport: Sport.Basketball,
+    league: League.NBA,
   },
   {
     id: 2,
@@ -15,6 +19,8 @@ export const eventsData = [
     changePercent: -1,
     volume: 20000,
     supply: 60000,
+    sport: Sport.Basketball,
+    league: League.NBA,
   },
   {
     id: 3,
@@ -23,6 +29,8 @@ export const eventsData = [
     changePercent: 3,
     volume: 18000,
     supply: 55000,
+    sport: Sport.Basketball,
+    league: League.NBA,
   },
 
   // EPL Events
@@ -33,6 +41,8 @@ export const eventsData = [
     changePercent: 1.5,
     volume: 25000,
     supply: 70000,
+    sport: Sport.Soccer,
+    league: League.EPL,
   },
   {
     id: 5,
@@ -41,6 +51,8 @@ export const eventsData = [
     changePercent: -2,
     volume: 30000,
     supply: 80000,
+    sport: Sport.Soccer,
+    league: League.EPL,
   },
   {
     id: 6,
@@ -49,6 +61,8 @@ export const eventsData = [
     changePercent: 2.5,
     volume: 22000,
     supply: 65000,
+    sport: Sport.Soccer,
+    league: League.EPL,
   },
 
   // NHL Events
@@ -59,6 +73,8 @@ export const eventsData = [
     changePercent: 0,
     volume: 17000,
     supply: 60000,
+    sport: Sport.Hockey,
+    league: League.NHL,
   },
   {
     id: 8,
@@ -67,6 +83,8 @@ export const eventsData = [
     changePercent: -1.5,
     volume: 16000,
     supply: 58000,
+    sport: Sport.Hockey,
+    league: League.NHL,
   },
   {
     id: 9,
@@ -75,6 +93,8 @@ export const eventsData = [
     changePercent: 3.5,
     volume: 14000,
     supply: 53000,
+    sport: Sport.Hockey,
+    league: League.NHL,
   },
   {
     id: 10,
@@ -83,5 +103,7 @@ export const eventsData = [
     changePercent: 2,
     volume: 19000,
     supply: 61000,
+    sport: Sport.Hockey,
+    league: League.NHL,
   },
 ];

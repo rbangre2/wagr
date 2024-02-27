@@ -6,9 +6,26 @@ import FilterRow from "@/components/FilterRow/FilterRow";
 import styles from "./page.module.css";
 import WageringEventTable from "@/components/WageringEventTable/WageringEventTable";
 import { eventsData } from "./mock";
+import { Sport, League, Filter } from "./types";
 
 export default function Bets() {
   const [wageringEvents, setWageringEvents] = useState(eventsData);
+  const [filters, setFilters] = useState<Filter>({
+    sport: Sport.None,
+    league: League.None,
+  });
+
+  const handleApplyFilters = (newFilters: Filter) => {
+    setFilters(newFilters);
+  };
+
+  const handleClearFilters = () => {
+    setFilters({
+      sport: Sport.None,
+      league: League.None,
+    });
+  };
+
   return (
     <DashboardLayout>
       <Box sx={{ display: "flex", flexDirection: "column" }}>
@@ -26,7 +43,11 @@ export default function Bets() {
           >
             Bet Market
           </Typography>
-          <FilterRow></FilterRow>
+          <FilterRow
+            initFilter={filters}
+            onApplyFilters={handleApplyFilters}
+            onClearFilters={handleClearFilters}
+          ></FilterRow>
         </Box>
         <Box
           sx={{
@@ -38,7 +59,10 @@ export default function Bets() {
             justifyContent: "left",
           }}
         >
-          <WageringEventTable wageringEvents={wageringEvents} />
+          <WageringEventTable
+            filters={filters}
+            wageringEvents={wageringEvents}
+          />
         </Box>
       </Box>
     </DashboardLayout>

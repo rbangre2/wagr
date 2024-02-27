@@ -10,7 +10,7 @@ import {
   Tooltip,
 } from "recharts";
 import OrderBook from "@/components/OrderBook/OrderBook";
-import { Params } from "./types";
+import { Params, BuyOrder, SellOrder } from "./types";
 
 type EventOddsData = {
   date: string;
@@ -79,8 +79,8 @@ export default function TradeEvent({ params }: Params) {
         <Box
           sx={{
             display: "flex",
-            justifyContent: "center", // This will center the buttons if they are not full width
-            gap: "10px", // Adds space between buttons
+            justifyContent: "center",
+            gap: "10px",
           }}
         >
           <Button

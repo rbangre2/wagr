@@ -10,31 +10,42 @@ import {
   Button,
 } from "@mui/material";
 import { useRouter } from "next/navigation";
+import { Filter, Sport, League } from "@/app/dashboard/bets/types";
 
-// Define the type for a single event's data
 interface WageringEvent {
   event: string;
   currentOdds: number;
-  chart?: string; // To be implemented later
+  chart?: string;
   changePercent: number;
   volume: number;
   supply: number;
+  sport: Sport;
+  league: League;
 }
 
-// Define the type for the props of the WageringEventTable component
 interface WageringEventTableProps {
   wageringEvents: WageringEvent[];
-  // Include any other props like sorting and filtering functions if needed
+  filters: Filter;
 }
 
 const WageringEventTable: React.FC<WageringEventTableProps> = ({
   wageringEvents,
+  filters,
 }) => {
   const router = useRouter();
   const handleTrade = (event: WageringEvent) => {
     router.push(`/dashboard/bets/eventId`);
     console.log("Trade button clicked for event:", event);
   };
+
+  const filteredEvents = wageringEvents.filter((event) => {
+    const matchesSport =
+      filters.sport === Sport.None || event.sport === filters.sport;
+    const matchesLeague =
+      filters.league === League.None || event.league === filters.league;
+
+    return matchesSport && matchesLeague;
+  });
 
   return (
     <TableContainer component={Paper}>
@@ -43,7 +54,6 @@ const WageringEventTable: React.FC<WageringEventTableProps> = ({
           <TableRow>
             <TableCell>Name</TableCell>
             <TableCell align="right">Price</TableCell>
-            <TableCell align="right">Chart</TableCell>
             <TableCell align="right">Change %</TableCell>
             <TableCell align="right">Volume</TableCell>
             <TableCell align="right">Supply</TableCell>
@@ -51,14 +61,12 @@ const WageringEventTable: React.FC<WageringEventTableProps> = ({
           </TableRow>
         </TableHead>
         <TableBody>
-          {wageringEvents.map((event, index) => (
+          {filteredEvents.map((event, index) => (
             <TableRow key={index}>
               <TableCell component="th" scope="row">
                 {event.event}
               </TableCell>
               <TableCell align="right">{event.currentOdds}</TableCell>
-              <TableCell align="right">{event.chart}</TableCell>{" "}
-              {/* To be replaced with actual chart */}
               <TableCell align="right">
                 {event.changePercent.toFixed(2)}%
               </TableCell>
