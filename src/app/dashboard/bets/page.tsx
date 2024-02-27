@@ -14,6 +14,7 @@ export default function Bets() {
           sx={{
             marginBottom: "20px",
             fontFamily: "'PT Sans Narrow', sans-serif",
+            fontSize: 75,
             fontWeight: 700,
             paddingRight: "20px",
           }}

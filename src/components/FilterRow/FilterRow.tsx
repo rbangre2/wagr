@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { grey } from "@mui/material/colors";
 import {
   Box,
   FormControl,
@@ -20,6 +21,13 @@ const FilterRow: React.FC = () => {
 
   const handleApplyFilters = () => {
     console.log(selectedSport, selectedLeague, oddsRange, amount);
+  };
+
+  const resetFilters = () => {
+    setSelectedSport("");
+    setSelectedLeague("");
+    setOddsRange([1.01, 5]);
+    setAmount("");
   };
 
   const handleOddsRangeChange = (event: Event, newValue: number | number[]) => {
@@ -115,9 +123,36 @@ const FilterRow: React.FC = () => {
             }}
           />
         </Grid>
-        <Grid item xs={2}>
-          <Button variant="contained" onClick={handleApplyFilters} fullWidth>
+        <Grid item xs={2} sx={{ display: "flex", flexDirection: "column" }}>
+          <Button
+            variant="contained"
+            onClick={handleApplyFilters}
+            fullWidth
+            sx={{
+              backgroundColor: grey[900], // or any other color that matches the scheme
+              color: "#fff",
+              "&:hover": {
+                backgroundColor: grey[700], // Darken the color slightly on hover
+              },
+            }}
+          >
             Apply Filters
+          </Button>
+          <Button
+            variant="outlined"
+            onClick={resetFilters}
+            fullWidth
+            sx={{
+              mt: 1, // margin top
+              color: grey[500],
+              borderColor: grey[500],
+              "&:hover": {
+                borderColor: grey[400],
+                color: grey[400],
+              },
+            }}
+          >
+            Reset
           </Button>
         </Grid>
       </Grid>
