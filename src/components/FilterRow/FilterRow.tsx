@@ -7,7 +7,6 @@ import {
   Select,
   MenuItem,
   Button,
-  Grid,
   TextField,
 } from "@mui/material";
 import OddsRangeSlider from "../OddsSlider/OddsSlider";
@@ -46,88 +45,89 @@ const FilterRow: React.FC = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
+        flexWrap: "wrap", // Allows the boxes to wrap when the window is resized
       }}
     >
-      <Grid container spacing={2} alignItems="center">
-        <Grid item xs={2}>
-          <FormControl fullWidth>
-            <InputLabel id="sport-select-label">Sport</InputLabel>
-            <Select
-              labelId="sport-select-label"
-              id="sport-select"
-              value={selectedSport}
-              label="Sport"
-              onChange={(event) =>
-                setSelectedSport(event.target.value as Sport)
-              }
-            >
-              {Object.values(Sport).map((sport) => (
-                <MenuItem key={sport} value={sport}>
-                  {sport}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item xs={2}>
-          <FormControl fullWidth>
-            <InputLabel id="league-select-label">League</InputLabel>
-            <Select
-              labelId="league-select-label"
-              id="league-select"
-              value={selectedLeague}
-              label="League"
-              onChange={(event) =>
-                setSelectedLeague(event.target.value as League)
-              }
-              disabled={!selectedSport}
-            >
-              {availableLeagues.map((league) => (
-                <MenuItem key={league.value} value={league.value}>
-                  {league.label}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Grid>
-        <Box
+      {/* Sport selection */}
+      <Box sx={{ minWidth: 120, margin: 1 }}>
+        <FormControl fullWidth>
+          <InputLabel id="sport-select-label">Sport</InputLabel>
+          <Select
+            labelId="sport-select-label"
+            id="sport-select"
+            value={selectedSport}
+            label="Sport"
+            onChange={(event) => setSelectedSport(event.target.value as Sport)}
+          >
+            {Object.values(Sport).map((sport) => (
+              <MenuItem key={sport} value={sport}>
+                {sport}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Box>
+
+      {/* League selection */}
+      <Box sx={{ minWidth: 120, margin: 1 }}>
+        <FormControl fullWidth>
+          <InputLabel id="league-select-label">League</InputLabel>
+          <Select
+            labelId="league-select-label"
+            id="league-select"
+            value={selectedLeague}
+            label="League"
+            onChange={(event) =>
+              setSelectedLeague(event.target.value as League)
+            }
+            disabled={!selectedSport}
+          >
+            {availableLeagues.map((league) => (
+              <MenuItem key={league.value} value={league.value}>
+                {league.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Box>
+
+      {/* Buttons */}
+      <Box
+        sx={{
+          display: "flex",
+          gap: 2,
+          margin: 1,
+          justifyContent: "flex-end", // Aligns the buttons to the right
+          flex: 1,
+        }}
+      >
+        <Button
+          variant="contained"
+          onClick={handleApplyFilters}
           sx={{
-            paddingLeft: "450px",
-            paddingTop: "15px",
-            display: "flex",
-            gap: 2,
+            backgroundColor: grey[900],
+            color: "#fff",
+            "&:hover": {
+              backgroundColor: grey[700],
+            },
           }}
         >
-          <Button
-            variant="contained"
-            onClick={handleApplyFilters}
-            sx={{
-              flex: 1,
-              backgroundColor: grey[900],
-              color: "#fff",
-              "&:hover": {
-                backgroundColor: grey[700],
-              },
-            }}
-          >
-            Apply
-          </Button>
-          <Button
-            variant="contained"
-            onClick={handleApplyFilters}
-            sx={{
-              flex: 1,
-              backgroundColor: "lightgray",
-              color: "black",
-              "&:hover": {
-                backgroundColor: grey[700],
-              },
-            }}
-          >
-            Reset
-          </Button>
-        </Box>
-      </Grid>
+          Apply
+        </Button>
+        <Button
+          variant="contained"
+          onClick={resetFilters} // Fixed to use resetFilters function
+          sx={{
+            backgroundColor: "lightgray",
+            color: "black",
+            "&:hover": {
+              backgroundColor: grey[700],
+            },
+          }}
+        >
+          Reset
+        </Button>
+      </Box>
     </Box>
   );
 };
