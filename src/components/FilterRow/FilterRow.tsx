@@ -40,9 +40,10 @@ const FilterRow: React.FC<FilterRowProps> = ({
     onClearFilters();
   };
 
-  const availableLeagues = selectedSport
-    ? leagueOptions.filter((league) => league.sport === selectedSport)
-    : leagueOptions;
+  const availableLeagues =
+    selectedSport === Sport.None
+      ? leagueOptions
+      : leagueOptions.filter((league) => league.sport === selectedSport);
 
   return (
     <Box

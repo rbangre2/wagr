@@ -39,11 +39,16 @@ const WageringEventTable: React.FC<WageringEventTableProps> = ({
   };
 
   const filteredEvents = wageringEvents.filter((event) => {
-    const matchesSport =
-      filters.sport === Sport.None || event.sport === filters.sport;
-    const matchesLeague =
-      filters.league === League.None || event.league === filters.league;
+    const matchesSport = event.sport === filters.sport;
+    const matchesLeague = event.league === filters.league;
 
+    if (filters.sport == Sport.None && filters.league == League.None) {
+      return true;
+    } else if (filters.sport == Sport.None) {
+      return matchesLeague;
+    } else if (filters.league == League.None) {
+      return matchesSport;
+    }
     return matchesSport && matchesLeague;
   });
 
