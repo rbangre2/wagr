@@ -15,7 +15,7 @@ export default function Bets() {
             marginBottom: "20px",
             fontFamily: "'PT Sans Narrow', sans-serif",
             fontWeight: 700,
-            paddingRight: "30px",
+            paddingRight: "20px",
           }}
         >
           Bet Market

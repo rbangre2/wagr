@@ -10,7 +10,7 @@ import {
   TextField,
 } from "@mui/material";
 import OddsRangeSlider from "../OddsSlider/OddsSlider";
-import { Sport, League } from "./types";
+import { Sport, League, sportsOptions, leagueOptions } from "./types";
 
 const FilterRow: React.FC = () => {
   const [selectedSport, setSelectedSport] = useState<Sport | "">("");
@@ -25,6 +25,10 @@ const FilterRow: React.FC = () => {
   const handleOddsRangeChange = (event: Event, newValue: number | number[]) => {
     setOddsRange(newValue as number[]);
   };
+
+  const availableLeagues = selectedSport
+    ? leagueOptions.filter((league) => league.sport === selectedSport)
+    : leagueOptions;
 
   return (
     <Box
@@ -68,10 +72,11 @@ const FilterRow: React.FC = () => {
               onChange={(event) =>
                 setSelectedLeague(event.target.value as League)
               }
+              disabled={!selectedSport}
             >
-              {Object.values(League).map((league) => (
-                <MenuItem key={league} value={league}>
-                  {league}
+              {availableLeagues.map((league) => (
+                <MenuItem key={league.value} value={league.value}>
+                  {league.label}
                 </MenuItem>
               ))}
             </Select>
