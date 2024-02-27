@@ -90,71 +90,43 @@ const FilterRow: React.FC = () => {
             </Select>
           </FormControl>
         </Grid>
-        <Grid item xs={4}>
-          <Box
-            sx={{
-              marginTop: "20px",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <OddsRangeSlider
-              value={oddsRange}
-              onChange={handleOddsRangeChange}
-              valueLabelDisplay="auto"
-              min={1.01}
-              max={5}
-              step={0.01}
-            />
-          </Box>
-        </Grid>
-        <Grid item xs={2}>
-          <TextField
-            id="amount-input"
-            label="Amount"
-            type="number"
-            variant="outlined"
-            fullWidth
-            value={amount}
-            onChange={(event) => {
-              const value = event.target.value;
-              const numericalValue = parseFloat(value);
-              setAmount(numericalValue >= 0 ? numericalValue : "");
-            }}
-          />
-        </Grid>
-        <Grid item xs={2} sx={{ display: "flex", flexDirection: "column" }}>
+        <Box
+          sx={{
+            paddingLeft: "450px",
+            paddingTop: "15px",
+            display: "flex",
+            gap: 2,
+          }}
+        >
           <Button
             variant="contained"
             onClick={handleApplyFilters}
-            fullWidth
             sx={{
-              backgroundColor: grey[900], // or any other color that matches the scheme
+              flex: 1,
+              backgroundColor: grey[900],
               color: "#fff",
               "&:hover": {
-                backgroundColor: grey[700], // Darken the color slightly on hover
+                backgroundColor: grey[700],
               },
             }}
           >
             Apply
           </Button>
           <Button
-            variant="outlined"
-            onClick={resetFilters}
-            fullWidth
+            variant="contained"
+            onClick={handleApplyFilters}
             sx={{
-              mt: 1, // margin top
-              color: grey[500],
-              borderColor: grey[500],
+              flex: 1,
+              backgroundColor: "lightgray",
+              color: "black",
               "&:hover": {
-                borderColor: grey[400],
-                color: grey[400],
+                backgroundColor: grey[700],
               },
             }}
           >
             Reset
           </Button>
-        </Grid>
+        </Box>
       </Grid>
     </Box>
   );
