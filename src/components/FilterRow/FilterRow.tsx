@@ -136,7 +136,7 @@ const FilterRow: React.FC = () => {
               },
             }}
           >
-            Apply Filters
+            Apply
           </Button>
           <Button
             variant="outlined"
