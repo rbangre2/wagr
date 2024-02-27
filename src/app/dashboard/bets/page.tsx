@@ -12,11 +12,11 @@ export default function Bets() {
           variant="h3"
           component="h1"
           sx={{
-            marginBottom: "20px",
+            marginTop: "-15px",
             fontFamily: "'PT Sans Narrow', sans-serif",
-            fontSize: 75,
+            fontSize: 100,
             fontWeight: 700,
-            paddingRight: "20px",
+            paddingRight: "30px",
           }}
         >
           Bet Market
