@@ -1,4 +1,5 @@
 export enum Sport {
+  None = "None",
   Soccer = "Soccer",
   Basketball = "Basketball",
   Hockey = "Hockey",
@@ -6,6 +7,7 @@ export enum Sport {
 }
 
 export enum League {
+  None = "None",
   EPL = "English Premier League",
   LaLiga = "La Liga",
   SerieA = "Serie A",

@@ -14,8 +14,8 @@ import OddsRangeSlider from "../OddsSlider/OddsSlider";
 import { Sport, League, sportsOptions, leagueOptions } from "./types";
 
 const FilterRow: React.FC = () => {
-  const [selectedSport, setSelectedSport] = useState<Sport | "">("");
-  const [selectedLeague, setSelectedLeague] = useState<League | "">("");
+  const [selectedSport, setSelectedSport] = useState<Sport>(Sport.None);
+  const [selectedLeague, setSelectedLeague] = useState<League>(League.None);
   const [oddsRange, setOddsRange] = useState<number[]>([1.01, 5]);
   const [amount, setAmount] = useState<number | "">("");
 
@@ -24,8 +24,8 @@ const FilterRow: React.FC = () => {
   };
 
   const resetFilters = () => {
-    setSelectedSport("");
-    setSelectedLeague("");
+    setSelectedSport(Sport.None);
+    setSelectedLeague(League.None);
     setOddsRange([1.01, 5]);
     setAmount("");
   };
