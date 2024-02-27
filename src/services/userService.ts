@@ -116,7 +116,7 @@ export const updateBalance = async (
 
   const userRef = doc(db, "users", userId);
   await updateDoc(userRef, {
-    balance: increment(amount), // Use Firestore increment to ensure atomicity
+    balance: increment(amount),
   });
 
   const updatedUserSnap = await getDoc(userRef);
@@ -128,7 +128,6 @@ export const updateBalance = async (
   const updatedUser: User = {
     ...updatedUserData,
     id: updatedUserSnap.id,
-    balance: updatedUserData.balance + amount,
   };
 
   return updatedUser;
