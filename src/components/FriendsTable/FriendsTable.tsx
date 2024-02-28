@@ -14,6 +14,9 @@ import StatusIndicator from "../StatusIndicator/StatusIndicator";
 import { GridRenderCellParams, GridAlignment } from "@mui/x-data-grid";
 import { formatCurrency } from "@/utils/designUtils";
 import { FriendRequest } from "@/models/FriendRequest";
+import { getUserById } from "@/services/userService";
+import { getIncomingFriendRequestsForUser } from "@/services/friendService";
+import { useUser } from "@/contexts/UserContext";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -109,12 +112,12 @@ const incomingRequestColumns = [
           sx={{ width: 30, height: 30, marginRight: 2 }}
         />
         <Typography variant="body2" noWrap>
-          {params.row.sender}
+          {params.row.senderName}
         </Typography>
       </Box>
     ),
-    headerAlign: "center" as GridAlignment, // Corrected type casting
-    align: "center" as GridAlignment, // Corrected type casting
+    headerAlign: "center" as GridAlignment,
+    align: "center" as GridAlignment,
   },
   {
     field: "sentDate",
@@ -202,12 +205,10 @@ function TabPanel(props: TabPanelProps) {
 
 const FriendsTable: React.FC = () => {
   const [friends, setFriends] = useState<Friend[]>([]);
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-
   const [tabValue, setTabValue] = useState(0);
   const [incomingRequests, setIncomingRequests] = useState<FriendRequest[]>([]);
   const [outgoingRequests, setOutgoingRequests] = useState<FriendRequest[]>([]);
+  const user = useUser().user;
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
@@ -215,9 +216,35 @@ const FriendsTable: React.FC = () => {
 
   useEffect(() => {
     setFriends(mockFriends);
-    setIncomingRequests(mockIncomingRequests);
     setOutgoingRequests(mockOutgoingRequest);
-  }, []);
+
+    async function fetchIncomingRequests() {
+      try {
+        if (user && user.id) {
+          const incomingRequestsData = await getIncomingFriendRequestsForUser(
+            user.id
+          );
+
+          const incomingRequestsWithSenderInfo = await Promise.all(
+            incomingRequestsData.map(async (request) => {
+              const senderUser = await getUserById(request.sender);
+              return {
+                ...request,
+                senderName: senderUser
+                  ? senderUser.firstName + " " + senderUser.lastName
+                  : "Unknown",
+              };
+            })
+          );
+          setIncomingRequests(incomingRequestsWithSenderInfo);
+        }
+      } catch (error) {
+        console.error("Error fetching incoming friend requests:", error);
+      }
+    }
+
+    fetchIncomingRequests();
+  }, [user?.id]);
 
   return (
     <>

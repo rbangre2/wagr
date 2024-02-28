@@ -126,6 +126,7 @@ export const mockOutgoingRequest: FriendRequest[] = [
   {
     id: "fr-003",
     sender: "currentUser",
+
     receiver: "user003",
     status: "pending",
     createdAt: "2024-02-26T15:35:00",
