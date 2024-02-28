@@ -8,14 +8,8 @@ import {
   GridValueFormatterParams,
   GridRenderCellParams,
 } from "@mui/x-data-grid";
-import LaLigaIcon from "@/resources/laliga.png";
-import SerieAIcon from "@/resources/seriea.png";
 import Image from "next/image";
-
-const leagueIcons: { [key: string]: string } = {
-  "LaLiga Santander": LaLigaIcon.src,
-  "Serie A": SerieAIcon.src,
-};
+import { leagueIcons } from "./types";
 
 export default function SoccerGames() {
   const [data, setData] = useState<TableFixture[]>([]);
