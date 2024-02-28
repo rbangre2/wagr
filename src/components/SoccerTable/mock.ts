@@ -1,4 +1,4 @@
-export const data = [
+export const soccerData = [
   {
     id: 1,
     homeTeam: "Manchester United",
