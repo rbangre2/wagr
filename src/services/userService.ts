@@ -132,3 +132,22 @@ export const updateBalance = async (
 
   return updatedUser;
 };
+
+export const getUserById = async (userId: string): Promise<User | null> => {
+  const userRef = doc(db, "users", userId);
+
+  try {
+    const userSnap = await getDoc(userRef);
+
+    if (userSnap.exists()) {
+      const userData = userSnap.data() as User;
+      return { ...userData, id: userSnap.id };
+    } else {
+      console.log("no user found with the given ID");
+      return null;
+    }
+  } catch (error) {
+    console.error("error fetching user by ID:", error);
+    throw new Error("Failed to fetch user");
+  }
+};
