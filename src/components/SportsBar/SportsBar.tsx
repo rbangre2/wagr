@@ -12,7 +12,6 @@ const sportsTabs = [
   { label: "Basketball", icon: <SportsBasketballIcon />, value: "basketball" },
   { label: "Hockey", icon: <SportsHockeyIcon />, value: "hockey" },
   { label: "Cricket", icon: <SportsCricketIcon />, value: "cricket" },
-  // Add more sports and icons as needed
 ];
 
 const SportsBar: React.FC = () => {
