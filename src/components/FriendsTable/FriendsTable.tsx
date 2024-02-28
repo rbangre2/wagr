@@ -7,7 +7,7 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { DataGrid } from "@mui/x-data-grid";
 import { Tabs, Tab, Box, Typography } from "@mui/material";
-import { Friend } from "./types";
+import { Friend, TabPanelProps } from "./types";
 import { formatDistanceToNow } from "date-fns";
 import { mockFriends, mockOutgoingRequest } from "./mock";
 import StatusIndicator from "../StatusIndicator/StatusIndicator";
@@ -18,177 +18,9 @@ import { getUserById } from "@/services/userService";
 import {
   getIncomingFriendRequestsForUser,
   getOutgoingFriendRequests,
+  acceptFriendRequest,
 } from "@/services/friendService";
 import { useUser } from "@/contexts/UserContext";
-
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: any;
-  value: any;
-}
-
-const columns = [
-  {
-    field: "profile",
-    headerName: "Profile",
-    renderCell: (params: GridRenderCellParams) => (
-      <Avatar alt={params.row.name} src={params.row.profilePicture} />
-    ),
-    width: 125,
-    headerAlign: "center" as GridAlignment,
-    align: "center" as GridAlignment,
-  },
-  {
-    field: "name",
-    headerName: "Name",
-    width: 150,
-    headerAlign: "center" as GridAlignment,
-    align: "center" as GridAlignment,
-  },
-  {
-    field: "status",
-    headerName: "Status",
-    renderCell: (params: GridRenderCellParams) => (
-      <>
-        <StatusIndicator status={params.row.status} />
-        {params.row.status}
-      </>
-    ),
-    width: 150,
-    headerAlign: "center" as GridAlignment,
-    align: "center" as GridAlignment,
-  },
-  {
-    field: "lastActive",
-    headerName: "Last Active",
-    valueGetter: (params: GridRenderCellParams) =>
-      `${formatDistanceToNow(new Date(params.row.lastActive), {
-        addSuffix: true,
-      })}`,
-    width: 175,
-    headerAlign: "center" as GridAlignment,
-    align: "center" as GridAlignment,
-  },
-  {
-    field: "netResult",
-    headerName: "Net Result",
-    width: 150,
-    renderCell: (params: GridRenderCellParams) => {
-      const value = params.value as number;
-      const formattedValue = formatCurrency(value);
-      const color = value > 0 ? "green" : value < 0 ? "red" : "grey";
-
-      return <div style={{ color: color }}>{formattedValue}</div>;
-    },
-    headerAlign: "center" as GridAlignment,
-    align: "center" as GridAlignment,
-  },
-  {
-    field: "actions",
-    headerName: "Actions",
-    renderCell: () => (
-      <>
-        <IconButton aria-label="challenge">
-          <ChallengeIcon />
-        </IconButton>
-        <IconButton aria-label="remove">
-          <PersonRemoveIcon />
-        </IconButton>
-      </>
-    ),
-    width: 200,
-    headerAlign: "center" as GridAlignment,
-    align: "center" as GridAlignment,
-  },
-];
-
-const incomingRequestColumns = [
-  {
-    field: "from",
-    headerName: "From",
-    width: 150,
-    renderCell: (params: GridRenderCellParams) => (
-      <Box sx={{ display: "flex", alignItems: "center" }}>
-        <Avatar
-          alt={params.row.senderName}
-          src={params.row.senderProfilePicture}
-          sx={{ width: 30, height: 30, marginRight: 2 }}
-        />
-        <Typography variant="body2" noWrap>
-          {params.row.senderName}
-        </Typography>
-      </Box>
-    ),
-    headerAlign: "left" as GridAlignment,
-    align: "left" as GridAlignment,
-  },
-  {
-    field: "sentDate",
-    headerName: "Sent Date",
-    width: 250,
-    valueGetter: (params: GridRenderCellParams) =>
-      `${formatDistanceToNow(new Date(params.row.createdAt), {
-        addSuffix: true,
-      })}`,
-    headerAlign: "center" as GridAlignment,
-    align: "center" as GridAlignment,
-  },
-  {
-    field: "actions",
-    headerName: "Actions",
-    width: 180,
-    renderCell: () => (
-      <Box sx={{ display: "flex", justifyContent: "center", gap: 1 }}>
-        <IconButton aria-label="accept" color="success" size="small">
-          <CheckCircleOutlineIcon />
-        </IconButton>
-        <IconButton aria-label="decline" color="error" size="small">
-          <CancelIcon />
-        </IconButton>
-      </Box>
-    ),
-    headerAlign: "center" as GridAlignment,
-    align: "center" as GridAlignment,
-  },
-];
-
-const outgoingRequestColumns = [
-  {
-    field: "sent to",
-    headerName: "To",
-    width: 200,
-    renderCell: (params: GridRenderCellParams) => (
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-        <Avatar
-          alt={params.row.receiverName}
-          src={params.row.receiverProfilePicture}
-        />
-        <span>{params.row.receiverName}</span>
-      </Box>
-    ),
-  },
-  {
-    field: "sentDate",
-    headerName: "Sent Date",
-    width: 180,
-    valueGetter: (params: GridRenderCellParams) =>
-      formatDistanceToNow(new Date(params.row.createdAt), { addSuffix: true }),
-  },
-  {
-    field: "actions",
-    headerName: "Actions",
-    width: 180,
-    renderCell: () => (
-      <Box sx={{ display: "flex", justifyContent: "center", gap: 1 }}>
-        <IconButton aria-label="cancel request" color="warning" size="small">
-          <CancelIcon />
-        </IconButton>
-      </Box>
-    ),
-    headerAlign: "center" as GridAlignment,
-    align: "center" as GridAlignment,
-  },
-];
 
 function TabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
@@ -211,11 +43,198 @@ const FriendsTable: React.FC = () => {
   const [tabValue, setTabValue] = useState(0);
   const [incomingRequests, setIncomingRequests] = useState<FriendRequest[]>([]);
   const [outgoingRequests, setOutgoingRequests] = useState<FriendRequest[]>([]);
+  const [refreshRequests, setRefreshRequests] = useState(false);
   const user = useUser().user;
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
+
+  const handleAcceptRequest = async (requestId: string, senderId: string) => {
+    try {
+      if (user && user.id) {
+        await acceptFriendRequest(requestId, senderId, user.id);
+        setTabValue(0);
+        setRefreshRequests((prevState) => !prevState);
+      }
+    } catch (error) {
+      console.error("error accepting friend request ", error);
+    }
+  };
+
+  const columns = [
+    {
+      field: "profile",
+      headerName: "Profile",
+      renderCell: (params: GridRenderCellParams) => (
+        <Avatar alt={params.row.name} src={params.row.profilePicture} />
+      ),
+      width: 125,
+      headerAlign: "center" as GridAlignment,
+      align: "center" as GridAlignment,
+    },
+    {
+      field: "name",
+      headerName: "Name",
+      width: 150,
+      headerAlign: "center" as GridAlignment,
+      align: "center" as GridAlignment,
+    },
+    {
+      field: "status",
+      headerName: "Status",
+      renderCell: (params: GridRenderCellParams) => (
+        <>
+          <StatusIndicator status={params.row.status} />
+          {params.row.status}
+        </>
+      ),
+      width: 150,
+      headerAlign: "center" as GridAlignment,
+      align: "center" as GridAlignment,
+    },
+    {
+      field: "lastActive",
+      headerName: "Last Active",
+      valueGetter: (params: GridRenderCellParams) =>
+        `${formatDistanceToNow(new Date(params.row.lastActive), {
+          addSuffix: true,
+        })}`,
+      width: 175,
+      headerAlign: "center" as GridAlignment,
+      align: "center" as GridAlignment,
+    },
+    {
+      field: "netResult",
+      headerName: "Net Result",
+      width: 150,
+      renderCell: (params: GridRenderCellParams) => {
+        const value = params.value as number;
+        const formattedValue = formatCurrency(value);
+        const color = value > 0 ? "green" : value < 0 ? "red" : "grey";
+
+        return <div style={{ color: color }}>{formattedValue}</div>;
+      },
+      headerAlign: "center" as GridAlignment,
+      align: "center" as GridAlignment,
+    },
+    {
+      field: "actions",
+      headerName: "Actions",
+      renderCell: () => (
+        <>
+          <IconButton aria-label="challenge">
+            <ChallengeIcon />
+          </IconButton>
+          <IconButton aria-label="remove">
+            <PersonRemoveIcon />
+          </IconButton>
+        </>
+      ),
+      width: 200,
+      headerAlign: "center" as GridAlignment,
+      align: "center" as GridAlignment,
+    },
+  ];
+
+  const incomingRequestColumns = [
+    {
+      field: "from",
+      headerName: "From",
+      width: 150,
+      renderCell: (params: GridRenderCellParams) => (
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <Avatar
+            alt={params.row.senderName}
+            src={params.row.senderProfilePicture}
+            sx={{ width: 30, height: 30, marginRight: 2 }}
+          />
+          <Typography variant="body2" noWrap>
+            {params.row.senderName}
+          </Typography>
+        </Box>
+      ),
+      headerAlign: "left" as GridAlignment,
+      align: "left" as GridAlignment,
+    },
+    {
+      field: "sentDate",
+      headerName: "Sent Date",
+      width: 250,
+      valueGetter: (params: GridRenderCellParams) =>
+        `${formatDistanceToNow(new Date(params.row.createdAt), {
+          addSuffix: true,
+        })}`,
+      headerAlign: "center" as GridAlignment,
+      align: "center" as GridAlignment,
+    },
+    {
+      field: "actions",
+      headerName: "Actions",
+      width: 180,
+      renderCell: (params: GridRenderCellParams<FriendRequest>) => {
+        return (
+          <Box sx={{ display: "flex", justifyContent: "center", gap: 1 }}>
+            <IconButton
+              aria-label="accept"
+              color="success"
+              size="small"
+              onClick={() =>
+                handleAcceptRequest(params.row.id, params.row.sender)
+              }
+            >
+              <CheckCircleOutlineIcon />
+            </IconButton>
+            <IconButton aria-label="decline" color="error" size="small">
+              <CancelIcon />
+            </IconButton>
+          </Box>
+        );
+      },
+      headerAlign: "center" as GridAlignment,
+      align: "center" as GridAlignment,
+    },
+  ];
+
+  const outgoingRequestColumns = [
+    {
+      field: "sent to",
+      headerName: "To",
+      width: 200,
+      renderCell: (params: GridRenderCellParams) => (
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <Avatar
+            alt={params.row.receiverName}
+            src={params.row.receiverProfilePicture}
+          />
+          <span>{params.row.receiverName}</span>
+        </Box>
+      ),
+    },
+    {
+      field: "sentDate",
+      headerName: "Sent Date",
+      width: 180,
+      valueGetter: (params: GridRenderCellParams) =>
+        formatDistanceToNow(new Date(params.row.createdAt), {
+          addSuffix: true,
+        }),
+    },
+    {
+      field: "actions",
+      headerName: "Actions",
+      width: 180,
+      renderCell: () => (
+        <Box sx={{ display: "flex", justifyContent: "center", gap: 1 }}>
+          <IconButton aria-label="cancel request" color="warning" size="small">
+            <CancelIcon />
+          </IconButton>
+        </Box>
+      ),
+      headerAlign: "center" as GridAlignment,
+      align: "center" as GridAlignment,
+    },
+  ];
 
   useEffect(() => {
     setFriends(mockFriends);
@@ -271,7 +290,7 @@ const FriendsTable: React.FC = () => {
 
     fetchIncomingRequests();
     fetchOutgoingRequests();
-  }, [user?.id]);
+  }, [user, user?.id, refreshRequests]);
 
   return (
     <>

@@ -10,6 +10,8 @@ export interface User {
   createdAt?: Date;
 }
 
-interface Friend extends User {
-  netResult: number; // for the friens table
+// subcollection of User
+export interface Friend {
+  friendId: string;
+  netResult: number;
 }

@@ -6,3 +6,9 @@ export interface Friend {
   lastActive: string;
   netResult: number;
 }
+
+export interface TabPanelProps {
+  children?: React.ReactNode;
+  index: any;
+  value: any;
+}
