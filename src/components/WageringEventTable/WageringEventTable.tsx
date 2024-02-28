@@ -10,6 +10,9 @@ import {
   Button,
 } from "@mui/material";
 import ShowChartIcon from "@mui/icons-material/ShowChart";
+import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+import TrendingDownIcon from "@mui/icons-material/TrendingDown";
+import TrendingFlatIcon from "@mui/icons-material/TrendingFlat";
 import { useRouter } from "next/navigation";
 import styles from "./WageringEventsTable.module.css";
 import { Filter, Sport, League } from "@/app/dashboard/bets/types";
@@ -21,7 +24,7 @@ const WageringEventTable: React.FC<WageringEventTableProps> = ({
 }) => {
   const router = useRouter();
   const handleTrade = (event: WageringEvent) => {
-    router.push(`/dashboard/bets/eventId`);
+    router.push(`/trade/${event.id}`);
     console.log("Trade button clicked for event:", event);
   };
 
@@ -39,6 +42,15 @@ const WageringEventTable: React.FC<WageringEventTableProps> = ({
     return matchesSport && matchesLeague;
   });
 
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(value);
+  };
+
   return (
     <TableContainer component={Paper}>
       <Table>
@@ -50,25 +62,25 @@ const WageringEventTable: React.FC<WageringEventTableProps> = ({
               Name
             </TableCell>
             <TableCell
-              align="right"
+              align="left"
               style={{ fontFamily: '"Poppins", sans-serif', fontWeight: 700 }}
             >
               Price
             </TableCell>
             <TableCell
-              align="right"
+              align="left"
               style={{ fontFamily: '"Poppins", sans-serif', fontWeight: 700 }}
             >
               Change %
             </TableCell>
             <TableCell
-              align="right"
+              align="left"
               style={{ fontFamily: '"Poppins", sans-serif', fontWeight: 700 }}
             >
               Volume
             </TableCell>
             <TableCell
-              align="right"
+              align="left"
               style={{ fontFamily: '"Poppins", sans-serif', fontWeight: 700 }}
             >
               Supply
@@ -87,12 +99,32 @@ const WageringEventTable: React.FC<WageringEventTableProps> = ({
               <TableCell component="th" scope="row">
                 {event.event}
               </TableCell>
-              <TableCell align="right">{event.currentOdds}</TableCell>
-              <TableCell align="right">
-                {event.changePercent.toFixed(2)}%
+              <TableCell align="left">{event.currentOdds}</TableCell>
+              <TableCell align="center">
+                <span
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    color:
+                      event.changePercent > 0
+                        ? "green"
+                        : event.changePercent < 0
+                        ? "red"
+                        : "grey",
+                  }}
+                >
+                  {event.changePercent > 0 ? (
+                    <TrendingUpIcon style={{ marginRight: "5px" }} />
+                  ) : event.changePercent < 0 ? (
+                    <TrendingDownIcon style={{ marginRight: "5px" }} />
+                  ) : (
+                    <TrendingFlatIcon style={{ marginRight: "5px" }} />
+                  )}
+                  {event.changePercent.toFixed(2)}%
+                </span>
               </TableCell>
-              <TableCell align="right">{event.volume}</TableCell>
-              <TableCell align="right">{event.supply}</TableCell>
+              <TableCell align="left">{formatCurrency(event.volume)}</TableCell>
+              <TableCell align="left">{formatCurrency(event.supply)}</TableCell>
               <TableCell align="center">
                 <Button
                   variant="contained"
