@@ -4,7 +4,6 @@ import { Box, Typography } from "@mui/material";
 import styles from "./page.module.css";
 import FriendsTable from "@/components/FriendsTable/FriendsTable";
 import AddFriend from "@/components/AddFriend/AddFriend";
-import { useUser } from "@/contexts/UserContext";
 
 export default function Friends() {
   return (
