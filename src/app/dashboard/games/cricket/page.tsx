@@ -4,7 +4,6 @@ import React from "react";
 import SportsTable from "@/components/SportsTable/SportsTable";
 import { CricketData } from "@/app/dashboard/games/cricket/mock"; // Adjust path as needed
 
-
 const cricketColumns = [
   { field: "homeTeam", headerName: "Home Team", width: 150 },
   { field: "awayTeam", headerName: "Away Team", width: 150 },
@@ -19,9 +18,7 @@ const cricketColumns = [
   },
 ];
 
-
-
-const CricketTable = () => {
+const CricketGames = () => {
   return (
     <GamesLayout>
       <SportsTable
@@ -33,5 +30,4 @@ const CricketTable = () => {
   );
 };
 
-export default CricketTable;
-
+export default CricketGames;

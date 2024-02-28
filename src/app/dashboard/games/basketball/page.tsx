@@ -18,10 +18,17 @@ const basketballColumns = [
   },
 ];
 
-
-const BasketballTable = () => {
-  return <GamesLayout> <SportsTable title="Upcoming Basketball Games" columns={basketballColumns} data={BasketballData} /> </GamesLayout>;
+const BasketballGames = () => {
+  return (
+    <GamesLayout>
+      {" "}
+      <SportsTable
+        title="Upcoming Basketball Games"
+        columns={basketballColumns}
+        data={BasketballData}
+      />{" "}
+    </GamesLayout>
+  );
 };
 
-
-export default BasketballTable;
+export default BasketballGames;

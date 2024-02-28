@@ -4,7 +4,6 @@ import React from "react";
 import SportsTable from "@/components/SportsTable/SportsTable";
 import { HockeyData } from "@/app/dashboard/games/hockey/mock"; // Adjust the import path based on your project structure
 
-
 const hockeyColumns = [
   { field: "homeTeam", headerName: "Home Team", width: 150 },
   { field: "awayTeam", headerName: "Away Team", width: 150 },
@@ -19,13 +18,16 @@ const hockeyColumns = [
   },
 ];
 
-
-const HockeyTable = () => {
+const HockeyGames = () => {
   return (
     <GamesLayout>
-      <SportsTable title="Upcoming Hockey Games" columns={hockeyColumns} data={HockeyData} />
+      <SportsTable
+        title="Upcoming Hockey Games"
+        columns={hockeyColumns}
+        data={HockeyData}
+      />
     </GamesLayout>
   );
 };
 
-export default HockeyTable;
+export default HockeyGames;
