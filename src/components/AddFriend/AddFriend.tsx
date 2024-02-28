@@ -2,28 +2,28 @@ import React, { useState } from "react";
 import { TextField, Button, Box } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import { AddUser } from "./types";
-
-// Mock data for users - replace with your actual data fetching logic
-const users: AddUser[] = [
-  { id: "u1", email: "alice@example.com" },
-  { id: "u2", email: "bob@example.com" },
-  { id: "u3", email: "charlie@example.com" },
-];
+import { User } from "@/models/User";
+import { sendFriendReqeust } from "@/services/friendService";
+import { getUserByEmail } from "@/services/userService";
+import { useUser } from "@/contexts/UserContext";
 
 const AddFriend: React.FC = () => {
   const [emailInput, setEmailInput] = useState("");
+  const user = useUser();
 
-  const sendFriendInvite = (email: string) => {
-    console.log("Sending invite to:", email);
-  };
-
-  const handleInviteClick = () => {
-    const user = users.find((user) => user.email === emailInput);
-    if (user) {
-      sendFriendInvite(user.email);
-      setEmailInput(""); // Clear the input after sending invite
-    } else {
-      alert("User not found");
+  const handleInviteClick = async () => {
+    try {
+      const receiver = await getUserByEmail(emailInput);
+      if (user.user && user.user.id && receiver && receiver.id) {
+        await sendFriendReqeust(user.user.id, receiver.id);
+        console.log("Invite sent successfully.");
+        setEmailInput("");
+      } else {
+        alert("User not found.");
+      }
+    } catch (error) {
+      console.error("Failed to send invite:", error);
+      alert("Failed to send invite.");
     }
   };
 
@@ -39,7 +39,7 @@ const AddFriend: React.FC = () => {
       />
       <Button
         variant="contained"
-        color="secondary" // You can change 'secondary' to whatever color fits your theme.
+        color="secondary"
         onClick={handleInviteClick}
         disabled={!emailInput}
         startIcon={<SendIcon />}
