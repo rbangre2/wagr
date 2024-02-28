@@ -6,7 +6,7 @@ import ChallengeIcon from "@mui/icons-material/SportsMma";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { DataGrid } from "@mui/x-data-grid";
-import { Tabs, Tab, Box, Typography } from "@mui/material";
+import { Tabs, Tab, Box, Typography, setRef } from "@mui/material";
 import { TabPanelProps } from "./types";
 import { Friend } from "@/models/User";
 import { formatDistanceToNow } from "date-fns";
@@ -19,6 +19,7 @@ import {
   getIncomingFriendRequestsForUser,
   getOutgoingFriendRequests,
   acceptFriendRequest,
+  rejectFriendRequest,
   getFriends,
 } from "@/services/friendService";
 import { useUser } from "@/contexts/UserContext";
@@ -60,6 +61,17 @@ const FriendsTable: React.FC = () => {
       }
     } catch (error) {
       console.error("error accepting friend request ", error);
+    }
+  };
+
+  const handleRejectRequest = async (requestId: string) => {
+    try {
+      if (user && user.id) {
+        await rejectFriendRequest(requestId);
+        setRefreshRequests((prevState) => !prevState);
+      }
+    } catch (error) {
+      console.error("error rejecting friend request");
     }
   };
 
@@ -186,7 +198,12 @@ const FriendsTable: React.FC = () => {
             >
               <CheckCircleOutlineIcon />
             </IconButton>
-            <IconButton aria-label="decline" color="error" size="small">
+            <IconButton
+              aria-label="decline"
+              color="error"
+              size="small"
+              onClick={() => handleRejectRequest(params.row.id)}
+            >
               <CancelIcon />
             </IconButton>
           </Box>
@@ -225,9 +242,14 @@ const FriendsTable: React.FC = () => {
       field: "actions",
       headerName: "Actions",
       width: 180,
-      renderCell: () => (
+      renderCell: (params: GridRenderCellParams) => (
         <Box sx={{ display: "flex", justifyContent: "center", gap: 1 }}>
-          <IconButton aria-label="cancel request" color="warning" size="small">
+          <IconButton
+            aria-label="cancel request"
+            color="warning"
+            size="small"
+            onClick={() => handleRejectRequest(params.row.id)}
+          >
             <CancelIcon />
           </IconButton>
         </Box>
