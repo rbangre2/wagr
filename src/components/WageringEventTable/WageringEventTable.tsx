@@ -9,24 +9,11 @@ import {
   Paper,
   Button,
 } from "@mui/material";
+import ShowChartIcon from "@mui/icons-material/ShowChart";
 import { useRouter } from "next/navigation";
+import styles from "./WageringEventsTable.module.css";
 import { Filter, Sport, League } from "@/app/dashboard/bets/types";
-
-interface WageringEvent {
-  event: string;
-  currentOdds: number;
-  chart?: string;
-  changePercent: number;
-  volume: number;
-  supply: number;
-  sport: Sport;
-  league: League;
-}
-
-interface WageringEventTableProps {
-  wageringEvents: WageringEvent[];
-  filters: Filter;
-}
+import { WageringEvent, WageringEventTableProps } from "./types";
 
 const WageringEventTable: React.FC<WageringEventTableProps> = ({
   wageringEvents,
@@ -57,12 +44,41 @@ const WageringEventTable: React.FC<WageringEventTableProps> = ({
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell>Name</TableCell>
-            <TableCell align="right">Price</TableCell>
-            <TableCell align="right">Change %</TableCell>
-            <TableCell align="right">Volume</TableCell>
-            <TableCell align="right">Supply</TableCell>
-            <TableCell align="right">Trade</TableCell>
+            <TableCell
+              style={{ fontFamily: '"Poppins", sans-serif', fontWeight: 700 }}
+            >
+              Name
+            </TableCell>
+            <TableCell
+              align="right"
+              style={{ fontFamily: '"Poppins", sans-serif', fontWeight: 700 }}
+            >
+              Price
+            </TableCell>
+            <TableCell
+              align="right"
+              style={{ fontFamily: '"Poppins", sans-serif', fontWeight: 700 }}
+            >
+              Change %
+            </TableCell>
+            <TableCell
+              align="right"
+              style={{ fontFamily: '"Poppins", sans-serif', fontWeight: 700 }}
+            >
+              Volume
+            </TableCell>
+            <TableCell
+              align="right"
+              style={{ fontFamily: '"Poppins", sans-serif', fontWeight: 700 }}
+            >
+              Supply
+            </TableCell>
+            <TableCell
+              align="center"
+              style={{ fontFamily: '"Poppins", sans-serif', fontWeight: 700 }}
+            >
+              Trade
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -77,11 +93,17 @@ const WageringEventTable: React.FC<WageringEventTableProps> = ({
               </TableCell>
               <TableCell align="right">{event.volume}</TableCell>
               <TableCell align="right">{event.supply}</TableCell>
-              <TableCell align="right">
+              <TableCell align="center">
                 <Button
                   variant="contained"
                   color="primary"
+                  startIcon={<ShowChartIcon />}
                   onClick={() => handleTrade(event)}
+                  style={{
+                    borderRadius: "20px",
+                    backgroundColor: "#99ccff",
+                    color: "#5d5d5d",
+                  }}
                 >
                   Trade
                 </Button>
