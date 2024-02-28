@@ -14,10 +14,8 @@ const OddsRangeSlider = styled(Slider)(({ theme }) => ({
       boxShadow: "0 0 0 8px rgba(58, 133, 137, 0.16)",
     },
     "&::after": {
-      // Pseudo-element for the label
-
       position: "absolute",
-      top: "-50px", // Adjust the position as needed
+      top: "-50px",
       left: "50%",
       transform: "translateX(-50%)",
       backgroundColor: "#fff",

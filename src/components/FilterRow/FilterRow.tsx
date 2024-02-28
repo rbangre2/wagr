@@ -7,36 +7,43 @@ import {
   Select,
   MenuItem,
   Button,
-  Grid,
   TextField,
 } from "@mui/material";
-import OddsRangeSlider from "../OddsSlider/OddsSlider";
-import { Sport, League, sportsOptions, leagueOptions } from "./types";
+import { Sport, League, Filter } from "@/app/dashboard/bets/types";
+import { leagueOptions } from "./types";
 
-const FilterRow: React.FC = () => {
-  const [selectedSport, setSelectedSport] = useState<Sport | "">("");
-  const [selectedLeague, setSelectedLeague] = useState<League | "">("");
-  const [oddsRange, setOddsRange] = useState<number[]>([1.01, 5]);
-  const [amount, setAmount] = useState<number | "">("");
+interface FilterRowProps {
+  initFilter: Filter;
+  onApplyFilters: (filters: Filter) => void;
+  onClearFilters: () => void;
+}
+
+const FilterRow: React.FC<FilterRowProps> = ({
+  initFilter,
+  onApplyFilters,
+  onClearFilters,
+}) => {
+  const [selectedSport, setSelectedSport] = useState<Sport>(Sport.None);
+  const [selectedLeague, setSelectedLeague] = useState<League>(League.None);
 
   const handleApplyFilters = () => {
-    console.log(selectedSport, selectedLeague, oddsRange, amount);
+    const newFilter: Filter = {
+      sport: selectedSport,
+      league: selectedLeague,
+    };
+    onApplyFilters(newFilter);
   };
 
   const resetFilters = () => {
-    setSelectedSport("");
-    setSelectedLeague("");
-    setOddsRange([1.01, 5]);
-    setAmount("");
+    setSelectedSport(Sport.None);
+    setSelectedLeague(League.None);
+    onClearFilters();
   };
 
-  const handleOddsRangeChange = (event: Event, newValue: number | number[]) => {
-    setOddsRange(newValue as number[]);
-  };
-
-  const availableLeagues = selectedSport
-    ? leagueOptions.filter((league) => league.sport === selectedSport)
-    : leagueOptions;
+  const availableLeagues =
+    selectedSport === Sport.None
+      ? leagueOptions
+      : leagueOptions.filter((league) => league.sport === selectedSport);
 
   return (
     <Box
@@ -46,116 +53,89 @@ const FilterRow: React.FC = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
+        flexWrap: "wrap", // Allows the boxes to wrap when the window is resized
       }}
     >
-      <Grid container spacing={2} alignItems="center">
-        <Grid item xs={2}>
-          <FormControl fullWidth>
-            <InputLabel id="sport-select-label">Sport</InputLabel>
-            <Select
-              labelId="sport-select-label"
-              id="sport-select"
-              value={selectedSport}
-              label="Sport"
-              onChange={(event) =>
-                setSelectedSport(event.target.value as Sport)
-              }
-            >
-              {Object.values(Sport).map((sport) => (
-                <MenuItem key={sport} value={sport}>
-                  {sport}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item xs={2}>
-          <FormControl fullWidth>
-            <InputLabel id="league-select-label">League</InputLabel>
-            <Select
-              labelId="league-select-label"
-              id="league-select"
-              value={selectedLeague}
-              label="League"
-              onChange={(event) =>
-                setSelectedLeague(event.target.value as League)
-              }
-              disabled={!selectedSport}
-            >
-              {availableLeagues.map((league) => (
-                <MenuItem key={league.value} value={league.value}>
-                  {league.label}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item xs={4}>
-          <Box
-            sx={{
-              marginTop: "20px",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
+      {/* Sport selection */}
+      <Box sx={{ minWidth: 120, margin: 1 }}>
+        <FormControl fullWidth>
+          <InputLabel id="sport-select-label">Sport</InputLabel>
+          <Select
+            labelId="sport-select-label"
+            id="sport-select"
+            value={selectedSport}
+            label="Sport"
+            onChange={(event) => setSelectedSport(event.target.value as Sport)}
           >
-            <OddsRangeSlider
-              value={oddsRange}
-              onChange={handleOddsRangeChange}
-              valueLabelDisplay="auto"
-              min={1.01}
-              max={5}
-              step={0.01}
-            />
-          </Box>
-        </Grid>
-        <Grid item xs={2}>
-          <TextField
-            id="amount-input"
-            label="Amount"
-            type="number"
-            variant="outlined"
-            fullWidth
-            value={amount}
-            onChange={(event) => {
-              const value = event.target.value;
-              const numericalValue = parseFloat(value);
-              setAmount(numericalValue >= 0 ? numericalValue : "");
-            }}
-          />
-        </Grid>
-        <Grid item xs={2} sx={{ display: "flex", flexDirection: "column" }}>
-          <Button
-            variant="contained"
-            onClick={handleApplyFilters}
-            fullWidth
-            sx={{
-              backgroundColor: grey[900], // or any other color that matches the scheme
-              color: "#fff",
-              "&:hover": {
-                backgroundColor: grey[700], // Darken the color slightly on hover
-              },
-            }}
+            {Object.values(Sport).map((sport) => (
+              <MenuItem key={sport} value={sport}>
+                {sport}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Box>
+
+      {/* League selection */}
+      <Box sx={{ minWidth: 120, margin: 1 }}>
+        <FormControl fullWidth>
+          <InputLabel id="league-select-label">League</InputLabel>
+          <Select
+            labelId="league-select-label"
+            id="league-select"
+            value={selectedLeague}
+            label="League"
+            onChange={(event) =>
+              setSelectedLeague(event.target.value as League)
+            }
+            disabled={!selectedSport}
           >
-            Apply
-          </Button>
-          <Button
-            variant="outlined"
-            onClick={resetFilters}
-            fullWidth
-            sx={{
-              mt: 1, // margin top
-              color: grey[500],
-              borderColor: grey[500],
-              "&:hover": {
-                borderColor: grey[400],
-                color: grey[400],
-              },
-            }}
-          >
-            Reset
-          </Button>
-        </Grid>
-      </Grid>
+            {availableLeagues.map((league) => (
+              <MenuItem key={league.value} value={league.value}>
+                {league.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Box>
+
+      {/* Buttons */}
+      <Box
+        sx={{
+          display: "flex",
+          gap: 2,
+          margin: 1,
+          justifyContent: "flex-end", // Aligns the buttons to the right
+          flex: 1,
+        }}
+      >
+        <Button
+          variant="contained"
+          onClick={handleApplyFilters}
+          sx={{
+            backgroundColor: grey[900],
+            color: "#fff",
+            "&:hover": {
+              backgroundColor: grey[700],
+            },
+          }}
+        >
+          Apply
+        </Button>
+        <Button
+          variant="contained"
+          onClick={resetFilters} // Fixed to use resetFilters function
+          sx={{
+            backgroundColor: "lightgray",
+            color: "black",
+            "&:hover": {
+              backgroundColor: grey[700],
+            },
+          }}
+        >
+          Reset
+        </Button>
+      </Box>
     </Box>
   );
 };
