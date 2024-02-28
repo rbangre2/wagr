@@ -53,10 +53,9 @@ const FilterRow: React.FC<FilterRowProps> = ({
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        flexWrap: "wrap", // Allows the boxes to wrap when the window is resized
+        flexWrap: "wrap",
       }}
     >
-      {/* Sport selection */}
       <Box sx={{ minWidth: 120, margin: 1 }}>
         <FormControl fullWidth>
           <InputLabel id="sport-select-label">Sport</InputLabel>
