@@ -1,6 +1,7 @@
 "use client";
 import GamesLayout from "../GamesLayout";
 import React from "react";
+import { Box } from "@mui/material";
 import SportsTable from "@/components/SportsTable/SportsTable";
 import { HockeyData } from "@/app/dashboard/games/hockey/mock"; // Adjust the import path based on your project structure
 
@@ -21,11 +22,7 @@ const hockeyColumns = [
 const HockeyGames = () => {
   return (
     <GamesLayout>
-      <SportsTable
-        title="Upcoming Hockey Games"
-        columns={hockeyColumns}
-        data={HockeyData}
-      />
+      <Box paddingTop="15px"> coming soon... </Box>
     </GamesLayout>
   );
 };

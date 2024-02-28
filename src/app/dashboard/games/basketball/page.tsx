@@ -3,6 +3,7 @@ import GamesLayout from "../GamesLayout";
 import React from "react";
 import SportsTable from "@/components/SportsTable/SportsTable";
 import { BasketballData } from "@/app/dashboard/games/basketball/mock";
+import { Box } from "@mui/material";
 
 const basketballColumns = [
   { field: "homeTeam", headerName: "Home Team", width: 150 },
@@ -21,12 +22,7 @@ const basketballColumns = [
 const BasketballGames = () => {
   return (
     <GamesLayout>
-      {" "}
-      <SportsTable
-        title="Upcoming Basketball Games"
-        columns={basketballColumns}
-        data={BasketballData}
-      />{" "}
+      <Box paddingTop="15px"> coming soon...</Box>
     </GamesLayout>
   );
 };

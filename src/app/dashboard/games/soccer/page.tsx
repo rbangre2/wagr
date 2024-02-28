@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import GamesLayout from "../GamesLayout";
 import { TableFixture } from "@/models/Fixture";
-import { getLaLigaFixtures } from "@/services/sportsService";
+import { getLaLigaFixtures, getSerieAFixtures } from "@/services/sportsService";
 import SportsTable from "@/components/SportsTable/SportsTable";
 import { soccerColumns } from "./types";
 
@@ -13,7 +13,9 @@ export default function SoccerGames() {
   useEffect(() => {
     const fetchFixtures = async () => {
       try {
-        const fixtures = await getLaLigaFixtures();
+        let fixtures = await getLaLigaFixtures();
+        fixtures = fixtures.concat(await getSerieAFixtures());
+        console.log(fixtures.length);
         setData(fixtures);
       } catch (error) {
         console.error("failed to fetch soccer data", error);

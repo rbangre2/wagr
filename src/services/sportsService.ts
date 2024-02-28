@@ -42,11 +42,15 @@ const getLeagueFixtures = async (
     console.log(tableFixtures);
     return tableFixtures;
   } catch (error) {
-    console.error("Error fetching Premier League fixtures:", error);
+    console.error("Error fetching fixtures:", error);
     throw error;
   }
 };
 
 export const getLaLigaFixtures = async (): Promise<TableFixture[]> => {
   return await getLeagueFixtures(League.LaLiga);
+};
+
+export const getSerieAFixtures = async (): Promise<TableFixture[]> => {
+  return await getLeagueFixtures(League.SerieA);
 };
