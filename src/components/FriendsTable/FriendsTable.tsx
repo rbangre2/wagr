@@ -6,16 +6,19 @@ import ChallengeIcon from "@mui/icons-material/SportsMma";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { DataGrid } from "@mui/x-data-grid";
-import { Tabs, Tab, Box, Button, Typography } from "@mui/material";
+import { Tabs, Tab, Box, Typography } from "@mui/material";
 import { Friend } from "./types";
 import { formatDistanceToNow } from "date-fns";
-import { mockFriends, mockIncomingRequests, mockOutgoingRequest } from "./mock";
+import { mockFriends, mockOutgoingRequest } from "./mock";
 import StatusIndicator from "../StatusIndicator/StatusIndicator";
 import { GridRenderCellParams, GridAlignment } from "@mui/x-data-grid";
 import { formatCurrency } from "@/utils/designUtils";
 import { FriendRequest } from "@/models/FriendRequest";
 import { getUserById } from "@/services/userService";
-import { getIncomingFriendRequestsForUser } from "@/services/friendService";
+import {
+  getIncomingFriendRequestsForUser,
+  getOutgoingFriendRequests,
+} from "@/services/friendService";
 import { useUser } from "@/contexts/UserContext";
 
 interface TabPanelProps {
@@ -32,15 +35,15 @@ const columns = [
       <Avatar alt={params.row.name} src={params.row.profilePicture} />
     ),
     width: 125,
-    headerAlign: "center" as GridAlignment, // Corrected type casting
-    align: "center" as GridAlignment, // Corrected type casting
+    headerAlign: "center" as GridAlignment,
+    align: "center" as GridAlignment,
   },
   {
     field: "name",
     headerName: "Name",
     width: 150,
-    headerAlign: "center" as GridAlignment, // Corrected type casting
-    align: "center" as GridAlignment, // Corrected type casting
+    headerAlign: "center" as GridAlignment,
+    align: "center" as GridAlignment,
   },
   {
     field: "status",
@@ -52,8 +55,8 @@ const columns = [
       </>
     ),
     width: 150,
-    headerAlign: "center" as GridAlignment, // Corrected type casting
-    align: "center" as GridAlignment, // Corrected type casting
+    headerAlign: "center" as GridAlignment,
+    align: "center" as GridAlignment,
   },
   {
     field: "lastActive",
@@ -63,15 +66,15 @@ const columns = [
         addSuffix: true,
       })}`,
     width: 175,
-    headerAlign: "center" as GridAlignment, // Corrected type casting
-    align: "center" as GridAlignment, // Corrected type casting
+    headerAlign: "center" as GridAlignment,
+    align: "center" as GridAlignment,
   },
   {
     field: "netResult",
     headerName: "Net Result",
     width: 150,
     renderCell: (params: GridRenderCellParams) => {
-      const value = params.value as number; // Cast to number if necessary
+      const value = params.value as number;
       const formattedValue = formatCurrency(value);
       const color = value > 0 ? "green" : value < 0 ? "red" : "grey";
 
@@ -116,8 +119,8 @@ const incomingRequestColumns = [
         </Typography>
       </Box>
     ),
-    headerAlign: "center" as GridAlignment,
-    align: "center" as GridAlignment,
+    headerAlign: "left" as GridAlignment,
+    align: "left" as GridAlignment,
   },
   {
     field: "sentDate",
@@ -127,8 +130,8 @@ const incomingRequestColumns = [
       `${formatDistanceToNow(new Date(params.row.createdAt), {
         addSuffix: true,
       })}`,
-    headerAlign: "center" as GridAlignment, // Corrected type casting
-    align: "center" as GridAlignment, // Corrected type casting
+    headerAlign: "center" as GridAlignment,
+    align: "center" as GridAlignment,
   },
   {
     field: "actions",
@@ -160,7 +163,7 @@ const outgoingRequestColumns = [
           alt={params.row.receiverName}
           src={params.row.receiverProfilePicture}
         />
-        <span>{params.row.receiver}</span>
+        <span>{params.row.receiverName}</span>
       </Box>
     ),
   },
@@ -243,7 +246,31 @@ const FriendsTable: React.FC = () => {
       }
     }
 
+    async function fetchOutgoingRequests() {
+      try {
+        if (user && user.id) {
+          const outgoingRequestsData = await getOutgoingFriendRequests(user.id);
+
+          const outgoingRequestsWithReceiverInfo = await Promise.all(
+            outgoingRequestsData.map(async (request) => {
+              const receiverUser = await getUserById(request.receiver);
+              return {
+                ...request,
+                receiverName: receiverUser
+                  ? receiverUser.firstName + " " + receiverUser.lastName
+                  : "Unknown",
+              };
+            })
+          );
+          setOutgoingRequests(outgoingRequestsWithReceiverInfo);
+        }
+      } catch (error) {
+        console.error("error fetching outgoing requests", error);
+      }
+    }
+
     fetchIncomingRequests();
+    fetchOutgoingRequests();
   }, [user?.id]);
 
   return (
