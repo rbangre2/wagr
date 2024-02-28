@@ -7,9 +7,9 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { DataGrid } from "@mui/x-data-grid";
 import { Tabs, Tab, Box, Typography } from "@mui/material";
-import { Friend, TabPanelProps } from "./types";
+import { TabPanelProps } from "./types";
+import { Friend } from "@/models/User";
 import { formatDistanceToNow } from "date-fns";
-import { mockFriends, mockOutgoingRequest } from "./mock";
 import StatusIndicator from "../StatusIndicator/StatusIndicator";
 import { GridRenderCellParams, GridAlignment } from "@mui/x-data-grid";
 import { formatCurrency } from "@/utils/designUtils";
@@ -19,6 +19,7 @@ import {
   getIncomingFriendRequestsForUser,
   getOutgoingFriendRequests,
   acceptFriendRequest,
+  getFriends,
 } from "@/services/friendService";
 import { useUser } from "@/contexts/UserContext";
 
@@ -237,8 +238,16 @@ const FriendsTable: React.FC = () => {
   ];
 
   useEffect(() => {
-    setFriends(mockFriends);
-    setOutgoingRequests(mockOutgoingRequest);
+    async function fetchFriends() {
+      try {
+        if (user && user.id) {
+          const friendsList = await getFriends(user.id);
+          setFriends(friendsList);
+        }
+      } catch (error) {
+        console.error("failed to fetch friends: ", error);
+      }
+    }
 
     async function fetchIncomingRequests() {
       try {
@@ -288,6 +297,7 @@ const FriendsTable: React.FC = () => {
       }
     }
 
+    fetchFriends();
     fetchIncomingRequests();
     fetchOutgoingRequests();
   }, [user, user?.id, refreshRequests]);

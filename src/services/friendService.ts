@@ -1,17 +1,19 @@
 import { FriendRequest } from "@/models/FriendRequest";
-import { Friend } from "@/models/User";
+import { UserFriend } from "@/models/User";
 import { db } from "@/utils/firebaseConfig";
 import {
   collection,
   addDoc,
   query,
   where,
+  getDoc,
   getDocs,
   updateDoc,
   doc,
   setDoc,
   deleteDoc,
 } from "firebase/firestore";
+import { Friend } from "@/models/User";
 
 export async function sendFriendReqeust(sender: string, receiver: string) {
   const friendRequest: Omit<FriendRequest, "id"> = {
@@ -31,6 +33,7 @@ export async function sendFriendReqeust(sender: string, receiver: string) {
   }
 }
 
+// function to accept friend request
 export async function acceptFriendRequest(
   requestId: string,
   senderId: string,
@@ -42,7 +45,7 @@ export async function acceptFriendRequest(
   const senderFriendRef = doc(db, "users", senderId, "friends", receiverId);
   const receiverFriendRef = doc(db, "users", receiverId, "friends", senderId);
 
-  const friendData: Friend = { friendId: "", netResult: 0 };
+  const friendData: UserFriend = { friendId: "", netResult: 0 };
 
   await setDoc(senderFriendRef, { ...friendData, friendId: receiverId });
 
@@ -113,27 +116,39 @@ export async function getOutgoingFriendRequests(
   }
 }
 
-export async function addFriend(userId: string, friendId: string) {
-  const userFriendsRef = collection(db, "users", "friends");
-
-  await setDoc(doc(userFriendsRef, friendId), {
-    friendId: friendId,
-    netResult: 0,
-  });
-
-  const friendFriendsRef = collection(db, "users", friendId, "friends");
-  await setDoc(doc(friendFriendsRef, userId), {
-    friendId: userId,
-    netResult: 0,
-  });
-}
-
+/* TODO: when additional Friend fields are implemented, adjust friend creation */
 export async function getFriends(userId: string) {
   const userFriendsRef = collection(db, "users", userId, "friends");
-
-  // Get all friends from the subcollection
   const snapshot = await getDocs(userFriendsRef);
-  const friends = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+
+  const friendPromises = snapshot.docs.map(async (docSnapshot) => {
+    const friendId = docSnapshot.id; // Assuming the friend's user ID is stored as the document ID
+    const friendRef = doc(db, "users", friendId);
+    const friendSnap = await getDoc(friendRef);
+
+    if (friendSnap.exists()) {
+      // Assuming firstName and lastName fields exist in the user document
+      const friendData = friendSnap.data();
+      const name = `${friendData.firstName} ${friendData.lastName}`;
+
+      // Constructing the friend object with required fields
+      return {
+        id: friendId,
+        name: name,
+        profilePicture:
+          friendData.profilePicture || "https://placeimg.com/67/10/any",
+        status: "Online", // Assuming we default to "online"
+        lastActive: friendData.lastActive || new Date().toISOString(), // Assuming lastActive is stored in ISO string format
+        netResult: docSnapshot.data().netResult || 0, // Using the netResult from the friends subcollection, defaulting to 0
+      };
+    } else {
+      return null; // Or handle this case as needed
+    }
+  });
+
+  const friends = (await Promise.all(friendPromises)).filter(
+    (friend): friend is Friend => friend !== null
+  );
 
   return friends;
 }
