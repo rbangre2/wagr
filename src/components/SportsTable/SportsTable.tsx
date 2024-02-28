@@ -1,6 +1,7 @@
 import React from "react";
 import { DataGrid, GridSortModel } from "@mui/x-data-grid";
 import { Typography, Box } from "@mui/material";
+import styles from "./SportsTable.module.css";
 
 const defaultColumns = [
   { field: "homeTeam", headerName: "Home Team", width: 150 },
@@ -27,7 +28,15 @@ const SportsTable = ({
   ];
   return (
     <Box style={{ height: "100%", width: "100%", paddingTop: "20px" }}>
-      <Typography variant="h6" gutterBottom>
+      <Typography
+        variant="h6"
+        gutterBottom
+        style={{
+          fontFamily: "'Shadows Into Light', cursive",
+          fontWeight: 700,
+          fontSize: "25px",
+        }}
+      >
         {title}
       </Typography>
       <DataGrid
