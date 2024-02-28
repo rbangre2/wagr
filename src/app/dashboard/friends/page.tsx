@@ -9,23 +9,27 @@ export default function Friends() {
   return (
     <DashboardLayout>
       <Box className={styles.friendsContainer}>
-        <Box className={styles.leftSide}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 89,
+          }}
+        >
           <Typography
             variant="h3"
             component="h1"
             sx={{
-              marginBottom: "20px",
               fontFamily: "'PT Sans Narrow', sans-serif",
               fontWeight: 700,
             }}
           >
             Friends!
           </Typography>
-          <FriendsTable />
-        </Box>
-        <Box className={styles.rightSide}>
           <AddFriend />
         </Box>
+        <FriendsTable />
       </Box>
     </DashboardLayout>
   );

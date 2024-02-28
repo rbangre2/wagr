@@ -1,4 +1,6 @@
-export const data = [
+import { FriendRequest } from "@/models/FriendRequest";
+
+export const mockFriends = [
   {
     id: "dc946bfa-545e-422d-9984-8067e9270be7",
     name: "Tiffany Fisher",
@@ -78,5 +80,54 @@ export const data = [
     status: "Offline",
     lastActive: "2023-03-16T10:26:50",
     netResult: -780,
+  },
+];
+
+// Mock data for incoming friend requests
+export const mockIncomingRequests: FriendRequest[] = [
+  {
+    id: "fr-001",
+    sender: "user001",
+    receiver: "currentUser",
+    status: "pending",
+    createdAt: "2024-02-24T10:00:00",
+  },
+  {
+    id: "fr-002",
+    sender: "user002",
+    receiver: "currentUser",
+    status: "pending",
+    createdAt: "2024-02-25T11:20:00",
+  },
+  {
+    id: "fr-003",
+    sender: "user003",
+    receiver: "currentUser",
+    status: "pending",
+    createdAt: "2024-02-26T15:35:00",
+  },
+];
+
+export const mockOutgoingRequest: FriendRequest[] = [
+  {
+    id: "fr-001",
+    sender: "currentUser",
+    receiver: "user001",
+    status: "pending",
+    createdAt: "2024-02-24T10:00:00",
+  },
+  {
+    id: "fr-002",
+    sender: "currentUser",
+    receiver: "user002",
+    status: "pending",
+    createdAt: "2024-02-25T11:20:00",
+  },
+  {
+    id: "fr-003",
+    sender: "currentUser",
+    receiver: "user003",
+    status: "pending",
+    createdAt: "2024-02-26T15:35:00",
   },
 ];
