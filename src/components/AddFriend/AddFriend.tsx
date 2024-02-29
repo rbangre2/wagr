@@ -24,35 +24,35 @@ const AddFriend: React.FC = () => {
       return;
     }
     if (user && user.email === emailInput) {
-      setError("You cannot add yourself as a friend.");
+      setError("you cannot add yourself as a friend.");
       return;
     }
 
     try {
       const receiver = await getUserByEmail(emailInput);
       if (!receiver || !receiver.id) {
-        setError("User could not be found.");
+        setError("user could not be found.");
         return;
       }
 
-      // Check if there's already a friend request between these users
+      // shouldnt really ever happen
       if (!user) {
-        setError("User is not available.");
+        setError("please authenticate yourself first!");
         return;
       }
 
       const requestStatus = await checkFriendRequestStatus(user.id ?? "", receiver.id);
       if (requestStatus.exists) {
-        setError("A friend request already exists between you two.");
+        setError("friend request pending or you are already friends");
         return;
       }
 
       await sendFriendRequest(user.id ?? "", receiver.id ?? "");
       setEmailInput("");
       setSnackbarOpen(true);
-      setHelperText("Friend request sent successfully");
+      setHelperText("friend request sent successfully");
     } catch (error) {
-      setError("Failed to send invite.");
+      setError("failed to send invite.");
     }
   };
 
