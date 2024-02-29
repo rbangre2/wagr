@@ -1,7 +1,8 @@
-import React from "react";
-import { DataGrid, GridSortModel } from "@mui/x-data-grid";
+import React, { useState } from "react";
+import { DataGrid, GridSortModel, GridRowParams } from "@mui/x-data-grid";
 import { Typography, Box } from "@mui/material";
-import styles from "./SportsTable.module.css";
+import PlaceBetModal from "../PlaceBetModal/PlaceBetModal";
+import { Event } from "@/models/Event"; // Ensure this import points to where your Event type is defined
 
 const defaultColumns = [
   { field: "homeTeam", headerName: "Home Team", width: 150 },
@@ -9,6 +10,13 @@ const defaultColumns = [
   { field: "league", headerName: "League", width: 150 },
   { field: "location", headerName: "Location", width: 285 },
   { field: "date", headerName: "Date", type: "date", width: 150 },
+];
+
+const sortModel: GridSortModel = [
+  {
+    field: "date",
+    sort: "asc",
+  },
 ];
 
 const SportsTable = ({
@@ -20,12 +28,14 @@ const SportsTable = ({
   columns?: any[];
   data: any[];
 }) => {
-  const sortModel: GridSortModel = [
-    {
-      field: "date",
-      sort: "asc",
-    },
-  ];
+  const [isBetModalOpen, setBetModalOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+
+  const handleRowClick = (params: GridRowParams) => {
+    setSelectedEvent(params.row as Event); // Cast the row data to the Event type
+    setBetModalOpen(true);
+  };
+
   return (
     <Box style={{ height: "100%", width: "100%", paddingTop: "20px" }}>
       <Typography
@@ -43,8 +53,15 @@ const SportsTable = ({
         rows={data}
         columns={columns}
         sortModel={sortModel}
-        disableRowSelectionOnClick
+        onRowClick={handleRowClick}
       />
+      {selectedEvent && (
+        <PlaceBetModal
+          open={isBetModalOpen}
+          onClose={() => setBetModalOpen(false)}
+          event={selectedEvent}
+        />
+      )}
     </Box>
   );
 };
