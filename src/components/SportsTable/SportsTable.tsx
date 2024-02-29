@@ -31,10 +31,10 @@ const SportsTable = ({
       <Typography
         variant="h6"
         gutterBottom
-        style={{
-          fontFamily: "'Shadows Into Light', cursive",
+        sx={{
+          fontFamily: "'PT Sans Narrow', sans-serif",
           fontWeight: 700,
-          fontSize: "25px",
+          fontSize: 35,
         }}
       >
         {title}

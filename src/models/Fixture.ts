@@ -60,3 +60,13 @@ export interface TableFixture {
   location: string;
   date: Date;
 }
+
+export interface Event {
+  id: number;
+  homeTeam: string;
+  awayTeam: string;
+  league: string;
+  location: string;
+  date: Date;
+  status: "Upcoming" | "Finished";
+}

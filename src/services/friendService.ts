@@ -1,6 +1,6 @@
 import { FriendRequest } from "@/models/FriendRequest";
 import { UserFriend } from "@/models/User";
-import { db } from "@/utils/firebaseConfig";
+import { db } from "@/utils/firebase/firebaseConfig";
 import {
   collection,
   addDoc,

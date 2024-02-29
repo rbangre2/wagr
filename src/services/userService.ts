@@ -14,7 +14,7 @@ import {
   updateDoc,
   increment,
 } from "firebase/firestore";
-import { db, auth } from "../utils/firebaseConfig";
+import { db, auth } from "../utils/firebase/firebaseConfig";
 import { User } from "@/models/User";
 
 export const signup = async (
