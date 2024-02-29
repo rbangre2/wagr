@@ -1,8 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import GamesLayout from "../GamesLayout";
-import { TableFixture } from "@/models/Fixture";
-import { getLaLigaFixtures, getSerieAFixtures } from "@/services/sportsService";
+import { Event } from "@/models/Event";
+import { getEvents } from "@/services/sportsService";
 import SportsTable from "@/components/SportsTable/SportsTable";
 import {
   GridValueFormatterParams,
@@ -12,8 +12,8 @@ import Image from "next/image";
 import { leagueIcons } from "./types";
 
 export default function SoccerGames() {
-  const [data, setData] = useState<TableFixture[]>([]);
-  const tableTitle = "Upcoming Soccer Fixtures";
+  const [data, setData] = useState<Event[]>([]);
+  const tableTitle = "Upcoming Fixtures";
 
   const soccerColumns = [
     { field: "homeTeam", headerName: "Home Team", width: 150 },
@@ -54,8 +54,7 @@ export default function SoccerGames() {
   useEffect(() => {
     const fetchFixtures = async () => {
       try {
-        let fixtures = await getLaLigaFixtures();
-        fixtures = fixtures.concat(await getSerieAFixtures());
+        const fixtures = await getEvents();
         console.log(fixtures.length);
         setData(fixtures);
       } catch (error) {

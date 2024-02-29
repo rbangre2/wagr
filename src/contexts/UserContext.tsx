@@ -1,4 +1,3 @@
-("");
 import React, {
   createContext,
   useContext,
@@ -8,7 +7,7 @@ import React, {
   FC,
 } from "react";
 import { User } from "@/models/User";
-import { auth } from "../utils/firebaseConfig";
+import { auth } from "../utils/firebase/firebaseConfig";
 import { onAuthStateChanged } from "firebase/auth";
 import { getUserByEmail } from "@/services/userService";
 
