@@ -15,7 +15,7 @@ import {
 } from "firebase/firestore";
 import { Friend } from "@/models/User";
 
-export async function sendFriendReqeust(sender: string, receiver: string) {
+export async function sendFriendRequest(sender: string, receiver: string) {
   const friendRequest: Omit<FriendRequest, "id"> = {
     sender,
     receiver,
@@ -169,3 +169,22 @@ export async function removeFriend(userId: string, friendId: string) {
   await deleteDoc(doc(db, "users", userId, "friends", friendId));
   await deleteDoc(doc(db, "users", friendId, "friends", userId));
 }
+
+
+export async function checkFriendRequestStatus( sender: string, receiver: string) {
+  const q = query(
+    collection(db, "FriendRequests"),
+    where("sender", "==", sender),
+    where("receiver", "==", receiver)
+  );
+  const querySnapshot = await getDocs(q);
+  const friendRequests: FriendRequest[] = querySnapshot.docs.map(
+    (doc) =>
+      ({
+        ...doc.data(),
+        id: doc.id,
+      } as FriendRequest)
+  );
+  return { exists: friendRequests.length > 0, id: friendRequests[0]?.id };
+}
+
