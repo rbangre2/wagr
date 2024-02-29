@@ -10,7 +10,7 @@ interface FormTextFieldProps {
   disabled?: boolean;
   type?: string;
   showPassword?: boolean;
-  setShowPassword?: any;
+  setShowPassword?: (show: boolean) => void; // Updated type
   style?: any;
   width?: string;
   endAdornment?: React.ReactNode;
@@ -33,7 +33,7 @@ export default function FormTextField({
 }: FormTextFieldProps) {
   return (
     <TextField
-      type={showPassword ? "text" : type}
+      type={type === "password" && showPassword ? "text" : type}
       margin="normal"
       disabled={disabled}
       id={idName}
@@ -42,9 +42,6 @@ export default function FormTextField({
       multiline={type === "Des"}
       value={value}
       onChange={onChange}
-      inputProps={{
-        endadornment: endAdornment,
-      }}
       label={labelName}
       onKeyDown={(event) => {
         if (event.key === "Enter" && type === "password" && onSubmit) {
@@ -63,16 +60,13 @@ export default function FormTextField({
           textOverflow: "ellipsis",
           width: width || "100%",
         },
-        endAdornment:
-          type === "password" && !showPassword ? (
-            <IconButton onClick={() => setShowPassword(!showPassword)}>
-              <IconEye />
+        endAdornment: endAdornment || (
+          type === "password" ? (
+            <IconButton onClick={() => setShowPassword && setShowPassword(!showPassword)}>
+              {showPassword ? <IconEyeOff /> : <IconEye />}
             </IconButton>
-          ) : type === "password" && showPassword ? (
-            <IconButton onClick={() => setShowPassword(!showPassword)}>
-              <IconEyeOff />
-            </IconButton>
-          ) : null,
+          ) : null
+        ),
       }}
       sx={{
         "& .MuiInputBase-input": {
@@ -86,20 +80,20 @@ export default function FormTextField({
           textOverflow: "ellipsis",
           alignItems: "center",
           "& fieldset": {
-            borderColor: "black", // Change the focused border color
+            borderColor: "black",
           },
           "&:hover fieldset": {
-            borderColor: "black", // Change the hover border color
+            borderColor: "black",
           },
           "&.Mui-focused fieldset": {
-            borderColor: "black", // Change the focused border color
+            borderColor: "black",
           },
         },
         "& .MuiInputLabel-root": {
-          color: "black", // Change the unfocused label color
+          color: "black",
           fontFamily: "var(--font)",
           "&.Mui-focused": {
-            color: "black", // Change the focused label color
+            color: "black",
           },
         },
       }}
