@@ -1,4 +1,4 @@
-import { Filter, Sport, League } from "@/app/dashboard/bets/types";
+import { Filter, Sport, League } from "@/app/dashboard/market/types";
 
 export interface WageringEvent {
   id: number;

@@ -11,7 +11,8 @@ import {
 import styles from "./AppDrawer.module.css";
 import { useRouter } from "next/navigation";
 import GamesIcon from "@mui/icons-material/SportsSoccer";
-import BetsIcon from "@mui/icons-material/AttachMoney";
+import BetsIcon from "@mui/icons-material/AccountBalance";
+import MyBetsIcon from "@mui/icons-material/Casino";
 import FriendsIcon from "@mui/icons-material/People";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import ResultsIcon from "@mui/icons-material/Insights";
@@ -28,7 +29,8 @@ interface AppDrawerProps {
 
 const drawerItems = [
   { text: "Games", icon: <GamesIcon /> },
-  { text: "Bets", icon: <BetsIcon /> },
+  { text: "Market", icon: <BetsIcon /> },
+  { text: "Wagers", icon: <MyBetsIcon /> },
   { text: "Stake", icon: <StakeIcon /> },
   { text: "Friends", icon: <FriendsIcon /> },
   { text: "Leagues", icon: <EmojiEventsIcon /> },
@@ -76,7 +78,7 @@ const AppDrawer: React.FC<AppDrawerProps> = ({
       }}
     >
       <List sx={{ paddingTop: "22px" }}>
-        {drawerItems.slice(0, 4).map((item) => (
+        {drawerItems.slice(0, 5).map((item) => (
           <ListItemButton
             key={item.text}
             onClick={() => handleNavigation(item.text)}
@@ -96,7 +98,7 @@ const AppDrawer: React.FC<AppDrawerProps> = ({
       </List>
       <Divider />
       <List>
-        {drawerItems.slice(4).map((item) => (
+        {drawerItems.slice(5).map((item) => (
           <ListItemButton
             key={item.text}
             onClick={() => handleNavigation(item.text)}

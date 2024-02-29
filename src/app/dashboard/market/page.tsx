@@ -8,7 +8,7 @@ import WageringEventTable from "@/components/WageringEventTable/WageringEventTab
 import { eventsData } from "./mock";
 import { Sport, League, Filter } from "./types";
 
-export default function Bets() {
+export default function Market() {
   const [wageringEvents, setWageringEvents] = useState(eventsData);
   const [filters, setFilters] = useState<Filter>({
     sport: Sport.None,
@@ -41,7 +41,7 @@ export default function Bets() {
               paddingRight: "30px",
             }}
           >
-            Bet Market
+            Market
           </Typography>
           <FilterRow
             initFilter={filters}

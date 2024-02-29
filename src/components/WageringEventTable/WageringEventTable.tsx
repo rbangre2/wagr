@@ -15,7 +15,7 @@ import TrendingDownIcon from "@mui/icons-material/TrendingDown";
 import TrendingFlatIcon from "@mui/icons-material/TrendingFlat";
 import { useRouter } from "next/navigation";
 import styles from "./WageringEventsTable.module.css";
-import { Filter, Sport, League } from "@/app/dashboard/bets/types";
+import { Filter, Sport, League } from "@/app/dashboard/market/types";
 import { WageringEvent, WageringEventTableProps } from "./types";
 
 const WageringEventTable: React.FC<WageringEventTableProps> = ({

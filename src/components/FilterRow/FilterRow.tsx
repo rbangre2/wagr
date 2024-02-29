@@ -9,7 +9,7 @@ import {
   Button,
   TextField,
 } from "@mui/material";
-import { Sport, League, Filter } from "@/app/dashboard/bets/types";
+import { Sport, League, Filter } from "@/app/dashboard/market/types";
 import { leagueOptions } from "./types";
 
 interface FilterRowProps {
