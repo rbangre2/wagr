@@ -47,7 +47,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
           marginTop: `${appBarHeight}px`,
         }}
       >
-        {children} {/* This is where the routed content will be rendered */}
+        {children}
       </Box>
     </Box>
   );

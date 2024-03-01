@@ -19,6 +19,7 @@ import { Friend } from "@/models/User";
 import { getFriends } from "@/services/friendService";
 import styles from "./PlaceBetModal.module.css";
 import { createBet } from "@/services/betService";
+import { getUserById } from "@/services/userService";
 
 interface PlaceBetProps {
   open: boolean;
@@ -59,24 +60,34 @@ const PlaceBet: React.FC<PlaceBetProps> = ({ open, onClose, event }) => {
       if (!selectedFriend || !odds || !amount) {
         return;
       }
+      const opponent = await getUserById(selectedFriend);
 
       const newBet = {
-        senderId: user?.id,
-        receiverId: selectedFriend,
-        senderSelection: selectedTeam,
         eventId: event.id,
-        senderBetChoice: selectedTeam,
-        amount: parseFloat(amount),
-        odds: parseFloat(odds),
         status: "Pending" as "Pending",
         createdAt: new Date(),
+
+        senderId: user.id,
+        senderName: `${user.firstName} ${user.lastName}`,
+        senderSelection: selectedTeam,
+        senderOdds: parseFloat(odds),
+        senderStake: parseFloat(amount),
+        senderPotentialWin: potentialPayout,
+
+        receiverId: selectedFriend,
+        receiverName: `${opponent?.firstName} ${opponent?.lastName}`,
+        receiverStake: potentialPayout - parseFloat(amount),
+        receiverOdds: potentialPayout / (potentialPayout - parseFloat(amount)),
+        receiverSelection:
+          selectedTeam === event.homeTeam ? event.awayTeam : event.homeTeam,
+        receiverPotentialWin: potentialPayout,
       };
 
       try {
         await createBet(newBet);
         onClose();
       } catch (error) {
-        console.error("Error placing bet: ", error);
+        console.error("error placing bet: ", error);
       }
     }
   };
