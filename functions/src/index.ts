@@ -99,7 +99,7 @@ exports.updateEvents = functions.pubsub
     await storeEventsInFirestore();
   });
 
-const fetchUpcomingPastEvents = async () => {
+const fetchPastDBEvents = async (): Promise<any> => {
   const now = admin.firestore.Timestamp.now();
   const eventsRef = db.collection("events");
   const snapshot = await eventsRef
@@ -108,6 +108,29 @@ const fetchUpcomingPastEvents = async () => {
     .get();
 
   return snapshot.docs.map((doc) => ({id: doc.id, ...doc.data()}));
+};
+
+const updateUserBalance = async (userId: string, amount: number) => {
+  const userRef = db.collection("users").doc(userId);
+
+  try {
+    // Retrieve the current balance of the user
+    const doc = await userRef.get();
+    if (!doc.exists) {
+      console.log("User not found!");
+      return;
+    }
+    const user = doc.data();
+
+    await userRef.update({
+      balance: user?.balance + amount,
+    });
+
+    console.log(`User ${userId}'s balance updated successfully.`);
+  } catch (error) {
+    console.error("Error updating user balance:", error);
+    throw error;
+  }
 };
 
 const fetchHistoricalDataForEvent = async (event: any) => {
@@ -168,14 +191,50 @@ const updateEventWithResult = async (event: any, match: any) => {
   }
 };
 
-exports.resolveEvents = functions.pubsub
+const fetchBetsForEvent = async (event: any): Promise<any> => {
+  const betsRef = db.collection("bets");
+  const snapshot = await betsRef.where("eventId", "==", event.id).get();
+  return snapshot.docs.map((doc) => ({id: doc.id, ...doc.data()}));
+};
+
+const settleBetsForEvent = async (event: any) => {
+  const bets = await fetchBetsForEvent(event);
+  const now = admin.firestore.FieldValue.serverTimestamp();
+
+  if (event && event.result) {
+    bets.forEach(async (bet: any) => {
+      let status = bet.status;
+      if (bet.status === "Accepted") {
+        if (bet.senderSelection === event.result &&
+          bet.receiverSelection !== event.result) {
+          status = "Resolved";
+          await updateUserBalance(bet.senderId, bet.senderPotentialWin);
+        } else {
+          status = "Resolved";
+          await updateUserBalance(bet.receiverId, bet.receiverPotentialWin);
+        }
+
+        const betRef = db.collection("bets").doc(bet.id);
+        await betRef.update({
+          status: status,
+          resolvedAt: now,
+        });
+      }
+    });
+  }
+};
+
+exports.resolveEventsAndBets = functions.pubsub
   .schedule("every 24 hours")
   .onRun(async (context) => {
-    const eventsToResolve = await fetchUpcomingPastEvents();
+    const eventsToResolve = await fetchPastDBEvents();
 
     for (const event of eventsToResolve) {
       const match = await fetchHistoricalDataForEvent(event);
-      await updateEventWithResult(event, match);
+      if (match) {
+        await updateEventWithResult(event, match);
+        await settleBetsForEvent(event);
+      }
     }
 
     console.log(`Resolved ${eventsToResolve.length} events.`);

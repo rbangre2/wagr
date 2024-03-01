@@ -1,7 +1,7 @@
 export interface Bet {
   id: string;
   eventId: string;
-  status: "Pending" | "Accepted" | "Declined" | "Won" | "Lost";
+  status: "Pending" | "Accepted" | "Declined" | "Resolved";
   createdAt: Date;
   acceptedAt?: Date;
   resolvedAt?: Date;
@@ -21,6 +21,8 @@ export interface Bet {
   receiverOdds: number;
   receiverSelection: string;
   receiverPotentialWin: number;
+
+  result?: string; // winner of the bet
 }
 
 export interface BetWithDetails {
