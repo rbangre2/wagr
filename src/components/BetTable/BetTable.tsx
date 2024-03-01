@@ -9,8 +9,10 @@ import {
   getOutgoingBetsByUserId,
   acceptBet,
   declineBet,
+  getBetById,
 } from "@/services/betService";
 import { getEventById } from "@/services/eventService";
+import { getUserById, updateUserBalance } from "@/services/userService";
 import IconButton from "@mui/material/IconButton";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
@@ -19,7 +21,7 @@ const BetTable: React.FC = () => {
   const [tabValue, setTabValue] = useState(0);
   const [refreshToggle, setRefreshToggle] = useState(false);
   const [rows, setRows] = useState<BetWithDetails[]>([]);
-  const { user } = useUser();
+  const { user, setUser } = useUser();
 
   useEffect(() => {
     const mapBetsToRows = async (bets: Bet[]): Promise<BetWithDetails[]> => {
@@ -110,15 +112,53 @@ const BetTable: React.FC = () => {
   };
 
   const handleAccept = async (id: string) => {
-    await acceptBet(id);
-    setRefreshToggle((t) => !t);
-    console.log(`Accept bet with id: ${id}`);
+    const bet = await getBetById(id);
+    if (!bet) {
+      console.error("bet not found");
+      return;
+    }
+
+    if (user && user.balance < bet.receiverStake) {
+      alert("insufficient funds to accept bet");
+      console.error("insufficient funds to accept bet");
+      return;
+    }
+
+    try {
+      if (user && user.id) {
+        await acceptBet(id);
+        await updateUserBalance(user.id, user.balance - bet.receiverStake);
+        setRefreshToggle((t) => !t);
+      }
+    } catch (error) {
+      console.error("error accepting bet with id: ", id);
+    }
+    console.log(`accepted bet with id: ${id}`);
   };
 
   const handleDecline = async (id: string) => {
-    await declineBet(id);
-    setRefreshToggle((t) => !t);
-    console.log(`Decline bet with id: ${id}`);
+    const bet = await getBetById(id);
+    if (!bet) {
+      console.error("bet not found");
+      return;
+    }
+    const sender = await getUserById(bet.senderId);
+    if (!sender) {
+      console.error("sender not found");
+      return;
+    }
+
+    try {
+      if (user && user.id) {
+        await declineBet(id);
+        await updateUserBalance(bet.senderId, sender.balance + bet.senderStake);
+        setUser({ ...user, balance: user.balance + bet.senderStake });
+        setRefreshToggle((t) => !t);
+      }
+    } catch (error) {
+      console.error("error rejecting bet: ", id);
+    }
+    console.log(`declined bet with id: ${id}`);
   };
 
   const incomingBetsColumn: GridColDef[] = [

@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Box, TextField, Button, Typography } from "@mui/material";
 import { useUser } from "@/contexts/UserContext";
-import { updateBalance } from "@/services/userService";
+import { deposit } from "@/services/userService";
 
 const DepositPage: React.FC = () => {
   const [amount, setAmount] = useState("");
@@ -20,7 +20,7 @@ const DepositPage: React.FC = () => {
 
     try {
       // Mock service function to update the user's balance
-      const updatedUser = await updateBalance(user?.id, depositAmount);
+      const updatedUser = await deposit(user?.id, depositAmount);
       setUser(updatedUser);
     } catch (error) {
       console.error("Error depositing funds:", error);

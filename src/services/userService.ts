@@ -106,7 +106,7 @@ export const getUserByEmail = async (
   }
 };
 
-export const updateBalance = async (
+export const deposit = async (
   userId: string | undefined,
   amount: number
 ): Promise<User> => {
@@ -131,6 +131,20 @@ export const updateBalance = async (
   };
 
   return updatedUser;
+};
+
+export const updateUserBalance = async (
+  userId: string,
+  newBalance: number
+): Promise<void> => {
+  if (!userId) {
+    throw new Error("user id is required");
+  }
+
+  const userRef = doc(db, "users", userId);
+  await updateDoc(userRef, {
+    balance: newBalance,
+  });
 };
 
 export const getUserById = async (userId: string): Promise<User | null> => {
