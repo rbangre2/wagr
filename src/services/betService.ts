@@ -7,6 +7,7 @@ import {
   addDoc,
   query,
   where,
+  getDoc,
   getDocs,
 } from "firebase/firestore";
 
@@ -95,6 +96,26 @@ export async function getBetsByUserId(userId: string): Promise<Bet[]> {
   } catch (error) {
     console.error("error getting bets by user ID: ", error);
     return [];
+  }
+}
+
+export async function getBetById(betId: string): Promise<Bet | null> {
+  try {
+    const betRef = doc(db, "bets", betId);
+    const betSnapshot = await getDoc(betRef);
+
+    if (betSnapshot.exists()) {
+      return {
+        ...(betSnapshot.data() as Bet),
+        id: betSnapshot.id,
+      };
+    } else {
+      console.log("bet not found: ", betId);
+      return null;
+    }
+  } catch (error) {
+    console.error("error fetching bet: ", error);
+    return null;
   }
 }
 
