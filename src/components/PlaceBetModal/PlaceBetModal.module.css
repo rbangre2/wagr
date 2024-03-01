@@ -1,0 +1,59 @@
+/* PlaceBetModal.module.css */
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000; /* Make sure the modal is on top of other elements */
+}
+
+.modalContent {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 500px; /* Adjust the width of the modal */
+  width: 100%;
+  max-height: calc(100vh - 40px); /* Adjust the height of the modal */
+  overflow-y: auto;
+  position: relative; /* For absolute positioning of the close button */
+}
+
+.closeButton {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.title {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.formControl {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.placeBetButton {
+  background-color: #6200ea; /* Example primary color */
+  color: white;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.placeBetButton:hover {
+  background-color: #3700b3; /* Darker shade for hover state */
+}
+
+.friendSelect {
+  margin-bottom: 20px;
+}
+
+.teamSelect {
+  margin-bottom: 20px;
+}
