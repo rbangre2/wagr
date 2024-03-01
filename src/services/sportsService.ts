@@ -14,7 +14,6 @@ export const getEvents = async (): Promise<Event[]> => {
         date: data.date.toDate(),
       } as Event;
     });
-    console.log(eventsList);
     return eventsList;
   } catch (error) {
     console.error("Error getting events:", error);
