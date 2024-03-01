@@ -1,8 +1,8 @@
-import LaLigaIcon from "@/resources/laliga.png";
-import SerieAIcon from "@/resources/seriea.png";
-import EPLIcon from "@/resources/epl.png";
-import BundesligaIcon from "@/resources/bundesliga.png";
-import Ligue1Icon from "@/resources/ligue1.png";
+import LaLigaIcon from "@/resources/leagues/laliga.png";
+import SerieAIcon from "@/resources/leagues/seriea.png";
+import EPLIcon from "@/resources/leagues/epl.png";
+import BundesligaIcon from "@/resources/leagues/bundesliga.png";
+import Ligue1Icon from "@/resources/leagues/ligue1.png";
 
 export const leagueIcons: { [key: string]: string } = {
   "LaLiga Santander": LaLigaIcon.src,
