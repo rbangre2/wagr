@@ -10,6 +10,7 @@ import {
   acceptBet,
   declineBet,
   getBetById,
+  getResolvedBetsByUserId,
 } from "@/services/betService";
 import { getEventById } from "@/services/eventService";
 import { getUserById, updateUserBalance } from "@/services/userService";
@@ -52,6 +53,12 @@ const BetTable: React.FC = () => {
                 eventDate: new Date(
                   (event.date as any).toDate()
                 ).toDateString(),
+                outcome:
+                  bet.result && bet.result === bet.senderId ? "WIN" : "LOST",
+                net_result:
+                  bet.result && bet.result === bet.senderId
+                    ? bet.senderPotentialWin - bet.senderStake
+                    : -1 * bet.senderStake,
               };
               return senderBet;
             }
@@ -73,6 +80,12 @@ const BetTable: React.FC = () => {
                 currency: "USD",
               }).format(bet.receiverPotentialWin),
               eventDate: new Date((event.date as any).toDate()).toDateString(),
+              outcome:
+                bet.result && bet.result === bet.receiverId ? "WIN" : "LOST",
+              net_result:
+                bet.result && bet.result === bet.senderId
+                  ? bet.senderPotentialWin - bet.senderStake
+                  : -1 * bet.senderStake,
             };
             return receiverBet;
           }
@@ -99,6 +112,10 @@ const BetTable: React.FC = () => {
           case 2:
             const outgoing = await getOutgoingBetsByUserId(userId);
             setRows(await mapBetsToRows(outgoing));
+            break;
+          case 3:
+            const resolved = await getResolvedBetsByUserId(userId);
+            setRows(await mapBetsToRows(resolved));
             break;
         }
       }
@@ -128,6 +145,7 @@ const BetTable: React.FC = () => {
       if (user && user.id) {
         await acceptBet(id);
         await updateUserBalance(user.id, user.balance - bet.receiverStake);
+        setUser({ ...user, balance: user.balance - bet.receiverStake });
         setRefreshToggle((t) => !t);
       }
     } catch (error) {
@@ -236,12 +254,24 @@ const BetTable: React.FC = () => {
     { field: "eventDate", headerName: "Event Date", width: 150 },
   ];
 
+  const resolvedBetsColumn: GridColDef[] = [
+    { field: "opponent", headerName: "Opponent", width: 150 },
+    { field: "event", headerName: "Event", width: 200 },
+    { field: "selection", headerName: "Selection", width: 150 },
+    { field: "staked", headerName: "Stake", width: 110 },
+    { field: "odds", headerName: "Odds", width: 110 },
+    { field: "outcome", headerName: "Outcome", width: 150 },
+    { field: "net_result", headerName: "Net Result", width: 150 },
+    { field: "eventDate", headerName: "Event Date", width: 150 },
+  ];
+
   return (
     <Box sx={{ height: 500, width: "100%" }}>
       <Tabs value={tabValue} onChange={handleTabChange} aria-label="bet tabs">
         <Tab label="Bets" />
         <Tab label="Incoming Bets" />
         <Tab label="Outgoing Bets" />
+        <Tab label="Resolved Bets" />
       </Tabs>
       <TabPanel value={tabValue} index={0}>
         <DataGrid rows={rows} columns={betsColumn} autoHeight />
@@ -251,6 +281,9 @@ const BetTable: React.FC = () => {
       </TabPanel>
       <TabPanel value={tabValue} index={2}>
         <DataGrid rows={rows} columns={outgoingBetsColumn} autoHeight />
+      </TabPanel>
+      <TabPanel value={tabValue} index={3}>
+        <DataGrid rows={rows} columns={resolvedBetsColumn} autoHeight />
       </TabPanel>
     </Box>
   );

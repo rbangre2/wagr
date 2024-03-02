@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { DataGrid, GridSortModel, GridRowParams } from "@mui/x-data-grid";
 import { Typography, Box } from "@mui/material";
 import PlaceBetModal from "../PlaceBetModal/PlaceBetModal";
-import { Event } from "@/models/Event"; // Ensure this import points to where your Event type is defined
+import { Event } from "@/models/Event";
 
 const defaultColumns = [
   { field: "homeTeam", headerName: "Home Team", width: 150 },
@@ -32,7 +32,7 @@ const SportsTable = ({
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
   const handleRowClick = (params: GridRowParams) => {
-    setSelectedEvent(params.row as Event); // Cast the row data to the Event type
+    setSelectedEvent(params.row as Event);
     setBetModalOpen(true);
   };
 
