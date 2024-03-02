@@ -34,6 +34,7 @@ const PlaceBet: React.FC<PlaceBetProps> = ({ open, onClose, event }) => {
   const [odds, setOdds] = useState("");
   const [amount, setAmount] = useState("");
   const [potentialPayout, setPotentialPayout] = useState<number>(0);
+  const [currency, setCurrency] = useState("USD");
   const { user, setUser } = useUser();
 
   useEffect(() => {
@@ -73,7 +74,7 @@ const PlaceBet: React.FC<PlaceBetProps> = ({ open, onClose, event }) => {
 
       const newBet = {
         eventId: event.id,
-        status: "Pending" as "Pending",
+        status: "Pending",
         createdAt: new Date(),
 
         senderId: user.id,
@@ -102,6 +103,10 @@ const PlaceBet: React.FC<PlaceBetProps> = ({ open, onClose, event }) => {
     }
   };
 
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(amount);
+  };
+
   return (
     <Modal open={open} onClose={onClose} className={styles.container}>
       <div className={styles.modalContent}>
@@ -120,7 +125,7 @@ const PlaceBet: React.FC<PlaceBetProps> = ({ open, onClose, event }) => {
             label="Choose a Friend"
             onChange={(e) => setSelectedFriend(e.target.value as string)}
           >
-            {friendsList.concat().map((friend) => (
+            {friendsList.map((friend) => (
               <MenuItem key={friend.id} value={friend.id}>
                 {friend.name}
               </MenuItem>
@@ -138,6 +143,21 @@ const PlaceBet: React.FC<PlaceBetProps> = ({ open, onClose, event }) => {
           >
             <MenuItem value={event.homeTeam}>{event.homeTeam}</MenuItem>
             <MenuItem value={event.awayTeam}>{event.awayTeam}</MenuItem>
+          </Select>
+        </FormControl>
+        <FormControl fullWidth className={styles.formControl} required>
+          <InputLabel id="select-currency-label">Currency</InputLabel>
+          <Select
+            labelId="select-currency-label"
+            id="select-currency"
+            value={currency}
+            label="Currency"
+            onChange={(e) => setCurrency(e.target.value as string)}
+          >
+            {/* Example currencies, add more as needed */}
+            <MenuItem value="USD">USD</MenuItem>
+            {/* <MenuItem value="EUR">EUR</MenuItem>
+            <MenuItem value="GBP">GBP</MenuItem> */}
           </Select>
         </FormControl>
         <TextField
@@ -175,7 +195,7 @@ const PlaceBet: React.FC<PlaceBetProps> = ({ open, onClose, event }) => {
           </Grid>
           <Grid item>
             <Typography variant="subtitle1">
-              Potential Payout: ${potentialPayout.toFixed(2)}
+              Potential Payout: {formatCurrency(potentialPayout)}
             </Typography>
           </Grid>
         </Grid>
