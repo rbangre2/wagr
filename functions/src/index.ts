@@ -205,8 +205,10 @@ const settleBetsForEvent = async (event: any) => {
     bets.forEach(async (bet: any) => {
       let status = bet.status;
       if (bet.status === "Accepted") {
-        if (bet.senderSelection === event.result &&
-          bet.receiverSelection !== event.result) {
+        if (
+          bet.senderSelection === event.result &&
+          bet.receiverSelection !== event.result
+        ) {
           status = "Resolved";
           await updateUserBalance(bet.senderId, bet.senderPotentialWin);
         } else {
@@ -218,6 +220,10 @@ const settleBetsForEvent = async (event: any) => {
         await betRef.update({
           status: status,
           resolvedAt: now,
+          result:
+            bet.senderSelection === event.result ?
+              bet.senderId :
+              bet.receiverId,
         });
       }
     });

@@ -1,11 +1,27 @@
 import { db } from "@/utils/firebase/firebaseConfig";
-import { collection, getDocs } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  Timestamp,
+} from "firebase/firestore";
 import { Event } from "@/models/Event";
 
 export const getEvents = async (): Promise<Event[]> => {
   try {
     const eventsCollectionRef = collection(db, "events");
-    const eventSnapshot = await getDocs(eventsCollectionRef);
+
+    // Use the current timestamp to filter future events
+    const now = Timestamp.now();
+
+    // Create a query that selects events happening in the future
+    const futureEventsQuery = query(
+      eventsCollectionRef,
+      where("date", ">", now)
+    );
+
+    const eventSnapshot = await getDocs(futureEventsQuery);
     const eventsList = eventSnapshot.docs.map((doc) => {
       const data = doc.data();
       return {

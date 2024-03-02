@@ -162,3 +162,38 @@ export async function getOutgoingBetsByUserId(userId: string): Promise<Bet[]> {
     return [];
   }
 }
+
+export async function getResolvedBetsByUserId(userId: string): Promise<Bet[]> {
+  try {
+    const betsRef = collection(db, "bets");
+    const resolvedBetsQuery = query(
+      betsRef,
+      where("status", "==", "Resolved"),
+      where("senderId", "==", userId)
+    );
+    const resolvedBetsQueryReceiver = query(
+      betsRef,
+      where("status", "==", "Resolved"),
+      where("receiverId", "==", userId)
+    );
+
+    const [sentBetsSnapshot, receivedBetsSnapshot] = await Promise.all([
+      getDocs(resolvedBetsQuery),
+      getDocs(resolvedBetsQueryReceiver),
+    ]);
+
+    const sentBets = sentBetsSnapshot.docs.map((doc) => ({
+      ...(doc.data() as Bet),
+      id: doc.id,
+    }));
+    const receivedBets = receivedBetsSnapshot.docs.map((doc) => ({
+      ...(doc.data() as Bet),
+      id: doc.id,
+    }));
+
+    return [...sentBets, ...receivedBets];
+  } catch (error) {
+    console.error("error getting resolved bets by user id: ", error);
+    return [];
+  }
+}
