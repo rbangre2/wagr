@@ -1,64 +1,46 @@
 import React, { useState } from "react";
 import {
   TextField,
+  Button,
   Box,
   Snackbar,
   IconButton,
   InputAdornment,
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
-import { checkFriendRequestStatus, sendFriendRequest } from "@/services/friendService";
+import { sendFriendRequest } from "@/services/friendService";
 import { getUserByEmail } from "@/services/userService";
 import { useUser } from "@/contexts/UserContext";
 
 const AddFriend: React.FC = () => {
   const [emailInput, setEmailInput] = useState("");
   const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(false);
   const [helperText, setHelperText] = useState("");
-  const { user } = useUser(); // Assuming useUser returns an object with a user field
+  const user = useUser();
 
   const handleInviteClick = async () => {
-    if (!emailInput) {
-      setError("Please enter an email address.");
-      return;
-    }
-    if (user && user.email === emailInput) {
-      setError("you cannot add yourself as a friend.");
-      return;
-    }
-
     try {
       const receiver = await getUserByEmail(emailInput);
-      if (!receiver || !receiver.id) {
-        setError("user could not be found.");
-        return;
+      if (user.user && user.user.id && receiver && receiver.id) {
+        await sendFriendRequest(user.user.id, receiver.id);
+        console.log("Invite sent successfully.");
+        setEmailInput("");
+        setError(false);
+        setHelperText("");
+        setSnackbarOpen(true);
+      } else {
+        setError(true);
+        setHelperText("user could not be found.");
       }
-
-      if (!user) {
-        setError("please authenticate yourself first!");
-        return;
-      }
-
-      const requestStatus = await checkFriendRequestStatus(user.id ?? "", receiver.id);
-      if (requestStatus.exists) {
-        setError("friend request pending or you are already friends");
-        return;
-      }
-
-      await sendFriendRequest(user.id ?? "", receiver.id ?? "");
-      setEmailInput("");
-      setSnackbarOpen(true);
-      setHelperText("friend request sent successfully");
     } catch (error) {
-      setError("failed to send invite.");
+      setError(true);
+      setHelperText("failed to send invite.");
     }
   };
 
   const handleCloseSnackbar = () => {
     setSnackbarOpen(false);
-    setError("");
-    setHelperText("");
   };
 
   return (
@@ -75,8 +57,8 @@ const AddFriend: React.FC = () => {
         variant="outlined"
         value={emailInput}
         onChange={(e) => setEmailInput(e.target.value)}
-        error={!!error}
-        helperText={error || helperText}
+        error={error}
+        helperText={helperText}
         sx={{ minWidth: "250px" }}
         InputProps={{
           endAdornment: (
@@ -96,7 +78,7 @@ const AddFriend: React.FC = () => {
         open={snackbarOpen}
         autoHideDuration={6000}
         onClose={handleCloseSnackbar}
-        message={helperText}
+        message="Friend request sent successfully"
       />
     </Box>
   );
