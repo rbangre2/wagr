@@ -74,7 +74,7 @@ const PlaceBet: React.FC<PlaceBetProps> = ({ open, onClose, event }) => {
 
       const newBet = {
         eventId: event.id,
-        status: "Pending",
+        status: "Pending" as "Pending",
         createdAt: new Date(),
 
         senderId: user.id,
@@ -125,7 +125,7 @@ const PlaceBet: React.FC<PlaceBetProps> = ({ open, onClose, event }) => {
             label="Choose a Friend"
             onChange={(e) => setSelectedFriend(e.target.value as string)}
           >
-            {friendsList.map((friend) => (
+            {friendsList.concat().map((friend) => (
               <MenuItem key={friend.id} value={friend.id}>
                 {friend.name}
               </MenuItem>
