@@ -35,7 +35,6 @@ const AddFriend: React.FC = () => {
         return;
       }
 
-      // shouldnt really ever happen
       if (!user) {
         setError("please authenticate yourself first!");
         return;

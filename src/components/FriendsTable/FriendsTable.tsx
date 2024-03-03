@@ -5,22 +5,24 @@ import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
 import ChallengeIcon from "@mui/icons-material/SportsMma";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CancelIcon from "@mui/icons-material/Cancel";
-import { DataGrid, GridRenderCellParams, GridAlignment } from "@mui/x-data-grid";
-import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Tabs, Tab, Box, Typography } from "@mui/material";
+import { DataGrid } from "@mui/x-data-grid";
+import { Tabs, Tab, Box, Typography, setRef } from "@mui/material";
+import { TabPanelProps } from "./types";
+import { Friend } from "@/models/User";
 import { formatDistanceToNow } from "date-fns";
 import StatusIndicator from "../StatusIndicator/StatusIndicator";
+import { GridRenderCellParams, GridAlignment } from "@mui/x-data-grid";
 import { formatCurrency } from "@/utils/designUtils";
-import { Friend } from "@/models/User"; // Ensure you have the correct path for your models
-import { removeFriend, getIncomingFriendRequestsForUser, getOutgoingFriendRequests, acceptFriendRequest, rejectFriendRequest, getFriends } from "@/services/friendService"; // Ensure paths are correct
-import { useUser } from "@/contexts/UserContext";
 import { FriendRequest } from "@/models/FriendRequest";
 import { getUserById } from "@/services/userService";
-
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: any;
-  value: any;
-}
+import {
+  getIncomingFriendRequestsForUser,
+  getOutgoingFriendRequests,
+  acceptFriendRequest,
+  rejectFriendRequest,
+  getFriends,
+} from "@/services/friendService";
+import { useUser } from "@/contexts/UserContext";
 
 function TabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
@@ -44,25 +46,7 @@ const FriendsTable: React.FC = () => {
   const [incomingRequests, setIncomingRequests] = useState<FriendRequest[]>([]);
   const [outgoingRequests, setOutgoingRequests] = useState<FriendRequest[]>([]);
   const [refreshRequests, setRefreshRequests] = useState(false);
-  const { user } = useUser();
-  const [openDialog, setOpenDialog] = useState(false);
-  const [friendToRemove, setFriendToRemove] = useState({ id: "", name: "" });
-
-
-  useEffect(() => {
-    async function fetchData() {
-      if (user && user.id) {
-        const fetchedFriends = await getFriends(user.id);
-        setFriends(fetchedFriends);
-        const fetchedIncomingRequests = await getIncomingFriendRequestsForUser(user.id);
-        setIncomingRequests(fetchedIncomingRequests);
-        const fetchedOutgoingRequests = await getOutgoingFriendRequests(user.id);
-        setOutgoingRequests(fetchedOutgoingRequests);
-      }
-    }
-
-    fetchData();
-  }, [user, refreshRequests]);
+  const user = useUser().user;
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
@@ -70,30 +54,24 @@ const FriendsTable: React.FC = () => {
 
   const handleAcceptRequest = async (requestId: string, senderId: string) => {
     try {
-      if (user) {
-        await acceptFriendRequest(requestId, senderId || "", user.id);
+      if (user && user.id) {
+        await acceptFriendRequest(requestId, senderId, user.id);
+        setTabValue(0);
         setRefreshRequests((prevState) => !prevState);
       }
     } catch (error) {
-      console.error("Error accepting friend request:", error);
+      console.error("error accepting friend request ", error);
     }
   };
 
   const handleRejectRequest = async (requestId: string) => {
     try {
-      await rejectFriendRequest(requestId);
-      setRefreshRequests((prevState) => !prevState);
+      if (user && user.id) {
+        await rejectFriendRequest(requestId);
+        setRefreshRequests((prevState) => !prevState);
+      }
     } catch (error) {
-      console.error("Error rejecting friend request:", error);
-    }
-  };
-
-  const handleRemoveFriend = async (friendId: string) => {
-    try {
-      await removeFriend(user.id, friendId);
-      setRefreshRequests((prevState) => !prevState);
-    } catch (error) {
-      console.error("Error removing friend:", error);
+      console.error("error rejecting friend request");
     }
   };
 
@@ -101,12 +79,12 @@ const FriendsTable: React.FC = () => {
     {
       field: "profile",
       headerName: "Profile",
-      width: 125,
-      renderCell: (params: GridRenderCellParams<any>) => (
+      renderCell: (params: GridRenderCellParams) => (
         <Avatar alt={params.row.name} src={params.row.profilePicture} />
       ),
-      headerAlign: "center",
-      align: "center",
+      width: 125,
+      headerAlign: "center" as GridAlignment,
+      align: "center" as GridAlignment,
     },
     {
       field: "name",
@@ -156,26 +134,209 @@ const FriendsTable: React.FC = () => {
     {
       field: "actions",
       headerName: "Actions",
-      width: 200,
-      renderCell: (params: GridRenderCellParams<any>) => (
+      renderCell: () => (
         <>
           <IconButton aria-label="challenge">
             <ChallengeIcon />
           </IconButton>
-          <IconButton aria-label="remove" onClick={() => handleRemoveFriend(params.id)}>
+          <IconButton aria-label="remove" onClick={() => handleRemoveFriend(params.row.id)}>
             <PersonRemoveIcon />
           </IconButton>
         </>
       ),
-      headerAlign: "center",
-      align: "center",
+      width: 200,
+      headerAlign: "center" as GridAlignment,
+      align: "center" as GridAlignment,
     },
   ];
 
+  const incomingRequestColumns = [
+    {
+      field: "from",
+      headerName: "From",
+      width: 150,
+      renderCell: (params: GridRenderCellParams) => (
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <Avatar
+            alt={params.row.senderName}
+            src={params.row.senderProfilePicture}
+            sx={{ width: 30, height: 30, marginRight: 2 }}
+          />
+          <Typography variant="body2" noWrap>
+            {params.row.senderName}
+          </Typography>
+        </Box>
+      ),
+      headerAlign: "left" as GridAlignment,
+      align: "left" as GridAlignment,
+    },
+    {
+      field: "sentDate",
+      headerName: "Sent Date",
+      width: 250,
+      valueGetter: (params: GridRenderCellParams) =>
+        `${formatDistanceToNow(new Date(params.row.createdAt), {
+          addSuffix: true,
+        })}`,
+      headerAlign: "center" as GridAlignment,
+      align: "center" as GridAlignment,
+    },
+    {
+      field: "actions",
+      headerName: "Actions",
+      width: 180,
+      renderCell: (params: GridRenderCellParams<FriendRequest>) => {
+        return (
+          <Box sx={{ display: "flex", justifyContent: "center", gap: 1 }}>
+            <IconButton
+              aria-label="accept"
+              color="success"
+              size="small"
+              onClick={() =>
+                handleAcceptRequest(params.row.id, params.row.sender)
+              }
+            >
+              <CheckCircleOutlineIcon />
+            </IconButton>
+            <IconButton
+              aria-label="decline"
+              color="error"
+              size="small"
+              onClick={() => handleRejectRequest(params.row.id)}
+            >
+              <CancelIcon />
+            </IconButton>
+          </Box>
+        );
+      },
+      headerAlign: "center" as GridAlignment,
+      align: "center" as GridAlignment,
+    },
+  ];
+
+  const outgoingRequestColumns = [
+    {
+      field: "sent to",
+      headerName: "To",
+      width: 200,
+      renderCell: (params: GridRenderCellParams) => (
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <Avatar
+            alt={params.row.receiverName}
+            src={params.row.receiverProfilePicture}
+          />
+          <span>{params.row.receiverName}</span>
+        </Box>
+      ),
+    },
+    {
+      field: "sentDate",
+      headerName: "Sent Date",
+      width: 180,
+      valueGetter: (params: GridRenderCellParams) =>
+        formatDistanceToNow(new Date(params.row.createdAt), {
+          addSuffix: true,
+        }),
+    },
+    {
+      field: "actions",
+      headerName: "Actions",
+      width: 180,
+      renderCell: (params: GridRenderCellParams) => (
+        <Box sx={{ display: "flex", justifyContent: "center", gap: 1 }}>
+          <IconButton
+            aria-label="cancel request"
+            color="warning"
+            size="small"
+            onClick={() => handleRejectRequest(params.row.id)}
+          >
+            <CancelIcon />
+          </IconButton>
+        </Box>
+      ),
+      headerAlign: "center" as GridAlignment,
+      align: "center" as GridAlignment,
+    },
+  ];
+
+  useEffect(() => {
+    async function fetchFriends() {
+      try {
+        if (user && user.id) {
+          const friendsList = await getFriends(user.id);
+          setFriends(friendsList);
+        }
+      } catch (error) {
+        console.error("failed to fetch friends: ", error);
+      }
+    }
+
+    async function fetchIncomingRequests() {
+      try {
+        if (user && user.id) {
+          const incomingRequestsData = await getIncomingFriendRequestsForUser(
+            user.id
+          );
+
+          const incomingRequestsWithSenderInfo = await Promise.all(
+            incomingRequestsData.map(async (request) => {
+              const senderUser = await getUserById(request.sender);
+              return {
+                ...request,
+                senderName: senderUser
+                  ? senderUser.firstName + " " + senderUser.lastName
+                  : "Unknown",
+              };
+            })
+          );
+          setIncomingRequests(incomingRequestsWithSenderInfo);
+        }
+      } catch (error) {
+        console.error("Error fetching incoming friend requests:", error);
+      }
+    }
+
+    async function fetchOutgoingRequests() {
+      try {
+        if (user && user.id) {
+          const outgoingRequestsData = await getOutgoingFriendRequests(user.id);
+
+          const outgoingRequestsWithReceiverInfo = await Promise.all(
+            outgoingRequestsData.map(async (request) => {
+              const receiverUser = await getUserById(request.receiver);
+              return {
+                ...request,
+                receiverName: receiverUser
+                  ? receiverUser.firstName + " " + receiverUser.lastName
+                  : "Unknown",
+              };
+            })
+          );
+          setOutgoingRequests(outgoingRequestsWithReceiverInfo);
+        }
+      } catch (error) {
+        console.error("error fetching outgoing requests", error);
+      }
+    }
+
+    fetchFriends();
+    fetchIncomingRequests();
+    fetchOutgoingRequests();
+  }, [user, user?.id, refreshRequests]);
+
   return (
     <>
-      <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-        <Tabs value={tabValue} onChange={handleTabChange} aria-label="friend tabs">
+      <Box
+        sx={{
+          borderBottom: 1,
+          borderColor: "divider",
+        }}
+      >
+        <Tabs
+          value={tabValue}
+          onChange={handleTabChange}
+          aria-label="friend tabs"
+        >
           <Tab label="Friends" />
           <Tab label="Incoming Requests" />
           <Tab label="Outgoing Requests" />
@@ -183,14 +344,32 @@ const FriendsTable: React.FC = () => {
       </Box>
       <TabPanel value={tabValue} index={0}>
         <div style={{ height: 500, width: "100%" }}>
-          <DataGrid rows={friends} columns={columns} pageSize={5} />
+          <DataGrid
+            rows={friends}
+            columns={columns}
+            disableRowSelectionOnClick
+          />
         </div>
       </TabPanel>
       <TabPanel value={tabValue} index={1}>
-        {/* Render incoming friend requests */}
+        <div style={{ height: 500, width: "100%" }}>
+          <DataGrid
+            rows={incomingRequests}
+            columns={incomingRequestColumns}
+            disableRowSelectionOnClick
+            disableColumnFilter
+            disableColumnSelector
+          />
+        </div>
       </TabPanel>
       <TabPanel value={tabValue} index={2}>
-        {/* Render outgoing friend requests */}
+        <div style={{ height: 500, width: "100%" }}>
+          <DataGrid
+            rows={outgoingRequests}
+            columns={outgoingRequestColumns}
+            disableRowSelectionOnClick
+          />
+        </div>
       </TabPanel>
     </>
   );
