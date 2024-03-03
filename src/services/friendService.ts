@@ -168,23 +168,38 @@ export async function updateFriendData(
 export async function removeFriend(userId: string, friendId: string) {
   await deleteDoc(doc(db, "users", userId, "friends", friendId));
   await deleteDoc(doc(db, "users", friendId, "friends", userId));
+
+  const friendRequestQuery = query(
+    collection(db, "FriendRequests"),
+    where("sender", "in", [userId, friendId]),
+    where("receiver", "in", [userId, friendId])
+  );
+
+  const querySnapshot = await getDocs(friendRequestQuery);
+  querySnapshot.forEach(async (doc) => {
+    await deleteDoc(doc.ref);
+  });
 }
 
 
-export async function checkFriendRequestStatus( sender: string, receiver: string) {
+
+export async function checkFriendRequestStatus(sender: string, receiver: string) {
   const q = query(
     collection(db, "FriendRequests"),
     where("sender", "==", sender),
     where("receiver", "==", receiver)
   );
   const querySnapshot = await getDocs(q);
-  const friendRequests: FriendRequest[] = querySnapshot.docs.map(
-    (doc) =>
-      ({
-        ...doc.data(),
-        id: doc.id,
-      } as FriendRequest)
-  );
-  return { exists: friendRequests.length > 0, id: friendRequests[0]?.id };
+  let status = "none";
+  let requestId = null;
+
+  querySnapshot.forEach((doc) => {
+    const requestData = doc.data();
+    status = requestData.status;
+    requestId = doc.id;
+  });
+
+  return { status, requestId };
 }
+
 
