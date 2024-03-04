@@ -8,8 +8,8 @@ export interface Event {
   location: string;
   date: Date;
   time: string;
-  status: "Upcoming" | "Finished";
-  competition_id: number;
+  status: "upcoming" | "finished";
+  competitionId: number;
   score?: string;
   result?: string;
 }

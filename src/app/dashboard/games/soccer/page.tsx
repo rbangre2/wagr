@@ -15,7 +15,7 @@ import { useSportsContext } from "@/contexts/SportContext";
 import styles from "./page.module.css";
 
 export default function SoccerGames() {
-  const { data } = useSportsContext();
+  const { events } = useSportsContext();
   const tableTitle = "Upcoming Fixtures";
 
   const soccerColumns = [
@@ -56,7 +56,7 @@ export default function SoccerGames() {
   return (
     <Box className={styles.background}>
       <GamesLayout>
-        <SportsTable title={tableTitle} columns={soccerColumns} data={data} />
+        <SportsTable title={tableTitle} columns={soccerColumns} data={events} />
       </GamesLayout>
     </Box>
   );
