@@ -49,7 +49,7 @@ export const SportsProvider: React.FC<SportsProviderProps> = ({ children }) => {
     };
 
     fetchEvents();
-  });
+  }, []);
 
   return (
     <SportsContext.Provider value={{ events }}>
