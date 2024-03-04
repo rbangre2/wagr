@@ -37,7 +37,30 @@ const SportsTable = ({
   };
 
   return (
-    <Box style={{ height: "100%", width: "100%", paddingTop: "20px" }}>
+    <Box
+      sx={{
+        height: "100%",
+        width: "100%",
+        paddingTop: "20px",
+        backgroundColor: "black", // Set the background color to black
+        color: "white", // Set the text color to white
+        "& .MuiDataGrid-cell": {
+          color: "lightgray", // Set the DataGrid cell text color to light gray
+        },
+        "& .MuiDataGrid-columnHeaders": {
+          color: "white", // Set the DataGrid header text color to white
+          backgroundColor: "#333", // Optional: Set a different background color for headers
+        },
+        "& .MuiDataGrid-footerContainer": {
+          color: "white",
+          backgroundColor: "#333",
+        },
+        "& .MuiTablePagination-root": {
+          color: "white",
+          backgroundColor: "#333",
+        },
+      }}
+    >
       <Typography
         variant="h6"
         gutterBottom
@@ -54,6 +77,17 @@ const SportsTable = ({
         columns={columns}
         sortModel={sortModel}
         onRowClick={handleRowClick}
+        sx={{
+          color: "white",
+          border: 0,
+          "& .MuiDataGrid-cell": {
+            borderBottom: "1px solid rgba(255, 255, 255, 0.12)", // Lighten the cell bordes
+            fontFamily: "'Open Sans', sans-serif", // Apply the font to DataGrid cells
+          },
+          "& .MuiDataGrid-columnSeparator": {
+            display: "none",
+          },
+        }}
       />
       {selectedEvent && (
         <PlaceBetModal

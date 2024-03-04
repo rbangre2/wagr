@@ -143,6 +143,7 @@ const PlaceBet: React.FC<PlaceBetProps> = ({ open, onClose, event }) => {
           >
             <MenuItem value={event.homeTeam}>{event.homeTeam}</MenuItem>
             <MenuItem value={event.awayTeam}>{event.awayTeam}</MenuItem>
+            <MenuItem value="Draw">Draw</MenuItem> {/* Add this line */}
           </Select>
         </FormControl>
         <FormControl fullWidth className={styles.formControl} required>
@@ -154,10 +155,7 @@ const PlaceBet: React.FC<PlaceBetProps> = ({ open, onClose, event }) => {
             label="Currency"
             onChange={(e) => setCurrency(e.target.value as string)}
           >
-            {/* Example currencies, add more as needed */}
             <MenuItem value="USD">USD</MenuItem>
-            {/* <MenuItem value="EUR">EUR</MenuItem>
-            <MenuItem value="GBP">GBP</MenuItem> */}
           </Select>
         </FormControl>
         <TextField

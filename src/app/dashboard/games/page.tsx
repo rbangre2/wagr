@@ -1,6 +1,9 @@
 "use client";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { Box } from "@mui/material";
+
+import styles from "./page.module.css"
 
 const Games = () => {
   const router = useRouter();
@@ -9,7 +12,9 @@ const Games = () => {
     router.push("/dashboard/games/soccer");
   }, [router]);
 
-  return null;
+  return (
+    <Box className={styles.background} />
+  );
 };
 
 export default Games;
