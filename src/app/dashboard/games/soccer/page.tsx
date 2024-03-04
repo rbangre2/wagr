@@ -10,9 +10,12 @@ import {
 } from "@mui/x-data-grid";
 import Image from "next/image";
 import { leagueIcons } from "./types";
+import { Box } from "@mui/material";
+import { useSportsContext } from "@/contexts/SportContext";
+import styles from "./page.module.css";
 
 export default function SoccerGames() {
-  const [data, setData] = useState<Event[]>([]);
+  const { data } = useSportsContext();
   const tableTitle = "Upcoming Fixtures";
 
   const soccerColumns = [
@@ -50,23 +53,11 @@ export default function SoccerGames() {
       },
     },
   ];
-
-  useEffect(() => {
-    const fetchFixtures = async () => {
-      try {
-        const fixtures = await getEvents();
-        console.log(fixtures.length);
-        setData(fixtures);
-      } catch (error) {
-        console.error("failed to fetch soccer data", error);
-      }
-    };
-
-    fetchFixtures();
-  }, []);
   return (
-    <GamesLayout>
-      <SportsTable title={tableTitle} columns={soccerColumns} data={data} />
-    </GamesLayout>
+    <Box className={styles.background}>
+      <GamesLayout>
+        <SportsTable title={tableTitle} columns={soccerColumns} data={data} />
+      </GamesLayout>
+    </Box>
   );
 }

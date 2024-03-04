@@ -2,11 +2,16 @@
 
 import React from "react";
 import { UserProvider } from "@/contexts/UserContext";
+import { SportsProvider } from "@/contexts/SportContext";
 
 export default function ParentProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <UserProvider> {children} </UserProvider>;
+  return (
+    <SportsProvider>
+      <UserProvider> {children} </UserProvider>{" "}
+    </SportsProvider>
+  );
 }
