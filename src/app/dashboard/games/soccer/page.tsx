@@ -47,7 +47,7 @@ export default function SoccerGames() {
       width: 180,
       valueFormatter: (params: GridValueFormatterParams) => {
         if (params.value instanceof Date) {
-          return params.value.toLocaleDateString();
+          return params.value.toLocaleString(); 
         }
         return params.value;
       },
