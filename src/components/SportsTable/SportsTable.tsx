@@ -90,6 +90,9 @@ const SportsTable = ({
           "& .MuiDataGrid-row:hover": {
             cursor: "pointer", // This will change the cursor to a pointer on hover
           },
+          "& .MuiDataGrid-cell:focus": {
+            outline: "none",
+          },
         }}
       />
       {selectedEvent && (
