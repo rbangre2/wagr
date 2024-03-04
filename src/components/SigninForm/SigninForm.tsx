@@ -58,7 +58,6 @@ const SigninForm = () => {
     try {
       await signIn(formData.email, formData.password);
       const authUser = await getUserByEmail(formData.email);
-      console.log(authUser);
       setUser(authUser);
       router.push("/dashboard");
     } catch (error) {

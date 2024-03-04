@@ -1,10 +1,11 @@
-import { League } from "@/models/Sport";
+export function determineMatchResult(ft_score: string): string {
+  const [homeScore, awayScore] = ft_score.split(" - ").map(Number);
 
-export const getLeagueIdFromName = (league: League | string): number => {
-  if (league == League.LaLiga) {
-    return 3;
-  } else if (league == League.SerieA) {
-    return 4;
+  if (homeScore > awayScore) {
+    return "Win";
+  } else if (homeScore < awayScore) {
+    return "Lose";
+  } else {
+    return "Draw";
   }
-  return -1;
-};
+}

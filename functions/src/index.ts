@@ -1,6 +1,7 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import axios from "axios";
+import {parse} from "date-fns";
 
 const apiKey = functions.config().livescore.apikey;
 const apiSecret = functions.config().livescore.apisecret;
@@ -8,12 +9,28 @@ const apiSecret = functions.config().livescore.apisecret;
 admin.initializeApp();
 const db = admin.firestore();
 
+export interface Event {
+  id: string;
+  homeTeam: string;
+  homeId: number;
+  awayTeam: string;
+  awayId: number;
+  league: string;
+  location: string;
+  date: Date;
+  time: string;
+  status: "upcoming" | "finished";
+  competitionId: number;
+  score?: string;
+  result?: string;
+}
+
 const fetchFixturesPage = async (url: string): Promise<any[]> => {
   const response = await axios.get(url);
   return response.data.data.fixtures;
 };
 
-const fetchEventsFromAPI = async (competitionId: number): Promise<any[]> => {
+const fetchEventsFromAPI = async (competitionId: number): Promise<Event[]> => {
   const baseUrl = "https://livescore-api.com/api-client/fixtures/matches.json";
   const queryParams = `key=${apiKey}&secret=${apiSecret}&competition_id=
     ${competitionId}&lang=en`;
@@ -32,6 +49,9 @@ const fetchEventsFromAPI = async (competitionId: number): Promise<any[]> => {
         break;
       }
     }
+
+    const upcoming = "upcoming";
+
     const events = fixtures.map((fixture) => ({
       id: fixture.id,
       homeTeam: fixture.home_name,
@@ -41,9 +61,9 @@ const fetchEventsFromAPI = async (competitionId: number): Promise<any[]> => {
       league: fixture.competition.name,
       competitionId: fixture.competition_id,
       location: fixture.location,
-      date: new Date(fixture.date),
+      date: fixture.date,
       time: fixture.time,
-      status: "upcoming",
+      status: upcoming as "upcoming",
     }));
 
     return events;
@@ -67,23 +87,25 @@ const storeEventsInFirestore = async () => {
   // Batch write new events to Firestore
   const batch = db.batch();
   newEvents.forEach((event) => {
+    const dateTimeUTCString = `${event.date}T${event.time}Z`;
+    const eventDate = parse(
+      dateTimeUTCString,
+      "yyyy-MM-dd'T'HH:mm:ss'Z'",
+      new Date()
+    );
     const eventRef = eventsCollection.doc(String(event.id));
-    batch.set(eventRef, event);
+    batch.set(eventRef, {
+      ...event,
+      date: eventDate,
+    });
   });
 
   await batch.commit();
   console.log(`${newEvents.length} new events added.`);
 };
 
-/**
- * Fetches and returns all events from multiple competitions.
- * Currently fetches events from La Liga (ID 3) and Serie A (ID 4).
- *
- * @return {Promise<any[]>} A promise that resolves to
- * an array of event objects.
- */
-async function getAllEvents() {
-  let events: any[] = [];
+const getAllEvents = async () => {
+  let events: Event[] = [];
   events = events.concat(await fetchEventsFromAPI(1)); // bundesliga
   events = events.concat(await fetchEventsFromAPI(2)); // epl
   events = events.concat(await fetchEventsFromAPI(3)); // la liga
@@ -91,157 +113,10 @@ async function getAllEvents() {
   events = events.concat(await fetchEventsFromAPI(5)); // ligue 1
   // do more later
   return events;
-}
+};
 
 exports.updateEvents = functions.pubsub
   .schedule("every 48 hours")
   .onRun(async (context) => {
     await storeEventsInFirestore();
-  });
-
-const fetchPastDBEvents = async (): Promise<any> => {
-  const now = admin.firestore.Timestamp.now();
-  const eventsRef = db.collection("events");
-  const snapshot = await eventsRef
-    .where("date", "<", now)
-    .where("status", "==", "Upcoming")
-    .get();
-
-  return snapshot.docs.map((doc) => ({id: doc.id, ...doc.data()}));
-};
-
-const updateUserBalance = async (userId: string, amount: number) => {
-  const userRef = db.collection("users").doc(userId);
-
-  try {
-    // Retrieve the current balance of the user
-    const doc = await userRef.get();
-    if (!doc.exists) {
-      console.log("User not found!");
-      return;
-    }
-    const user = doc.data();
-
-    await userRef.update({
-      balance: user?.balance + amount,
-    });
-
-    console.log(`User ${userId}'s balance updated successfully.`);
-  } catch (error) {
-    console.error("Error updating user balance:", error);
-    throw error;
-  }
-};
-
-const fetchHistoricalDataForEvent = async (event: any) => {
-  // Format the date to YYYY-MM-DD
-  const eventDate = event.date.toDate().toISOString().split("T")[0];
-  const url = `http://livescore-api.com/api-client/scores/history.json?key=${apiKey}
-    &secret=${apiSecret}&from=${eventDate}&to=${eventDate}`;
-
-  try {
-    const response = await axios.get(url);
-    // Filter the response to find the match related to the event
-    // should be a singular event;
-    const match = response.data.data.match[0];
-
-    return match || null;
-  } catch (error) {
-    console.error(
-      `Error fetching historical data for event: ${event.id}`,
-      error
-    );
-    throw error;
-  }
-};
-
-const updateEventWithResult = async (event: any, match: any) => {
-  if (match) {
-    // Parse the 'ft_score' to get home and away scores
-    const scores = match.ft_score.split(" - ").map(Number);
-    const homeScore = scores[0];
-    const awayScore = scores[1];
-
-    // Determine the result based on home and away scores
-    let result;
-    if (homeScore > awayScore) {
-      result = event.homeTeam;
-    } else if (homeScore < awayScore) {
-      result = event.awayTeam;
-    } else {
-      result = "Tie";
-    }
-
-    const eventRef = db.collection("events").doc(event.id);
-    await eventRef.update({
-      status: "Finished",
-      score: match.ft_score,
-      result: result,
-    });
-    console.log(
-      `Event ${event.id} updated with result: 
-        ${match.score} and outcome: ${result}`
-    );
-  } else {
-    console.log(
-      `No match found for event ${event.id} on date ${event.date
-        .toDate()
-        .toISOString()}`
-    );
-  }
-};
-
-const fetchBetsForEvent = async (event: any): Promise<any> => {
-  const betsRef = db.collection("bets");
-  const snapshot = await betsRef.where("eventId", "==", event.id).get();
-  return snapshot.docs.map((doc) => ({id: doc.id, ...doc.data()}));
-};
-
-const settleBetsForEvent = async (event: any) => {
-  const bets = await fetchBetsForEvent(event);
-  const now = admin.firestore.FieldValue.serverTimestamp();
-
-  if (event && event.result) {
-    bets.forEach(async (bet: any) => {
-      let status = bet.status;
-      if (bet.status === "Accepted") {
-        if (
-          bet.senderSelection === event.result &&
-          bet.receiverSelection !== event.result
-        ) {
-          status = "Resolved";
-          await updateUserBalance(bet.senderId, bet.senderPotentialWin);
-        } else {
-          status = "Resolved";
-          await updateUserBalance(bet.receiverId, bet.receiverPotentialWin);
-        }
-
-        const betRef = db.collection("bets").doc(bet.id);
-        await betRef.update({
-          status: status,
-          resolvedAt: now,
-          result:
-            bet.senderSelection === event.result ?
-              bet.senderId :
-              bet.receiverId,
-        });
-      }
-    });
-  }
-};
-
-exports.resolveEventsAndBets = functions.pubsub
-  .schedule("every 24 hours")
-  .onRun(async (context) => {
-    const eventsToResolve = await fetchPastDBEvents();
-
-    for (const event of eventsToResolve) {
-      const match = await fetchHistoricalDataForEvent(event);
-      if (match) {
-        await updateEventWithResult(event, match);
-        await settleBetsForEvent(event);
-      }
-    }
-
-    console.log(`Resolved ${eventsToResolve.length} events.`);
   });
