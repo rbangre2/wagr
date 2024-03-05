@@ -211,7 +211,7 @@ const BetTable = () => {
         <Tab label="Outgoing Bets" />
         <Tab label="Bet History" />
       </Tabs>
-      <DataGrid rows={betsData || []} columns={columns} autoHeight />
+      <DataGrid rows={betsData || []} columns={columns} autoHeight disableRowSelectionOnClick />
     </Box>
   );
 };
