@@ -305,34 +305,44 @@ exports.scheduledBetResolution = functions.pubsub
           // Determine the winning and losing amounts and users
           const winnerId = outcome === "Won" ? bet.senderId : bet.receiverId;
           const loserId = outcome === "Won" ? bet.receiverId : bet.senderId;
-          const winAmount =
+          const winnerProfit =
             outcome === "Won" ?
-              bet.senderPotentialWin :
-              bet.receiverPotentialWin;
-          const loseAmount =
-            outcome === "Won" ? bet.receiverStake : bet.senderStake;
+              bet.senderPotentialWin - bet.senderStake :
+              bet.receiverPotentialWin - bet.receiverStake;
 
-          // Fetch both user documents and update balances and net results
+          // For the loser, the net result is simply the negative of their stake
+          const loserLoss =
+            outcome === "Won" ? -bet.receiverStake : -bet.senderStake;
+
+          // Fetch both user documents and update balances
           const winnerRef = admin.firestore().doc(`users/${winnerId}`);
           const loserRef = admin.firestore().doc(`users/${loserId}`);
 
+          // Update the winner's balance by their profit
           batch.update(winnerRef, {
-            balance: FieldValue.increment(winAmount),
+            balance: admin.firestore.FieldValue.increment(winnerProfit),
           });
 
-          // Update net result in the friends subcollection
-          console.log("updating friends subcollection net results");
-          const friendRefWinner = winnerRef.collection("friends").doc(loserId);
-          const friendRefLoser = loserRef.collection("friends").doc(winnerId);
+          // Update the loser's balance by their loss (subtract the stake)
+          batch.update(loserRef, {
+            balance: admin.firestore.FieldValue.increment(loserLoss),
+          });
 
+          // Update net result in the friends subcollection for the winner
+          console.log("updating friends subcollection net results for winner");
+          const friendRefWinner = winnerRef.collection("friends").doc(loserId);
           batch.set(
             friendRefWinner,
-            {netResult: FieldValue.increment(winAmount)},
+            {netResult: admin.firestore.FieldValue.increment(winnerProfit)},
             {merge: true}
           );
+
+          // Update net result in the friends subcollection for the loser
+          console.log("updating friends subcollection net results for loser");
+          const friendRefLoser = loserRef.collection("friends").doc(winnerId);
           batch.set(
             friendRefLoser,
-            {netResult: FieldValue.increment(-loseAmount)},
+            {netResult: admin.firestore.FieldValue.increment(loserLoss)},
             {merge: true}
           );
         }

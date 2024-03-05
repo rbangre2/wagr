@@ -504,9 +504,9 @@ export async function getResolvedBetsByUserId(
               style: "currency",
               currency: "USD",
             }).format(
-              senderOutcome === "WIN"
-                ? bet.senderPotentialWin - bet.senderStake
-                : -1 * bet.senderStake
+              receiverOutcome === "WIN"
+                ? bet.receiverPotentialWin - bet.receiverStake
+                : -1 * bet.receiverStake
             ),
           };
           return receiverBet;

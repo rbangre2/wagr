@@ -14,14 +14,13 @@ import { getUserById, updateUserBalance } from "@/services/userService";
 
 const BetTable = () => {
   const [tabValue, setTabValue] = useState(0);
-  const [refreshToggle, setRefreshToggle] = useState(false);
   const { user, setUser } = useUser();
 
   // React Query hooks to fetch bets based on the tab
-  const { data: bets } = useBets(user?.id);
-  const { data: incomingBets } = useIncomingBets(user?.id);
-  const { data: outgoingBets } = useOutgoingBets(user?.id);
-  const { data: resolvedBets } = useResolvedBets(user?.id);
+  const { data: bets, refetch: refetchBets } = useBets(user?.id);
+  const { data: incomingBets, refetch: refetchIncomingBets } = useIncomingBets(user?.id);
+  const { data: outgoingBets, refetch: refetchOutgoingBets } = useOutgoingBets(user?.id);
+  const { data: resolvedBets, refetch: refetchResolvedBets } = useResolvedBets(user?.id);
 
   // Dynamically select the correct dataset based on the active tab
   const betsData = (() => {
@@ -162,7 +161,8 @@ const BetTable = () => {
         await acceptBet(id);
         await updateUserBalance(user.id, user.balance - bet.receiverStake);
         setUser({ ...user, balance: user.balance - bet.receiverStake });
-        setRefreshToggle((t) => !t);
+        refetchIncomingBets(); 
+        refetchBets(); 
       }
     } catch (error) {
       console.error("error accepting bet with id: ", id);
@@ -187,7 +187,9 @@ const BetTable = () => {
         await declineBet(id);
         await updateUserBalance(bet.senderId, sender.balance + bet.senderStake);
         setUser({ ...user, balance: user.balance + bet.senderStake });
-        setRefreshToggle((t) => !t);
+        refetchIncomingBets(); 
+        refetchOutgoingBets(); 
+        refetchBets(); 
       }
     } catch (error) {
       console.error("error rejecting bet: ", id);
