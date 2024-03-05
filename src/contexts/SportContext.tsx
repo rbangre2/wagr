@@ -26,35 +26,8 @@ export const SportsProvider: React.FC<SportsProviderProps> = ({ children }) => {
   const [events, setEvents] = useState<Event[]>([]);
 
   useEffect(() => {
-    const resolveEventResults = async (fetchedEvents: Event[]) => {
-      const now = new Date();
-      const fiveHoursAgo = new Date(now.getTime() - 5 * 60 * 60 * 1000);
-
-      const pastEvents = fetchedEvents.filter((fetchedEvent) => {
-        const eventDate = new Date(
-          (fetchedEvent.date as firebase.Timestamp).toDate()
-        );
-        console.log(`${eventDate} vs. ${fiveHoursAgo}`);
-        return eventDate < fiveHoursAgo && fetchedEvent.status === "upcoming";
-      });
-
-      console.log(`number of past events: ${pastEvents.length}`);
-
-      console.log(`number of past events: ${pastEvents.length}`);
-
-      for (const event of pastEvents) {
-        const ft_score = await getResultForEvent(event);
-        if (ft_score) {
-          const result = determineMatchResult(ft_score);
-          await updateEventResult(event.id, ft_score, result);
-        }
-      }
-    };
-
     const fetchEvents = async () => {
       const fetchedEvents = await getAllEvents();
-      console.log(fetchedEvents);
-      await resolveEventResults(fetchedEvents);
       setEvents(fetchedEvents);
     };
 
