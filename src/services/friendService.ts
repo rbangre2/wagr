@@ -190,6 +190,7 @@ export async function checkFriendRequestStatus(sender: string, receiver: string)
     where("receiver", "==", receiver)
   );
   const querySnapshot = await getDocs(q);
+<<<<<<< HEAD
 
   let requestId = null;
   let status: "pending" | "accepted" | "rejected" | null = null;
@@ -200,9 +201,22 @@ export async function checkFriendRequestStatus(sender: string, receiver: string)
     status = requestData.status as "pending" | "accepted" | "rejected";
     requestId = doc.id;
   }
+=======
+  let status = "none";
+  let requestId = null;
+
+  querySnapshot.forEach((doc) => {
+    const requestData = doc.data();
+    status = requestData.status;
+    requestId = doc.id;
+  });
+>>>>>>> 2784c00c8430806b230d468e4559bd5555544b7f
 
   return { status, requestId };
 }
 
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 2784c00c8430806b230d468e4559bd5555544b7f

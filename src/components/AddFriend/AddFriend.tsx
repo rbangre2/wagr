@@ -78,7 +78,11 @@ const AddFriend: React.FC = () => {
         open={snackbarOpen}
         autoHideDuration={6000}
         onClose={handleCloseSnackbar}
+<<<<<<< HEAD
         message="friend request sent successfully"
+=======
+        message="Friend request sent successfully"
+>>>>>>> 2784c00c8430806b230d468e4559bd5555544b7f
       />
     </Box>
   );
