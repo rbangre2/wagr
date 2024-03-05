@@ -17,12 +17,39 @@ export interface Event {
   awayId: number;
   league: string;
   location: string;
-  date: Date;
+  date: admin.firestore.Timestamp;
   time: string;
-  status: "upcoming" | "finished";
+  status: "upcoming" | "live" | "finished";
   competitionId: number;
   score?: string;
   result?: string;
+}
+
+export interface Bet {
+  id: string;
+  eventId: string;
+  status: "Pending" | "Accepted" | "Declined" | "Resolved";
+  createdAt: Date;
+  acceptedAt?: Date;
+  resolvedAt?: Date;
+
+  // Sender details
+  senderId: string;
+  senderName: string;
+  senderSelection: string;
+  senderOdds: number;
+  senderStake: number;
+  senderPotentialWin: number;
+
+  // Receiver details before acceptance (calculated based on the bet terms)
+  receiverId: string;
+  receiverName: string;
+  receiverStake: number;
+  receiverOdds: number;
+  receiverSelection: string;
+  receiverPotentialWin: number;
+
+  result?: string; // winner of the bet
 }
 
 const fetchFixturesPage = async (url: string): Promise<any[]> => {
@@ -119,4 +146,104 @@ exports.updateEvents = functions.pubsub
   .schedule("every 48 hours")
   .onRun(async (context) => {
     await storeEventsInFirestore();
+  });
+
+export const getResultForEvent = async (
+  event: Event
+): Promise<string | null> => {
+  const url = `https://livescore-api.com/api-client/teams/matches.json?key=${apiKey}&secret=${apiSecret}&number=1&team_id=${event.homeId}`;
+
+  try {
+    const response = await axios.get(url);
+    const matches = response.data.data;
+
+    const match = matches.length > 0 ? matches[0] : null;
+    console.log(match);
+
+    if (match && match.away_id == event.awayId) {
+      return match.ft_score;
+    }
+    console.warn(`no matching match found for event: ${event.id}`);
+    return null;
+  } catch (error) {
+    console.error(
+      `error fetching historical data for event: ${event.id}`,
+      error
+    );
+    throw error;
+  }
+};
+
+const determineMatchResult = (ftScore: string): string => {
+  const [homeScore, awayScore] = ftScore.split(" - ").map(Number);
+
+  if (homeScore > awayScore) {
+    return "Win";
+  } else if (homeScore < awayScore) {
+    return "Lose";
+  } else {
+    return "Draw";
+  }
+};
+
+const updateEventResult = async (
+  eventId: string,
+  score: string,
+  result: string
+): Promise<void> => {
+  const eventRef = db.doc(`events/${eventId}`);
+  try {
+    await eventRef.update({
+      score,
+      result,
+      status: "finished",
+    });
+  } catch (error) {
+    console.error(`error updating event ${eventId}:`, error);
+    throw error;
+  }
+};
+
+const resolveEventResults = async (fetchedEvents: Event[]) => {
+  const now = new Date();
+  const fiveHoursAgo = new Date(now.getTime() - 5 * 60 * 60 * 1000);
+
+  const pastEvents = fetchedEvents.filter((fetchedEvent) => {
+    const eventDate = new Date(
+      (fetchedEvent.date as admin.firestore.Timestamp).toDate()
+    );
+    return eventDate < fiveHoursAgo && fetchedEvent.status === "upcoming";
+  });
+
+  for (const event of pastEvents) {
+    const ftScore = await getResultForEvent(event);
+    if (ftScore) {
+      const result = determineMatchResult(ftScore);
+      await updateEventResult(event.id, ftScore, result);
+    }
+  }
+};
+
+const getDBEvents = async (): Promise<Event[]> => {
+  try {
+    const snapshot = await admin.firestore().collection("events").get();
+    const events: Event[] = snapshot.docs.map(
+      (doc) =>
+        ({
+          id: doc.id,
+          ...doc.data(),
+        } as Event)
+    );
+    return events;
+  } catch (error) {
+    console.error("Error getting documents: ", error);
+    throw error;
+  }
+};
+
+exports.resolveEvents = functions.pubsub
+  .schedule("every 8 hours")
+  .onRun(async (context) => {
+    const events = await getDBEvents();
+    await resolveEventResults(events);
   });
