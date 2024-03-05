@@ -22,7 +22,7 @@ export async function updateEventResult(
   score: string,
   result: string
 ): Promise<void> {
-  const eventRef = doc(db, "events", eventId);
+  const eventRef = doc(db, "events", eventId.toString());
   try {
     await updateDoc(eventRef, {
       score,
