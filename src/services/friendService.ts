@@ -166,12 +166,8 @@ export async function updateFriendData(
 export async function removeFriend(userId: string, friendId: string) {
   const batch = writeBatch(db);
 
-  const friendDocumentId = userId < friendId ? `${userId}_${friendId}` : `${friendId}_${userId}`;
-  const friendsTableRef = doc(db, "FriendsTable", friendDocumentId); // Adjust "FriendsTable" to your actual collection name
-
   batch.delete(doc(db, "users", userId, "friends", friendId));
   batch.delete(doc(db, "users", friendId, "friends", userId));
-  batch.delete(friendsTableRef);
 
   const friendRequestQuery = query(
     collection(db, "FriendRequests"),
@@ -185,7 +181,6 @@ export async function removeFriend(userId: string, friendId: string) {
       batch.delete(doc.ref);
     });
 
-    // Commit the batch
     await batch.commit();
     console.log('Friendship and any related friend requests successfully removed.');
   } catch (error) {
@@ -193,6 +188,7 @@ export async function removeFriend(userId: string, friendId: string) {
     throw new Error('Failed to remove friendship.');
   }
 }
+
 
 
 
