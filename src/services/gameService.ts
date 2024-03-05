@@ -4,7 +4,7 @@ import axios from "axios";
 export const getResultForEvent = async (
   event: Event
 ): Promise<string | null> => {
-  const url = `https://livescore-api.com/api-client/teams/matches.json?key=${process.env.NEXT_PUBLIC_apiKey}&secret=${process.env.NEXT_PUBLIC_apiSecret}&number=1&team_id=${event.homeId}`;
+  const url = `https://livescore-api.com/api-client/teams/matches.json?key=${process.env.NEXT_PUBLIC_LIVE_SCORE_API_KEY}&secret=${process.env.NEXT_PUBLIC_LIVE_SCORE_API_SECRET}&number=1&team_id=${event.homeId}`;
 
   try {
     const response = await axios.get(url);
@@ -16,7 +16,7 @@ export const getResultForEvent = async (
     if (match && match.away_id == event.awayId) {
       return match.ft_score;
     }
-    console.warn(`mo matching match found for event: ${event.id}`);
+    console.warn(`no matching match found for event: ${event.id}`);
     return null;
   } catch (error) {
     console.error(

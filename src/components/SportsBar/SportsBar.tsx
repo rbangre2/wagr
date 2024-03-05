@@ -37,6 +37,7 @@ const SportsBar: React.FC = () => {
           value={sport.value}
           iconPosition="start"
           className={styles.tab}
+          sx={{ color: "black" }}
         />
       ))}
     </Tabs>

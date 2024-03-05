@@ -64,8 +64,7 @@ const AppDrawer: React.FC<AppDrawerProps> = ({
           width: open ? drawerWidth : minimizedDrawerWidth,
           top: appBarHeight,
           height: `calc(100% - ${appBarHeight}px)`,
-          backgroundColor: "#333740",
-          color: "#FFFFFF",
+          backgroundColor: "#F2E9EB",
           boxSizing: "border-box",
           transition: theme.transitions.create(["width", "top"], {
             easing: theme.transitions.easing.sharp,
@@ -83,13 +82,14 @@ const AppDrawer: React.FC<AppDrawerProps> = ({
             key={item.text}
             onClick={() => handleNavigation(item.text)}
           >
-            <ListItemIcon sx={{ color: "#FFFFFF" }}>{item.icon}</ListItemIcon>
+            <ListItemIcon sx={{ color: "#31383F" }}>{item.icon}</ListItemIcon>
             <ListItemText
               primary={item.text}
               sx={{
                 "& .MuiListItemText-primary": {
                   fontFamily: '"Signika Negative", sans-serif',
                   fontSize: "1.2rem",
+                  color: "#31383F",
                 },
               }}
             />
@@ -103,13 +103,14 @@ const AppDrawer: React.FC<AppDrawerProps> = ({
             key={item.text}
             onClick={() => handleNavigation(item.text)}
           >
-            <ListItemIcon sx={{ color: "#FFFFFF" }}>{item.icon}</ListItemIcon>
+            <ListItemIcon sx={{ color: "#31383F" }}>{item.icon}</ListItemIcon>
             <ListItemText
               primary={item.text}
               sx={{
                 "& .MuiListItemText-primary": {
                   fontFamily: '"Signika Negative", sans-serif',
                   fontSize: "1.2rem",
+                  color: "#31383F",
                 },
               }}
             />

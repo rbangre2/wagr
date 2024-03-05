@@ -9,7 +9,7 @@ const defaultColumns = [
   { field: "awayTeam", headerName: "Away Team", width: 150 },
   { field: "league", headerName: "League", width: 150 },
   { field: "location", headerName: "Location", width: 285 },
-  { field: "date", headerName: "Date", type: "date", width: 150 },
+  { field: "date", headerName: "Date", type: "date", width: 200 },
 ];
 
 const sortModel: GridSortModel = [
@@ -41,23 +41,22 @@ const SportsTable = ({
       sx={{
         height: "100%",
         width: "100%",
-        paddingTop: "20px",
-        backgroundColor: "black", // Set the background color to black
-        color: "white", // Set the text color to white
+        backgroundColor: "white",
+        color: "black", // Text color black for contrast
         "& .MuiDataGrid-cell": {
-          color: "lightgray", // Set the DataGrid cell text color to light gray
+          color: "black", // Ensure DataGrid cell text color is black for readability
         },
         "& .MuiDataGrid-columnHeaders": {
-          color: "white", // Set the DataGrid header text color to white
-          backgroundColor: "#333", // Optional: Set a different background color for headers
+          color: "black", // Header text color black for contrast
+          backgroundColor: "#f0f0f0", // Light gray background for column headers for subtle differentiation
         },
         "& .MuiDataGrid-footerContainer": {
-          color: "white",
-          backgroundColor: "#333",
+          color: "black",
+          backgroundColor: "#f0f0f0", // Light gray background for the footer for consistency
         },
         "& .MuiTablePagination-root": {
-          color: "white",
-          backgroundColor: "#333",
+          color: "black",
+          backgroundColor: "#f0f0f0", // Light gray background for pagination for consistency
         },
       }}
     >
@@ -68,6 +67,7 @@ const SportsTable = ({
           fontFamily: "'PT Sans Narrow', sans-serif",
           fontWeight: 700,
           fontSize: 35,
+          color: "black", // Text color black for title
         }}
       >
         {title}
@@ -78,17 +78,19 @@ const SportsTable = ({
         sortModel={sortModel}
         onRowClick={handleRowClick}
         sx={{
-          color: "white",
+          color: "black",
+          backgroundColor: "white", // Keep background color white for light theme
           border: 0,
           "& .MuiDataGrid-cell": {
-            borderBottom: "1px solid rgba(255, 255, 255, 0.12)", // Lighten the cell bordes
-            fontFamily: "'Open Sans', sans-serif", // Apply the font to DataGrid cells
+            borderBottom: "1px solid rgba(0, 0, 0, 0.12)", // Use a light gray for cell borders for subtlety
+            fontFamily: "'Open Sans', sans-serif",
+            fontSize: 18,
           },
           "& .MuiDataGrid-columnSeparator": {
             display: "none",
           },
           "& .MuiDataGrid-row:hover": {
-            cursor: "pointer", // This will change the cursor to a pointer on hover
+            cursor: "pointer",
           },
           "& .MuiDataGrid-cell:focus": {
             outline: "none",

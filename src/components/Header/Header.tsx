@@ -58,16 +58,15 @@ const Header: React.FC<HeaderProps> = ({
       position="fixed"
       sx={{
         zIndex: (theme) => theme.zIndex.drawer + 1,
-        backgroundColor: "#1A1B1E",
+        backgroundColor: "#F2E9EB",
       }}
     >
       <Toolbar>
         <IconButton
-          color="inherit"
           aria-label="open drawer"
           edge="start"
           onClick={handleDrawerOpen}
-          sx={{ marginRight: "36px" }}
+          sx={{ marginRight: "36px", color: "#31383F" }}
         >
           <MenuIcon />
         </IconButton>
@@ -81,6 +80,7 @@ const Header: React.FC<HeaderProps> = ({
             fontWeight: 400,
             fontSize: "3rem",
             fontStyle: "normal",
+            color: "#31383F",
           }}
         >
           wagr
@@ -92,14 +92,18 @@ const Header: React.FC<HeaderProps> = ({
             sx={{
               marginRight: "20px",
               fontFamily: "'Ubuntu', sans-serif",
-              fontWeight: 600,
+              color: "#31383F",
             }}
           >
             {`${userName}`}
           </Typography>
           <Typography
             variant="h6"
-            sx={{ marginRight: "20px", fontFamily: "Ubuntu, sans-serif" }}
+            sx={{
+              marginRight: "20px",
+              fontFamily: "Ubuntu, sans-serif",
+              color: "#31383F",
+            }}
           >
             {`Balance: $${balance.toLocaleString(undefined, {
               minimumFractionDigits: 2,
@@ -113,7 +117,7 @@ const Header: React.FC<HeaderProps> = ({
             aria-controls="menu-appbar"
             aria-haspopup="true"
             onClick={handleProfileMenuOpen}
-            color="inherit"
+            sx={{ color: "#31383F" }}
           >
             <AccountCircleIcon />
           </IconButton>

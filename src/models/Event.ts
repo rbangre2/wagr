@@ -1,3 +1,5 @@
+import firebase from "firebase/firestore";
+
 export interface Event {
   id: string;
   homeTeam: string;
@@ -6,7 +8,7 @@ export interface Event {
   awayId: number;
   league: string;
   location: string;
-  date: Date;
+  date: firebase.Timestamp;
   time: string;
   status: "upcoming" | "finished";
   competitionId: number;

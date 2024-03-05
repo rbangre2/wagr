@@ -5,11 +5,12 @@ import React, {
   useEffect,
   ReactNode,
 } from "react";
-import { getEvents } from "@/services/sportsService";
+import { getEvents, getAllEvents } from "@/services/sportsService";
 import { determineMatchResult } from "@/utils/sportsUtils";
 import { getResultForEvent } from "@/services/gameService";
 import { updateEventResult } from "@/services/eventService"; // Use the correct function name
 import { Event } from "@/models/Event";
+import firebase from "firebase/firestore";
 
 interface SportsContextType {
   events: Event[];
@@ -25,11 +26,19 @@ export const SportsProvider: React.FC<SportsProviderProps> = ({ children }) => {
   const [events, setEvents] = useState<Event[]>([]);
 
   useEffect(() => {
-    const resolveEventResults = async () => {
+    const resolveEventResults = async (fetchedEvents: Event[]) => {
       const now = new Date();
-      const pastEvents = events.filter(
-        (event) => new Date(event.date) < now && event.status === "upcoming"
-      );
+      const fiveHoursAgo = new Date(now.getTime() - 5 * 60 * 60 * 1000);
+
+      const pastEvents = fetchedEvents.filter((fetchedEvent) => {
+        const eventDate = new Date(
+          (fetchedEvent.date as firebase.Timestamp).toDate()
+        );
+        console.log(`${eventDate} vs. ${fiveHoursAgo}`);
+        return eventDate < fiveHoursAgo && fetchedEvent.status === "upcoming";
+      });
+
+      console.log(`number of past events: ${pastEvents.length}`);
 
       console.log(`number of past events: ${pastEvents.length}`);
 
@@ -43,8 +52,9 @@ export const SportsProvider: React.FC<SportsProviderProps> = ({ children }) => {
     };
 
     const fetchEvents = async () => {
-      await resolveEventResults();
-      const fetchedEvents = await getEvents();
+      const fetchedEvents = await getAllEvents();
+      console.log(fetchedEvents);
+      await resolveEventResults(fetchedEvents);
       setEvents(fetchedEvents);
     };
 

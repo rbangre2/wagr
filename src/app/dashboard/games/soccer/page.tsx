@@ -19,8 +19,8 @@ export default function SoccerGames() {
   const tableTitle = "Upcoming Fixtures";
 
   const soccerColumns = [
-    { field: "homeTeam", headerName: "Home Team", width: 150 },
-    { field: "awayTeam", headerName: "Away Team", width: 150 },
+    { field: "homeTeam", headerName: "Home Team", width: 200 },
+    { field: "awayTeam", headerName: "Away Team", width: 200 },
     {
       field: "league",
       headerName: "League",
@@ -44,17 +44,17 @@ export default function SoccerGames() {
     {
       field: "date",
       headerName: "Date",
-      width: 180,
+      width: 250,
       valueFormatter: (params: GridValueFormatterParams) => {
         if (params.value instanceof Date) {
-          return params.value.toLocaleString(); 
+          return params.value.toLocaleString();
         }
-        return params.value;
+        return params.value.toDate().toLocaleString();
       },
     },
   ];
   return (
-    <Box className={styles.background}>
+    <Box>
       <GamesLayout>
         <SportsTable title={tableTitle} columns={soccerColumns} data={events} />
       </GamesLayout>
