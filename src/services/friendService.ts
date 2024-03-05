@@ -166,8 +166,12 @@ export async function updateFriendData(
 export async function removeFriend(userId: string, friendId: string) {
   const batch = writeBatch(db);
 
+  const friendDocumentId = userId < friendId ? `${userId}_${friendId}` : `${friendId}_${userId}`;
+  const friendsTableRef = doc(db, "FriendsTable", friendDocumentId); // Adjust "FriendsTable" to your actual collection name
+
   batch.delete(doc(db, "users", userId, "friends", friendId));
   batch.delete(doc(db, "users", friendId, "friends", userId));
+  batch.delete(friendsTableRef);
 
   const friendRequestQuery = query(
     collection(db, "FriendRequests"),
@@ -181,6 +185,7 @@ export async function removeFriend(userId: string, friendId: string) {
       batch.delete(doc.ref);
     });
 
+    // Commit the batch
     await batch.commit();
     console.log('Friendship and any related friend requests successfully removed.');
   } catch (error) {
@@ -192,20 +197,22 @@ export async function removeFriend(userId: string, friendId: string) {
 
 
 
-
-export async function checkFriendRequestStatus( sender: string, receiver: string) {
+export async function checkFriendRequestStatus(sender: string, receiver: string) {
   const q = query(
     collection(db, "FriendRequests"),
     where("sender", "==", sender),
     where("receiver", "==", receiver)
   );
   const querySnapshot = await getDocs(q);
-  const friendRequests: FriendRequest[] = querySnapshot.docs.map(
-    (doc) =>
-      ({
-        ...doc.data(),
-        id: doc.id,
-      } as FriendRequest)
-  );
-  return { exists: friendRequests.length > 0, id: friendRequests[0]?.id };
+  let requestId = null;
+  let status: "pending" | "accepted" | "rejected" | null = null;
+
+  if (!querySnapshot.empty) {
+    const doc = querySnapshot.docs[0];
+    const requestData = doc.data();
+    status = requestData.status as "pending" | "accepted" | "rejected";
+    requestId = doc.id;
+  }
+
+  return { status, requestId };
 }
