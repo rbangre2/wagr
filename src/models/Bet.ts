@@ -35,5 +35,5 @@ export interface BetWithDetails {
   potentialPayout: string;
   eventDate: string;
   outcome?: string;
-  net_result?: number;
+  net_result?: string;
 }

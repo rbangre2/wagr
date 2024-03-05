@@ -158,42 +158,87 @@ export async function getIncomingBetsByUserId(
       id: doc.id,
     }));
 
-    const betsWithDetails: BetWithDetails[] = await Promise.all(
+    const betsWithDetails: (BetWithDetails | undefined)[] = await Promise.all(
       incomingBets.map(async (bet) => {
         const event = await getEventById(bet.eventId);
-        return {
-          id: bet.id,
-          opponent: bet.senderId === userId ? bet.receiverName : bet.senderName,
-          event: event
-            ? `${event.homeTeam} vs ${event.awayTeam}`
-            : "Event details not found",
-          selection:
-            bet.senderId === userId
-              ? bet.senderSelection
-              : bet.receiverSelection,
-          staked: `$${
-            bet.senderId === userId ? bet.senderStake : bet.receiverStake
-          }`,
-          odds:
-            bet.senderId === userId
-              ? bet.senderOdds.toString()
-              : bet.receiverOdds.toString(),
-          potentialPayout: `$${
-            bet.senderId === userId
-              ? bet.senderPotentialWin
-              : bet.receiverPotentialWin
-          }`,
-          eventDate: event ? event.date.toDate().toLocaleDateString() : "N/A",
-          outcome: bet.result,
-          net_result:
-            bet.senderId === userId
-              ? bet.senderPotentialWin - bet.senderStake
-              : bet.receiverPotentialWin - bet.receiverStake,
-        };
+        if (event) {
+          const homeWin = event.result === "Win";
+          const senderOutcome =
+            (homeWin && bet.senderSelection === event.homeTeam) ||
+            (!homeWin && bet.senderSelection === event.awayTeam)
+              ? "WIN"
+              : "LOST";
+          // Determine the outcome for the receiver
+          const receiverOutcome =
+            (homeWin && bet.receiverSelection === event.homeTeam) ||
+            (!homeWin && bet.receiverSelection === event.awayTeam)
+              ? "WIN"
+              : "LOST";
+          if (userId === bet.senderId) {
+            const senderBet: BetWithDetails = {
+              id: bet.id,
+              opponent: bet.receiverName,
+              event: `${event.homeTeam} vs. ${event?.awayTeam}`,
+              selection: bet.senderSelection,
+              staked: new Intl.NumberFormat("en-US", {
+                style: "currency",
+                currency: "USD",
+              }).format(bet.senderStake),
+              odds: new Intl.NumberFormat("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              }).format(bet.senderOdds),
+              potentialPayout: new Intl.NumberFormat("en-US", {
+                style: "currency",
+                currency: "USD",
+              }).format(bet.senderPotentialWin),
+              eventDate: new Date((event.date as any).toDate()).toDateString(),
+              outcome: senderOutcome,
+              net_result: new Intl.NumberFormat("en-US", {
+                style: "currency",
+                currency: "USD",
+              }).format(
+                senderOutcome === "WIN"
+                  ? bet.senderPotentialWin - bet.senderStake
+                  : -1 * bet.senderStake
+              ),
+            };
+            return senderBet;
+          }
+          const receiverBet: BetWithDetails = {
+            id: bet.id,
+            opponent: bet.senderName,
+            event: `${event?.homeTeam} vs. ${event?.awayTeam}`,
+            selection: bet.receiverSelection,
+            staked: new Intl.NumberFormat("en-US", {
+              style: "currency",
+              currency: "USD",
+            }).format(bet.receiverStake),
+            odds: new Intl.NumberFormat("en-US", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            }).format(bet.receiverOdds),
+            potentialPayout: new Intl.NumberFormat("en-US", {
+              style: "currency",
+              currency: "USD",
+            }).format(bet.receiverPotentialWin),
+            eventDate: new Date((event.date as any).toDate()).toDateString(),
+            outcome: receiverOutcome,
+            net_result: new Intl.NumberFormat("en-US", {
+              style: "currency",
+              currency: "USD",
+            }).format(
+              senderOutcome === "WIN"
+                ? bet.senderPotentialWin - bet.senderStake
+                : -1 * bet.senderStake
+            ),
+          };
+          return receiverBet;
+        }
       })
     );
 
-    return betsWithDetails;
+    return betsWithDetails.filter((bet): bet is BetWithDetails => bet !== null);
   } catch (error) {
     console.error("error getting incoming bets by user ID: ", error);
     return [];
@@ -234,40 +279,87 @@ export async function getBetsByUserId(
 
     const bets = [...sentBets, ...receivedBets];
 
-    const betsWithDetails: BetWithDetails[] = await Promise.all(
+    const betsWithDetails: (BetWithDetails | undefined)[] = await Promise.all(
       bets.map(async (bet) => {
         const event = await getEventById(bet.eventId);
-        return {
-          id: bet.id,
-          opponent: bet.senderId === userId ? bet.receiverName : bet.senderName,
-          event: `${event?.homeTeam} vs ${event?.awayTeam}`,
-          selection:
-            bet.senderId === userId
-              ? bet.senderSelection
-              : bet.receiverSelection,
-          staked: `$${
-            bet.senderId === userId ? bet.senderStake : bet.receiverStake
-          }`,
-          odds:
-            bet.senderId === userId
-              ? bet.senderOdds.toString()
-              : bet.receiverOdds.toString(),
-          potentialPayout: `$${
-            bet.senderId === userId
-              ? bet.senderPotentialWin
-              : bet.receiverPotentialWin
-          }`,
-          eventDate: event ? event.date.toDate().toLocaleDateString() : "N/A",
-          outcome: bet.result,
-          net_result:
-            bet.senderId === userId
-              ? bet.senderPotentialWin - bet.senderStake
-              : bet.receiverPotentialWin - bet.receiverStake,
-        };
+        if (event) {
+          const homeWin = event.result === "Win";
+          const senderOutcome =
+            (homeWin && bet.senderSelection === event.homeTeam) ||
+            (!homeWin && bet.senderSelection === event.awayTeam)
+              ? "WIN"
+              : "LOST";
+          // Determine the outcome for the receiver
+          const receiverOutcome =
+            (homeWin && bet.receiverSelection === event.homeTeam) ||
+            (!homeWin && bet.receiverSelection === event.awayTeam)
+              ? "WIN"
+              : "LOST";
+          if (userId === bet.senderId) {
+            const senderBet: BetWithDetails = {
+              id: bet.id,
+              opponent: bet.receiverName,
+              event: `${event.homeTeam} vs. ${event?.awayTeam}`,
+              selection: bet.senderSelection,
+              staked: new Intl.NumberFormat("en-US", {
+                style: "currency",
+                currency: "USD",
+              }).format(bet.senderStake),
+              odds: new Intl.NumberFormat("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              }).format(bet.senderOdds),
+              potentialPayout: new Intl.NumberFormat("en-US", {
+                style: "currency",
+                currency: "USD",
+              }).format(bet.senderPotentialWin),
+              eventDate: new Date((event.date as any).toDate()).toDateString(),
+              outcome: senderOutcome,
+              net_result: new Intl.NumberFormat("en-US", {
+                style: "currency",
+                currency: "USD",
+              }).format(
+                senderOutcome === "WIN"
+                  ? bet.senderPotentialWin - bet.senderStake
+                  : -1 * bet.senderStake
+              ),
+            };
+            return senderBet;
+          }
+          const receiverBet: BetWithDetails = {
+            id: bet.id,
+            opponent: bet.senderName,
+            event: `${event?.homeTeam} vs. ${event?.awayTeam}`,
+            selection: bet.receiverSelection,
+            staked: new Intl.NumberFormat("en-US", {
+              style: "currency",
+              currency: "USD",
+            }).format(bet.receiverStake),
+            odds: new Intl.NumberFormat("en-US", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            }).format(bet.receiverOdds),
+            potentialPayout: new Intl.NumberFormat("en-US", {
+              style: "currency",
+              currency: "USD",
+            }).format(bet.receiverPotentialWin),
+            eventDate: new Date((event.date as any).toDate()).toDateString(),
+            outcome: receiverOutcome,
+            net_result: new Intl.NumberFormat("en-US", {
+              style: "currency",
+              currency: "USD",
+            }).format(
+              senderOutcome === "WIN"
+                ? bet.senderPotentialWin - bet.senderStake
+                : -1 * bet.senderStake
+            ),
+          };
+          return receiverBet;
+        }
       })
     );
 
-    return betsWithDetails;
+    return betsWithDetails.filter((bet): bet is BetWithDetails => bet !== null);
   } catch (error) {
     console.error("error getting bets by user ID: ", error);
     return [];
@@ -291,42 +383,87 @@ export async function getOutgoingBetsByUserId(
       id: doc.id,
     }));
 
-    const betsWithDetails: BetWithDetails[] = await Promise.all(
+    const betsWithDetails: (BetWithDetails | undefined)[] = await Promise.all(
       outgoingBets.map(async (bet) => {
         const event = await getEventById(bet.eventId);
-        return {
-          id: bet.id,
-          opponent: bet.senderId === userId ? bet.receiverName : bet.senderName,
-          event: event
-            ? `${event.homeTeam} vs ${event.awayTeam}`
-            : "Event details not found",
-          selection:
-            bet.senderId === userId
-              ? bet.senderSelection
-              : bet.receiverSelection,
-          staked: `$${
-            bet.senderId === userId ? bet.senderStake : bet.receiverStake
-          }`,
-          odds:
-            bet.senderId === userId
-              ? bet.senderOdds.toString()
-              : bet.receiverOdds.toString(),
-          potentialPayout: `$${
-            bet.senderId === userId
-              ? bet.senderPotentialWin
-              : bet.receiverPotentialWin
-          }`,
-          eventDate: event ? event.date.toDate().toLocaleDateString() : "N/A",
-          outcome: bet.result,
-          net_result:
-            bet.senderId === userId
-              ? bet.senderPotentialWin - bet.senderStake
-              : bet.receiverPotentialWin - bet.receiverStake,
-        };
+        if (event) {
+          const homeWin = event.result === "Win";
+          const senderOutcome =
+            (homeWin && bet.senderSelection === event.homeTeam) ||
+            (!homeWin && bet.senderSelection === event.awayTeam)
+              ? "WIN"
+              : "LOST";
+          // Determine the outcome for the receiver
+          const receiverOutcome =
+            (homeWin && bet.receiverSelection === event.homeTeam) ||
+            (!homeWin && bet.receiverSelection === event.awayTeam)
+              ? "WIN"
+              : "LOST";
+          if (userId === bet.senderId) {
+            const senderBet: BetWithDetails = {
+              id: bet.id,
+              opponent: bet.receiverName,
+              event: `${event.homeTeam} vs. ${event?.awayTeam}`,
+              selection: bet.senderSelection,
+              staked: new Intl.NumberFormat("en-US", {
+                style: "currency",
+                currency: "USD",
+              }).format(bet.senderStake),
+              odds: new Intl.NumberFormat("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              }).format(bet.senderOdds),
+              potentialPayout: new Intl.NumberFormat("en-US", {
+                style: "currency",
+                currency: "USD",
+              }).format(bet.senderPotentialWin),
+              eventDate: new Date((event.date as any).toDate()).toDateString(),
+              outcome: senderOutcome,
+              net_result: new Intl.NumberFormat("en-US", {
+                style: "currency",
+                currency: "USD",
+              }).format(
+                senderOutcome === "WIN"
+                  ? bet.senderPotentialWin - bet.senderStake
+                  : -1 * bet.senderStake
+              ),
+            };
+            return senderBet;
+          }
+          const receiverBet: BetWithDetails = {
+            id: bet.id,
+            opponent: bet.senderName,
+            event: `${event?.homeTeam} vs. ${event?.awayTeam}`,
+            selection: bet.receiverSelection,
+            staked: new Intl.NumberFormat("en-US", {
+              style: "currency",
+              currency: "USD",
+            }).format(bet.receiverStake),
+            odds: new Intl.NumberFormat("en-US", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            }).format(bet.receiverOdds),
+            potentialPayout: new Intl.NumberFormat("en-US", {
+              style: "currency",
+              currency: "USD",
+            }).format(bet.receiverPotentialWin),
+            eventDate: new Date((event.date as any).toDate()).toDateString(),
+            outcome: receiverOutcome,
+            net_result: new Intl.NumberFormat("en-US", {
+              style: "currency",
+              currency: "USD",
+            }).format(
+              senderOutcome === "WIN"
+                ? bet.senderPotentialWin - bet.senderStake
+                : -1 * bet.senderStake
+            ),
+          };
+          return receiverBet;
+        }
       })
     );
 
-    return betsWithDetails;
+    return betsWithDetails.filter((bet): bet is BetWithDetails => bet !== null);
   } catch (error) {
     console.error("error getting outgoing bets by user ID: ", error);
     return [];
@@ -397,10 +534,14 @@ export async function getResolvedBetsByUserId(
               }).format(bet.senderPotentialWin),
               eventDate: new Date((event.date as any).toDate()).toDateString(),
               outcome: senderOutcome,
-              net_result:
+              net_result: new Intl.NumberFormat("en-US", {
+                style: "currency",
+                currency: "USD",
+              }).format(
                 senderOutcome === "WIN"
                   ? bet.senderPotentialWin - bet.senderStake
-                  : -1 * bet.senderStake,
+                  : -1 * bet.senderStake
+              ),
             };
             return senderBet;
           }
@@ -423,10 +564,14 @@ export async function getResolvedBetsByUserId(
             }).format(bet.receiverPotentialWin),
             eventDate: new Date((event.date as any).toDate()).toDateString(),
             outcome: receiverOutcome,
-            net_result:
-              receiverOutcome === "WIN"
-                ? bet.receiverPotentialWin - bet.receiverStake
-                : -1 * bet.receiverStake,
+            net_result: new Intl.NumberFormat("en-US", {
+              style: "currency",
+              currency: "USD",
+            }).format(
+              senderOutcome === "WIN"
+                ? bet.senderPotentialWin - bet.senderStake
+                : -1 * bet.senderStake
+            ),
           };
           return receiverBet;
         }
