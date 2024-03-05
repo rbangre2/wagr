@@ -42,21 +42,21 @@ const SportsTable = ({
         height: "100%",
         width: "100%",
         backgroundColor: "white",
-        color: "black", // Text color black for contrast
+        color: "black",
         "& .MuiDataGrid-cell": {
-          color: "black", // Ensure DataGrid cell text color is black for readability
+          color: "black",
         },
         "& .MuiDataGrid-columnHeaders": {
-          color: "black", // Header text color black for contrast
-          backgroundColor: "#f0f0f0", // Light gray background for column headers for subtle differentiation
+          color: "black",
+          backgroundColor: "#f0f0f0",
         },
         "& .MuiDataGrid-footerContainer": {
           color: "black",
-          backgroundColor: "#f0f0f0", // Light gray background for the footer for consistency
+          backgroundColor: "#f0f0f0",
         },
         "& .MuiTablePagination-root": {
           color: "black",
-          backgroundColor: "#f0f0f0", // Light gray background for pagination for consistency
+          backgroundColor: "#f0f0f0",
         },
       }}
     >
@@ -67,7 +67,7 @@ const SportsTable = ({
           fontFamily: "'PT Sans Narrow', sans-serif",
           fontWeight: 700,
           fontSize: 35,
-          color: "black", // Text color black for title
+          color: "black",
         }}
       >
         {title}
@@ -79,10 +79,10 @@ const SportsTable = ({
         onRowClick={handleRowClick}
         sx={{
           color: "black",
-          backgroundColor: "white", // Keep background color white for light theme
+          backgroundColor: "white",
           border: 0,
           "& .MuiDataGrid-cell": {
-            borderBottom: "1px solid rgba(0, 0, 0, 0.12)", // Use a light gray for cell borders for subtlety
+            borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
             fontFamily: "'Open Sans', sans-serif",
             fontSize: 18,
           },

@@ -2,8 +2,9 @@
 
 import React from "react";
 import { UserProvider } from "@/contexts/UserContext";
-import { SportsProvider } from "@/contexts/SportContext";
-import { BetProvider } from "@/contexts/BetContext";
+import { QueryClient, QueryClientProvider } from "react-query";
+
+const queryClient = new QueryClient();
 
 export default function ParentProvider({
   children,
@@ -11,10 +12,8 @@ export default function ParentProvider({
   children: React.ReactNode;
 }) {
   return (
-    <BetProvider>
-      <SportsProvider>
-        <UserProvider> {children} </UserProvider>
-      </SportsProvider>
-    </BetProvider>
+    <QueryClientProvider client={queryClient}>
+      <UserProvider> {children} </UserProvider>
+    </QueryClientProvider>
   );
 }
