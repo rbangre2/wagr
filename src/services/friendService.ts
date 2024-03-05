@@ -197,22 +197,19 @@ export async function removeFriend(userId: string, friendId: string) {
 
 
 
-export async function checkFriendRequestStatus(sender: string, receiver: string) {
+export async function checkFriendRequestStatus( sender: string, receiver: string) {
   const q = query(
     collection(db, "FriendRequests"),
     where("sender", "==", sender),
     where("receiver", "==", receiver)
   );
   const querySnapshot = await getDocs(q);
-  let requestId = null;
-  let status: "pending" | "accepted" | "rejected" | null = null;
-
-  if (!querySnapshot.empty) {
-    const doc = querySnapshot.docs[0];
-    const requestData = doc.data();
-    status = requestData.status as "pending" | "accepted" | "rejected";
-    requestId = doc.id;
-  }
-
-  return { status, requestId };
+  const friendRequests: FriendRequest[] = querySnapshot.docs.map(
+    (doc) =>
+      ({
+        ...doc.data(),
+        id: doc.id,
+      } as FriendRequest)
+  );
+  return { exists: friendRequests.length > 0, id: friendRequests[0]?.id };
 }
