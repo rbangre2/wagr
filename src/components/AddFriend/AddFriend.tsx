@@ -17,13 +17,13 @@ const AddFriend: React.FC = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [error, setError] = useState(false);
   const [helperText, setHelperText] = useState("");
-  const user = useUser();
+  const { user } = useUser();
 
   const handleInviteClick = async () => {
     try {
       const receiver = await getUserByEmail(emailInput);
-      if (user.user && user.user.id && receiver && receiver.id) {
-        await sendFriendRequest(user.user.id, receiver.id);
+      if (user && user.id && receiver && receiver.id) {
+        await sendFriendRequest(user.id, receiver.id);
         console.log("Invite sent successfully.");
         setEmailInput("");
         setError(false);
@@ -78,7 +78,7 @@ const AddFriend: React.FC = () => {
         open={snackbarOpen}
         autoHideDuration={6000}
         onClose={handleCloseSnackbar}
-        message="Friend request sent successfully"
+        message="friend request sent successfully"
       />
     </Box>
   );

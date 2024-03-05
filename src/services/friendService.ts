@@ -190,16 +190,19 @@ export async function checkFriendRequestStatus(sender: string, receiver: string)
     where("receiver", "==", receiver)
   );
   const querySnapshot = await getDocs(q);
-  let status = "none";
-  let requestId = null;
 
-  querySnapshot.forEach((doc) => {
+  let requestId = null;
+  let status: "pending" | "accepted" | "rejected" | null = null;
+
+  if (!querySnapshot.empty) {
+    const doc = querySnapshot.docs[0];
     const requestData = doc.data();
-    status = requestData.status;
+    status = requestData.status as "pending" | "accepted" | "rejected";
     requestId = doc.id;
-  });
+  }
 
   return { status, requestId };
 }
+
 
 
