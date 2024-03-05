@@ -9,7 +9,7 @@ import {
   GridRenderCellParams,
 } from "@mui/x-data-grid";
 import Image from "next/image";
-import { leagueIcons } from "./types";
+import { leagueIcons, teamIcons } from "./types";
 import { Box } from "@mui/material";
 import { useSportsContext } from "@/contexts/SportContext";
 import styles from "./page.module.css";
@@ -19,8 +19,54 @@ export default function SoccerGames() {
   const tableTitle = "Upcoming Fixtures";
 
   const soccerColumns = [
-    { field: "homeTeam", headerName: "Home Team", width: 200 },
-    { field: "awayTeam", headerName: "Away Team", width: 200 },
+    {
+      field: "homeTeam",
+      headerName: "Home Team",
+      width: 200,
+      renderCell: (params: GridRenderCellParams) => {
+        const teamLogoUrl = teamIcons[params.value as string];
+        return (
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            {teamLogoUrl && (
+              <Image
+                width={24}
+                height={24}
+                src={teamLogoUrl}
+                alt={params.value as string}
+                style={{
+                  backgroundColor: "transparent",
+                }}
+              />
+            )}
+            {params.value}
+          </div>
+        );
+      },
+    },
+    {
+      field: "awayTeam",
+      headerName: "Away Team",
+      width: 200,
+      renderCell: (params: GridRenderCellParams) => {
+        const teamLogoUrl = teamIcons[params.value as string];
+        return (
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            {teamLogoUrl && (
+              <Image
+                width={24}
+                height={24}
+                src={teamLogoUrl}
+                alt={params.value as string}
+                style={{
+                  backgroundColor: "transparent",
+                }}
+              />
+            )}
+            {params.value}
+          </div>
+        );
+      },
+    },
     {
       field: "league",
       headerName: "League",
