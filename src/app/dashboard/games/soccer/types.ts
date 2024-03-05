@@ -6,6 +6,7 @@ import Ligue1Icon from "@/resources/leagues/ligue1.png";
 
 import ArsenalIcon from "@/resources/teams/epl/arsenal.png";
 import WestHamUnitedIcon from "@/resources/teams/epl/westham.png";
+import SheffieldIcon from "@/resources/teams/epl/sheffield.png";
 
 import BarcelonaIcon from "@/resources/teams/laliga/barcelona.png";
 import AtleticoMadridIcon from "@/resources/teams/laliga/atleticomadrid.png";
@@ -21,6 +22,7 @@ import InterMilanIcon from "@/resources/teams/seriea/inter.png";
 import GenoaIcon from "@/resources/teams/seriea/genoa.png";
 import JuventusIcon from "@/resources/teams/seriea/juventus.png";
 import LazioIcon from "@/resources/teams/seriea/lazio.png";
+import NapoliIcon from "@/resources/teams/seriea/napoli.png";
 
 export const leagueIcons: { [key: string]: string } = {
   "LaLiga Santander": LaLigaIcon.src,
@@ -34,6 +36,7 @@ export const teamIcons: { [key: string]: string } = {
   // epl
   Arsenal: ArsenalIcon.src,
   "West Ham United": WestHamUnitedIcon.src,
+  "Sheffield United": SheffieldIcon.src,
 
   // serie a
   Inter: InterMilanIcon.src,
@@ -42,6 +45,7 @@ export const teamIcons: { [key: string]: string } = {
   Fiorentina: FiorentinaIcon.src,
   Juventus: JuventusIcon.src,
   Lazi: LazioIcon.src,
+  "SSC Napoli": NapoliIcon.src,
 
   // la liga
   Barcelona: BarcelonaIcon.src,

@@ -9,6 +9,8 @@ import {
   where,
   getDoc,
   getDocs,
+  writeBatch,
+  increment,
 } from "firebase/firestore";
 
 interface BetCreationData
@@ -53,16 +55,63 @@ export async function declineBet(betId: string) {
 }
 
 // more work to be done with managing user balances
-export async function resolveBet(betId: string, outcome: "Won" | "Lost") {
+export async function resolveBet(
+  betId: string,
+  outcome: "Won" | "Lost"
+): Promise<void> {
   const betRef = doc(db, "bets", betId);
   try {
-    await updateDoc(betRef, {
-      status: outcome,
+    // Begin a batched write to ensure atomic operations
+    const batch = writeBatch(db);
+
+    // Fetch the bet details
+    const betSnap = await getDoc(betRef);
+    if (!betSnap.exists()) {
+      throw new Error(`No bet found with the ID: ${betId}`);
+    }
+    const betData = betSnap.data() as Bet;
+
+    // Update the bet status and resolved time
+    batch.update(betRef, {
+      status: "Resolved",
+      result: outcome,
       resolvedAt: new Date(),
     });
-    console.log(`bet resolved as ${outcome}`);
+
+    // Determine the winning and losing amounts and users
+    let winnerId: string, loserId: string, amount: number;
+    if (outcome === "Won") {
+      winnerId = betData.senderId;
+      loserId = betData.receiverId;
+      amount = betData.senderPotentialWin;
+    } else {
+      winnerId = betData.receiverId;
+      loserId = betData.senderId;
+      amount = betData.receiverPotentialWin;
+    }
+
+    // Fetch both user documents
+    const winnerRef = doc(db, "users", winnerId);
+    const loserRef = doc(db, "users", loserId);
+
+    // Deposit the winnings to the winner
+    batch.update(winnerRef, {
+      balance: increment(amount),
+    });
+
+    // Deduct the stake from the loser
+    batch.update(loserRef, {
+      balance: increment(-amount),
+    });
+
+    // Commit the batch
+    await batch.commit();
+    console.log(
+      `Bet ${betId} resolved as ${outcome}, users' balances updated.`
+    );
   } catch (error) {
-    console.error("error resolving bet: ", error);
+    console.error("Error resolving bet: ", error);
+    throw error;
   }
 }
 

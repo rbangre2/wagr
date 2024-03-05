@@ -3,6 +3,7 @@
 import React from "react";
 import { UserProvider } from "@/contexts/UserContext";
 import { SportsProvider } from "@/contexts/SportContext";
+import { BetProvider } from "@/contexts/BetContext";
 
 export default function ParentProvider({
   children,
@@ -10,8 +11,10 @@ export default function ParentProvider({
   children: React.ReactNode;
 }) {
   return (
-    <SportsProvider>
-      <UserProvider> {children} </UserProvider>{" "}
-    </SportsProvider>
+    <BetProvider>
+      <SportsProvider>
+        <UserProvider> {children} </UserProvider>
+      </SportsProvider>
+    </BetProvider>
   );
 }

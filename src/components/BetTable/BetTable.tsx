@@ -31,6 +31,18 @@ const BetTable: React.FC = () => {
           const event = await getEventById(bet.eventId);
 
           if (event) {
+            const homeWin = event.result === "Win";
+            const senderOutcome =
+              (homeWin && bet.senderSelection === event.homeTeam) ||
+              (!homeWin && bet.senderSelection === event.awayTeam)
+                ? "WIN"
+                : "LOST";
+            // Determine the outcome for the receiver
+            const receiverOutcome =
+              (homeWin && bet.receiverSelection === event.homeTeam) ||
+              (!homeWin && bet.receiverSelection === event.awayTeam)
+                ? "WIN"
+                : "LOST";
             console.log(`event date: ${event.date}`);
             if (user?.id === bet.senderId) {
               const senderBet: BetWithDetails = {
@@ -53,10 +65,9 @@ const BetTable: React.FC = () => {
                 eventDate: new Date(
                   (event.date as any).toDate()
                 ).toDateString(),
-                outcome:
-                  bet.result && bet.result === bet.senderId ? "WIN" : "LOST",
+                outcome: senderOutcome,
                 net_result:
-                  bet.result && bet.result === bet.senderId
+                  senderOutcome === "WIN"
                     ? bet.senderPotentialWin - bet.senderStake
                     : -1 * bet.senderStake,
               };
@@ -80,12 +91,11 @@ const BetTable: React.FC = () => {
                 currency: "USD",
               }).format(bet.receiverPotentialWin),
               eventDate: new Date((event.date as any).toDate()).toDateString(),
-              outcome:
-                bet.result && bet.result === bet.receiverId ? "WIN" : "LOST",
+              outcome: receiverOutcome,
               net_result:
-                bet.result && bet.result === bet.senderId
-                  ? bet.senderPotentialWin - bet.senderStake
-                  : -1 * bet.senderStake,
+                receiverOutcome === "WIN"
+                  ? bet.receiverPotentialWin - bet.receiverStake
+                  : -1 * bet.receiverStake,
             };
             return receiverBet;
           }
