@@ -1,192 +1,43 @@
-import React, { useEffect, useState } from "react";
-import { DataGrid, GridColDef, GridRowProps } from "@mui/x-data-grid";
-import { Tabs, Tab, Box, Button } from "@mui/material";
-import { Bet, BetWithDetails } from "@/models/Bet";
+import React, { useState } from "react";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { Tabs, Tab, Box } from "@mui/material";
 import { useUser } from "@/contexts/UserContext";
-import {
-  getBetsByUserId,
-  getIncomingBetsByUserId,
-  getOutgoingBetsByUserId,
-  acceptBet,
-  declineBet,
-  getBetById,
-  getResolvedBetsByUserId,
-} from "@/services/betService";
-import { getEventById } from "@/services/eventService";
-import { getUserById, updateUserBalance } from "@/services/userService";
+import { useBets } from "@/hooks/useBets";
+import { useIncomingBets } from "@/hooks/useIncomingBets";
+import { useOutgoingBets } from "@/hooks/useOutgoingBets";
+import { useResolvedBets } from "@/hooks/useResolvedBets";
 import IconButton from "@mui/material/IconButton";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
+import { acceptBet, declineBet, getBetById } from "@/services/betService";
+import { getUserById, updateUserBalance } from "@/services/userService";
 
-const BetTable: React.FC = () => {
+const BetTable = () => {
   const [tabValue, setTabValue] = useState(0);
   const [refreshToggle, setRefreshToggle] = useState(false);
-  const [rows, setRows] = useState<BetWithDetails[]>([]);
   const { user, setUser } = useUser();
 
-  useEffect(() => {
-    const mapBetsToRows = async (bets: Bet[]): Promise<BetWithDetails[]> => {
-      const betsWithDetails = await Promise.all(
-        bets.map(async (bet) => {
-          const event = await getEventById(bet.eventId.toString());
+  // React Query hooks to fetch bets based on the tab
+  const { data: bets } = useBets(user?.id);
+  const { data: incomingBets } = useIncomingBets(user?.id);
+  const { data: outgoingBets } = useOutgoingBets(user?.id);
+  const { data: resolvedBets } = useResolvedBets(user?.id);
 
-          if (event) {
-            const homeWin = event.result === "Win";
-            const senderOutcome =
-              (homeWin && bet.senderSelection === event.homeTeam) ||
-              (!homeWin && bet.senderSelection === event.awayTeam)
-                ? "WIN"
-                : "LOST";
-            // Determine the outcome for the receiver
-            const receiverOutcome =
-              (homeWin && bet.receiverSelection === event.homeTeam) ||
-              (!homeWin && bet.receiverSelection === event.awayTeam)
-                ? "WIN"
-                : "LOST";
-            if (user?.id === bet.senderId) {
-              const senderBet: BetWithDetails = {
-                id: bet.id,
-                opponent: bet.receiverName,
-                event: `${event.homeTeam} vs. ${event?.awayTeam}`,
-                selection: bet.senderSelection,
-                staked: new Intl.NumberFormat("en-US", {
-                  style: "currency",
-                  currency: "USD",
-                }).format(bet.senderStake),
-                odds: new Intl.NumberFormat("en-US", {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                }).format(bet.senderOdds),
-                potentialPayout: new Intl.NumberFormat("en-US", {
-                  style: "currency",
-                  currency: "USD",
-                }).format(bet.senderPotentialWin),
-                eventDate: new Date(
-                  (event.date as any).toDate()
-                ).toDateString(),
-                outcome: senderOutcome,
-                net_result:
-                  senderOutcome === "WIN"
-                    ? bet.senderPotentialWin - bet.senderStake
-                    : -1 * bet.senderStake,
-              };
-              return senderBet;
-            }
-            const receiverBet: BetWithDetails = {
-              id: bet.id,
-              opponent: bet.senderName,
-              event: `${event?.homeTeam} vs. ${event?.awayTeam}`,
-              selection: bet.receiverSelection,
-              staked: new Intl.NumberFormat("en-US", {
-                style: "currency",
-                currency: "USD",
-              }).format(bet.receiverStake),
-              odds: new Intl.NumberFormat("en-US", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              }).format(bet.receiverOdds),
-              potentialPayout: new Intl.NumberFormat("en-US", {
-                style: "currency",
-                currency: "USD",
-              }).format(bet.receiverPotentialWin),
-              eventDate: new Date((event.date as any).toDate()).toDateString(),
-              outcome: receiverOutcome,
-              net_result:
-                receiverOutcome === "WIN"
-                  ? bet.receiverPotentialWin - bet.receiverStake
-                  : -1 * bet.receiverStake,
-            };
-            return receiverBet;
-          }
-        })
-      );
-
-      const res = await Promise.all(betsWithDetails);
-      return res.filter((bet): bet is BetWithDetails => bet !== undefined);
-    };
-
-    const fetchBetsData = async () => {
-      if (user && user.id) {
-        const userId = user.id;
-        switch (tabValue) {
-          case 0:
-            const bets = await getBetsByUserId(userId);
-            setRows(await mapBetsToRows(bets));
-
-            break;
-          case 1:
-            const incoming = await getIncomingBetsByUserId(userId);
-            setRows(await mapBetsToRows(incoming));
-            break;
-          case 2:
-            const outgoing = await getOutgoingBetsByUserId(userId);
-            setRows(await mapBetsToRows(outgoing));
-            break;
-          case 3:
-            const resolved = await getResolvedBetsByUserId(userId);
-            setRows(await mapBetsToRows(resolved));
-            break;
-        }
-      }
-    };
-
-    fetchBetsData();
-  }, [tabValue, user, refreshToggle]);
-
-  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
-    setTabValue(newValue);
-  };
-
-  const handleAccept = async (id: string) => {
-    const bet = await getBetById(id);
-    if (!bet) {
-      console.error("bet not found");
-      return;
+  // Dynamically select the correct dataset based on the active tab
+  const betsData = (() => {
+    switch (tabValue) {
+      case 0:
+        return bets;
+      case 1:
+        return incomingBets;
+      case 2:
+        return outgoingBets;
+      case 3:
+        return resolvedBets;
+      default:
+        return [];
     }
-
-    if (user && user.balance < bet.receiverStake) {
-      alert("insufficient funds to accept bet");
-      console.error("insufficient funds to accept bet");
-      return;
-    }
-
-    try {
-      if (user && user.id) {
-        await acceptBet(id);
-        await updateUserBalance(user.id, user.balance - bet.receiverStake);
-        setUser({ ...user, balance: user.balance - bet.receiverStake });
-        setRefreshToggle((t) => !t);
-      }
-    } catch (error) {
-      console.error("error accepting bet with id: ", id);
-    }
-    console.log(`accepted bet with id: ${id}`);
-  };
-
-  const handleDecline = async (id: string) => {
-    const bet = await getBetById(id);
-    if (!bet) {
-      console.error("bet not found");
-      return;
-    }
-    const sender = await getUserById(bet.senderId);
-    if (!sender) {
-      console.error("sender not found");
-      return;
-    }
-
-    try {
-      if (user && user.id) {
-        await declineBet(id);
-        await updateUserBalance(bet.senderId, sender.balance + bet.senderStake);
-        setUser({ ...user, balance: user.balance + bet.senderStake });
-        setRefreshToggle((t) => !t);
-      }
-    } catch (error) {
-      console.error("error rejecting bet: ", id);
-    }
-    console.log(`declined bet with id: ${id}`);
-  };
+  })();
 
   const incomingBetsColumn: GridColDef[] = [
     { field: "opponent", headerName: "Opponent", width: 150 },
@@ -274,48 +125,87 @@ const BetTable: React.FC = () => {
     { field: "eventDate", headerName: "Event Date", width: 150 },
   ];
 
+  const columns = (() => {
+    switch (tabValue) {
+      case 0:
+        return betsColumn;
+      case 1:
+        return incomingBetsColumn;
+      case 2:
+        return outgoingBetsColumn;
+      case 3:
+        return resolvedBetsColumn;
+      default:
+        return betsColumn;
+    }
+  })();
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setTabValue(newValue);
+  };
+
+  const handleAccept = async (id: string) => {
+    const bet = await getBetById(id);
+    if (!bet) {
+      console.error("bet not found");
+      return;
+    }
+
+    if (user && user.balance < bet.receiverStake) {
+      alert("insufficient funds to accept bet");
+      console.error("insufficient funds to accept bet");
+      return;
+    }
+
+    try {
+      if (user && user.id) {
+        await acceptBet(id);
+        await updateUserBalance(user.id, user.balance - bet.receiverStake);
+        setUser({ ...user, balance: user.balance - bet.receiverStake });
+        setRefreshToggle((t) => !t);
+      }
+    } catch (error) {
+      console.error("error accepting bet with id: ", id);
+    }
+    console.log(`accepted bet with id: ${id}`);
+  };
+
+  const handleDecline = async (id: string) => {
+    const bet = await getBetById(id);
+    if (!bet) {
+      console.error("bet not found");
+      return;
+    }
+    const sender = await getUserById(bet.senderId);
+    if (!sender) {
+      console.error("sender not found");
+      return;
+    }
+
+    try {
+      if (user && user.id) {
+        await declineBet(id);
+        await updateUserBalance(bet.senderId, sender.balance + bet.senderStake);
+        setUser({ ...user, balance: user.balance + bet.senderStake });
+        setRefreshToggle((t) => !t);
+      }
+    } catch (error) {
+      console.error("error rejecting bet: ", id);
+    }
+    console.log(`declined bet with id: ${id}`);
+  };
+
   return (
-    <Box sx={{ height: 500, width: "100%" }}>
+    <Box sx={{ height: 600, width: "100%" }}>
       <Tabs value={tabValue} onChange={handleTabChange} aria-label="bet tabs">
-        <Tab label="Bets" />
+        <Tab label="My Bets" />
         <Tab label="Incoming Bets" />
         <Tab label="Outgoing Bets" />
-        <Tab label="Resolved Bets" />
+        <Tab label="Bet History" />
       </Tabs>
-      <TabPanel value={tabValue} index={0}>
-        <DataGrid rows={rows} columns={betsColumn} autoHeight />
-      </TabPanel>
-      <TabPanel value={tabValue} index={1}>
-        <DataGrid rows={rows} columns={incomingBetsColumn} autoHeight />
-      </TabPanel>
-      <TabPanel value={tabValue} index={2}>
-        <DataGrid rows={rows} columns={outgoingBetsColumn} autoHeight />
-      </TabPanel>
-      <TabPanel value={tabValue} index={3}>
-        <DataGrid rows={rows} columns={resolvedBetsColumn} autoHeight />
-      </TabPanel>
+      <DataGrid rows={betsData || []} columns={columns} autoHeight />
     </Box>
   );
 };
 
 export default BetTable;
-
-function TabPanel(props: {
-  children?: React.ReactNode;
-  index: any;
-  value: any;
-}) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
-      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
-    </div>
-  );
-}
