@@ -12,7 +12,7 @@ export async function getEventById(eventId: string): Promise<Event | null> {
       id: eventSnapshot.id,
     } as Event;
   } else {
-    console.error("event not found");
+    console.log("no event found");
     return null;
   }
 }

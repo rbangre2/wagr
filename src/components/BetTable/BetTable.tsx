@@ -28,7 +28,7 @@ const BetTable: React.FC = () => {
     const mapBetsToRows = async (bets: Bet[]): Promise<BetWithDetails[]> => {
       const betsWithDetails = await Promise.all(
         bets.map(async (bet) => {
-          const event = await getEventById(bet.eventId);
+          const event = await getEventById(bet.eventId.toString());
 
           if (event) {
             const homeWin = event.result === "Win";
@@ -43,7 +43,6 @@ const BetTable: React.FC = () => {
               (!homeWin && bet.receiverSelection === event.awayTeam)
                 ? "WIN"
                 : "LOST";
-            console.log(`event date: ${event.date}`);
             if (user?.id === bet.senderId) {
               const senderBet: BetWithDetails = {
                 id: bet.id,

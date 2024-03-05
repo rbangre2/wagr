@@ -5,10 +5,10 @@ import React, {
   useEffect,
   ReactNode,
 } from "react";
-import { getEvents, getAllEvents } from "@/services/sportsService";
+import { getAllEvents } from "@/services/sportsService";
 import { determineMatchResult } from "@/utils/sportsUtils";
 import { getResultForEvent } from "@/services/gameService";
-import { updateEventResult } from "@/services/eventService"; // Use the correct function name
+import { updateEventResult } from "@/services/eventService";
 import { Event } from "@/models/Event";
 import firebase from "firebase/firestore";
 

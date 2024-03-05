@@ -28,6 +28,7 @@ export const BetProvider: React.FC<BetProviderProps> = ({ children }) => {
         collection(db, "events"),
         where("status", "==", "finished")
       );
+      console.log("finding finished events");
       const eventDocs = await getDocs(finishedEventsQuery);
       const finishedEvents: Event[] = eventDocs.docs.map((doc) => ({
         id: doc.id,
@@ -39,13 +40,13 @@ export const BetProvider: React.FC<BetProviderProps> = ({ children }) => {
         collection(db, "bets"),
         where("status", "==", "Accepted")
       );
+      console.log("finding accepted bets");
       const betDocs = await getDocs(acceptedBetsQuery);
       const acceptedBets: Bet[] = betDocs.docs.map((doc) => ({
         id: doc.id,
         ...(doc.data() as Omit<Bet, "id">),
       }));
 
-      // Resolve each bet
       for (const bet of acceptedBets) {
         const event = finishedEvents.find((e) => e.id === bet.eventId);
         if (event && event.result) {
@@ -53,6 +54,7 @@ export const BetProvider: React.FC<BetProviderProps> = ({ children }) => {
             bet,
             event.result
           );
+          console.log("resolving bet");
           await resolveBet(bet.id, outcome);
         }
       }
