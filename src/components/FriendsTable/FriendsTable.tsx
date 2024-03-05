@@ -150,12 +150,12 @@ const FriendsTable: React.FC = () => {
     {
       field: "actions",
       headerName: "Actions",
-      renderCell: () => (
+      renderCell: (params: GridRenderCellParams) => (
         <>
           <IconButton aria-label="challenge">
             <ChallengeIcon />
           </IconButton>
-          <IconButton aria-label="remove">
+          <IconButton aria-label="remove"  onClick={() => handleRemoveFriend(params.row.id)} >
             <PersonRemoveIcon />
           </IconButton>
         </>
