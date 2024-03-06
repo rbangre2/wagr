@@ -8,6 +8,7 @@ export interface User {
   friends: string[];
   lastActive: Date;
   createdAt?: Date;
+  pfpSource?: string;
 }
 
 // subcollection of User

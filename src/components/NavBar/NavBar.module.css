@@ -1,0 +1,38 @@
+.container {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    height: 70px;
+    box-shadow: rgba(145, 158, 171, 0.3) 0px 0px 2px 0px, rgba(145, 158, 171, 0.12) 0px 12px 24px -4px;
+    background-color: var(--background-light);
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.tabContainer {
+    width: fit-content;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    color: var(--black);
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.tabContainer:hover {
+    cursor: pointer;
+    color: var(--accent);
+}
+
+.tabIcon {
+    margin-right: 5px;
+}
+
+.tabText {
+    font-size: 14px;
+    font-weight: 400;
+    font-family: var(--font);
+}
