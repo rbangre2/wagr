@@ -1,0 +1,43 @@
+.pageContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Align items to the start (left) */
+  padding: 20px;
+  width: 100%;
+}
+
+.headerContainer {
+  display: flex;
+  align-items: center; /* Align items vertically */
+  padding: 10px;
+  padding-bottom: 10px;
+  gap: 10px; /* Adjust the space between the icon and the text */
+}
+
+.lockIcon {
+  color: #4caf50; /* A color that indicates safety */
+  font-size: 42px; /* Adjust the size as needed */
+}
+
+.headerTitle {
+  font-weight: bold;
+  margin: 0; /* Remove any default margins */
+}
+
+.innerContainer {
+  display: flex;
+  flex-direction: row;
+  transition: box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: row;
+  align-items: left;
+  justify-content: flex-start;
+  padding-top: 30px;
+}
+
+.headerDescription {
+  color: #6c757d; /* A subtle color for less important text */
+  padding-left: 17px;
+  padding-top: 10px; /* Align with the title and icon */
+}

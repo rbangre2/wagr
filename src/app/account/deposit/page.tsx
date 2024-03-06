@@ -1,58 +1,35 @@
 "use client";
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Box, TextField, Button, Typography } from "@mui/material";
-import { useUser } from "@/contexts/UserContext";
-import { deposit } from "@/services/userService";
+import { Box, Typography } from "@mui/material";
+import LockIcon from "@mui/icons-material/Lock";
+import styles from "./page.module.css";
+import { CreditCardDetailsForm, creditCardDetailsFormObject } from "./types";
 
-const DepositPage: React.FC = () => {
-  const [amount, setAmount] = useState("");
-  const { user, setUser } = useUser();
-  const router = useRouter();
+export default function DepositPage() {
+  const [creditCardDetailsForm, setCreditCardDetailsForm] =
+    useState<CreditCardDetailsForm>(creditCardDetailsFormObject);
 
-  const handleDeposit = async () => {
-    // Parse the amount to a number and ensure it's not negative
-    const depositAmount = parseFloat(amount);
-    if (isNaN(depositAmount) || depositAmount <= 0) {
-      alert("Please enter a valid amount to deposit.");
-      return;
-    }
-
-    try {
-      // Mock service function to update the user's balance
-      const updatedUser = await deposit(user?.id, depositAmount);
-      setUser(updatedUser);
-    } catch (error) {
-      console.error("Error depositing funds:", error);
-      alert("Failed to deposit funds. Please try again later.");
-    }
-  };
+  const handleCreditCardDetailsFormChange =
+    (prop: string) => (event: { target: { value: any } }) => {
+      setCreditCardDetailsForm({
+        ...creditCardDetailsForm,
+        [prop]: event.target.value,
+      });
+    };
 
   return (
-    <Box sx={{ maxWidth: "320px", mx: "auto", mt: 4 }}>
-      <Typography variant="h4" gutterBottom>
-        Deposit Funds
+    <Box className={styles.pageContainer}>
+      <Box className={styles.headerContainer}>
+        <LockIcon className={styles.lockIcon} />
+        <Typography variant="h4" className={styles.headerTitle}>
+          Deposit Funds
+        </Typography>
+      </Box>
+      <Typography variant="subtitle1" className={styles.headerDescription}>
+        Add funds to your account quickly and securely. We use industry-leading
+        security measures to keep your information safe.
       </Typography>
-      <TextField
-        label="Amount to deposit"
-        variant="outlined"
-        value={amount}
-        onChange={(e) => setAmount(e.target.value)}
-        fullWidth
-        margin="normal"
-        type="number"
-        InputProps={{ inputProps: { min: 0 } }}
-      />
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleDeposit}
-        fullWidth
-      >
-        Deposit
-      </Button>
+      <Box className={styles.innerContainer}></Box>
     </Box>
   );
-};
-
-export default DepositPage;
+}
