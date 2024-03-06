@@ -11,6 +11,9 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import { acceptBet, declineBet, getBetById } from "@/services/betService";
 import { getUserById, updateUserBalance } from "@/services/userService";
+import { teamIcons } from "@/app/dashboard/games/soccer/types";
+import { GridRenderCellParams } from "@mui/x-data-grid";
+import Image from "next/image";
 
 const BetTable = () => {
   const [tabValue, setTabValue] = useState(0);
@@ -44,10 +47,104 @@ const BetTable = () => {
     }
   })();
 
+  const renderEventCell = (params: GridRenderCellParams) => {
+    const [homeTeam, awayTeam] = params.value
+      .split("vs.")
+      .map((team: string) => team.trim());
+    const homeIconSrc = teamIcons[homeTeam];
+    const awayIconSrc = teamIcons[awayTeam];
+
+    return (
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        {homeIconSrc && (
+          <Image
+            src={homeIconSrc}
+            alt={homeTeam}
+            style={{ width: "24px", height: "24px" }}
+          />
+        )}
+        <span>{homeTeam}</span>
+        <span>vs.</span>
+        <span>{awayTeam}</span>
+        {awayIconSrc && (
+          <Image
+            src={awayIconSrc}
+            alt={awayTeam}
+            style={{ width: "24px", height: "24px" }}
+          />
+        )}
+      </Box>
+    );
+  };
+
+  const renderOutcomeCell = (params: GridRenderCellParams) => (
+    <Box
+      sx={{
+        borderRadius: "20px",
+        bgcolor: params.value === "WIN" ? "lightblue" : "lightcoral",
+        color: "white",
+        py: 0.5,
+        px: 2,
+        display: "inline-block",
+      }}
+    >
+      {params.value}
+    </Box>
+  );
+
+  const renderSelectionCell = (params: GridRenderCellParams) => {
+    const teamIconSrc = teamIcons[params.value];
+    return (
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        <span>{params.value}</span>
+        {teamIconSrc && (
+          <Image
+            src={teamIconSrc}
+            alt={params.value}
+            style={{ width: "24px", height: "24px" }}
+          />
+        )}
+      </Box>
+    );
+  };
+
+  const renderNetResultCell = (params: GridRenderCellParams) => {
+    const netResultValue = params.value
+      ? params.value.replace(/[^0-9.-]+/g, "") // regex to parse value from currency string
+      : "0";
+    const netResult = parseFloat(netResultValue);
+
+    const formattedNetResult = new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 2,
+    }).format(netResult);
+
+    return (
+      <Box
+        sx={{
+          color: netResult < 0 ? "red" : "green",
+          fontWeight: "bold",
+        }}
+      >
+        {formattedNetResult}
+      </Box>
+    );
+  };
   const incomingBetsColumn: GridColDef[] = [
     { field: "opponent", headerName: "Opponent", width: 150 },
-    { field: "event", headerName: "Event", width: 200 },
-    { field: "selection", headerName: "Selection", width: 150 },
+    {
+      field: "event",
+      headerName: "Event",
+      width: 200,
+      renderCell: renderEventCell,
+    },
+    {
+      field: "selection",
+      headerName: "Selection",
+      width: 150,
+      renderCell: renderSelectionCell,
+    },
     { field: "staked", headerName: "Stake", width: 110 },
     { field: "odds", headerName: "Odds", width: 110 },
     { field: "potentialPayout", headerName: "Payout", width: 150 },
@@ -82,8 +179,18 @@ const BetTable = () => {
 
   const outgoingBetsColumn: GridColDef[] = [
     { field: "opponent", headerName: "Opponent", width: 150 },
-    { field: "event", headerName: "Event", width: 200 },
-    { field: "selection", headerName: "Selection", width: 150 },
+    {
+      field: "event",
+      headerName: "Event",
+      width: 200,
+      renderCell: renderEventCell,
+    },
+    {
+      field: "selection",
+      headerName: "Selection",
+      width: 150,
+      renderCell: renderSelectionCell,
+    },
     { field: "staked", headerName: "Stake", width: 110 },
     { field: "odds", headerName: "Odds", width: 110 },
     { field: "potentialPayout", headerName: "Payout", width: 150 },
@@ -111,8 +218,18 @@ const BetTable = () => {
 
   const betsColumn: GridColDef[] = [
     { field: "opponent", headerName: "Opponent", width: 150 },
-    { field: "event", headerName: "Event", width: 200 },
-    { field: "selection", headerName: "Selection", width: 150 },
+    {
+      field: "event",
+      headerName: "Event",
+      width: 200,
+      renderCell: renderEventCell,
+    },
+    {
+      field: "selection",
+      headerName: "Selection",
+      width: 150,
+      renderCell: renderSelectionCell,
+    },
     { field: "staked", headerName: "Stake", width: 110 },
     { field: "odds", headerName: "Odds", width: 110 },
     { field: "potentialPayout", headerName: "Payout", width: 150 },
@@ -121,12 +238,32 @@ const BetTable = () => {
 
   const resolvedBetsColumn: GridColDef[] = [
     { field: "opponent", headerName: "Opponent", width: 150 },
-    { field: "event", headerName: "Event", width: 200 },
-    { field: "selection", headerName: "Selection", width: 150 },
+    {
+      field: "event",
+      headerName: "Event",
+      width: 200,
+      renderCell: renderEventCell,
+    },
+    {
+      field: "selection",
+      headerName: "Selection",
+      width: 150,
+      renderCell: renderSelectionCell,
+    },
     { field: "staked", headerName: "Stake", width: 110 },
     { field: "odds", headerName: "Odds", width: 110 },
-    { field: "outcome", headerName: "Outcome", width: 150 },
-    { field: "net_result", headerName: "Net Result", width: 150 },
+    {
+      field: "outcome",
+      headerName: "Outcome",
+      width: 150,
+      renderCell: renderOutcomeCell,
+    },
+    {
+      field: "net_result",
+      headerName: "Net Result",
+      width: 150,
+      renderCell: renderNetResultCell,
+    },
     { field: "eventDate", headerName: "Event Date", width: 150 },
   ];
 
@@ -211,7 +348,12 @@ const BetTable = () => {
         <Tab label="Outgoing Bets" />
         <Tab label="Bet History" />
       </Tabs>
-      <DataGrid rows={betsData || []} columns={columns} autoHeight disableRowSelectionOnClick />
+      <DataGrid
+        rows={betsData || []}
+        columns={columns}
+        autoHeight
+        disableRowSelectionOnClick
+      />
     </Box>
   );
 };
