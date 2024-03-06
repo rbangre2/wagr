@@ -1,0 +1,57 @@
+.container {
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.topRow {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.buttonContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+
+.saveButton {
+  background-color: #4ea6ff;
+  color: #fff;
+  width: fit-content;
+  padding-left: 20px;
+  padding-right: 20px;
+  box-shadow: none;
+  border-radius: 100px;
+  margin-right: 10px;
+}
+
+.saveButton:hover {
+  box-shadow: none;
+  background-color: #e5f0ff;
+}
+
+.cancelButton {
+  background-color: #fa896b;
+  color: #fcede8;
+  width: fit-content;
+  padding-left: 20px;
+  padding-right: 20px;
+  box-shadow: none;
+  border-radius: 100px;
+}
+
+.cancelButton:hover {
+  box-shadow: none;
+  background-color: #f5724e;
+}

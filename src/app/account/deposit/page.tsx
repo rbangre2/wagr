@@ -3,11 +3,27 @@ import React, { useState } from "react";
 import { Box, Typography } from "@mui/material";
 import LockIcon from "@mui/icons-material/Lock";
 import styles from "./page.module.css";
-import { CreditCardDetailsForm, creditCardDetailsFormObject } from "./types";
+import {
+  CreditCardDetailsForm,
+  DepositDetailsForm,
+  defaultCreditCardDetailsForm,
+  defaultDepositDetailsForm,
+} from "./types";
+import DepositCard from "@/components/DepositCard/DepositCard";
 
 export default function DepositPage() {
+  const [depositDetailsForm, setDepositDetailsForm] =
+    useState<DepositDetailsForm>(defaultDepositDetailsForm);
   const [creditCardDetailsForm, setCreditCardDetailsForm] =
-    useState<CreditCardDetailsForm>(creditCardDetailsFormObject);
+    useState<CreditCardDetailsForm>(defaultCreditCardDetailsForm);
+
+  const handlePersonalDetailsFormChange =
+    (prop: string) => (event: { target: { value: any } }) => {
+      setDepositDetailsForm({
+        ...depositDetailsForm,
+        [prop]: event.target.value,
+      });
+    };
 
   const handleCreditCardDetailsFormChange =
     (prop: string) => (event: { target: { value: any } }) => {
@@ -29,7 +45,14 @@ export default function DepositPage() {
         Add funds to your account quickly and securely. We use industry-leading
         security measures to keep your information safe.
       </Typography>
-      <Box className={styles.innerContainer}></Box>
+      <Box className={styles.innerContainer}>
+        <DepositCard
+          depositDetailsForm={depositDetailsForm}
+          handleDepositDetailsFormChange={handlePersonalDetailsFormChange}
+          creditCardDetailsForm={creditCardDetailsForm}
+          handleCreditCardDetailsFormChange={handleCreditCardDetailsFormChange}
+        />
+      </Box>
     </Box>
   );
 }

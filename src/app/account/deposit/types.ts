@@ -4,8 +4,18 @@ export type CreditCardDetailsForm = {
   cvv: string;
 };
 
-export const creditCardDetailsFormObject: CreditCardDetailsForm = {
+export const defaultCreditCardDetailsForm: CreditCardDetailsForm = {
   creditCardNumber: "",
   expiry: "",
   cvv: "",
+};
+
+export type DepositDetailsForm = {
+  amount: number;
+  method: string;
+};
+
+export const defaultDepositDetailsForm = {
+  amount: 0,
+  method: "",
 };
