@@ -27,7 +27,7 @@ export default function CreditCardDetailsCard({
             idName="creditCardNumber"
             labelName="Credit Card Number"
             value={creditCardDetailsForm.creditCardNumber}
-            onChange={handleCreditCardDetailsFormChange("username")}
+            onChange={handleCreditCardDetailsFormChange("creditCardNumber")}
           />
         </Box>
         <Box className={styles.twoBox}>
