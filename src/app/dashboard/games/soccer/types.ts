@@ -17,6 +17,13 @@ import ManUnitedIcon from "@/resources/teams/epl/manunited.png";
 import WolvesIcon from "@/resources/teams/epl/wolverhampton.png";
 import LiverpoolIcon from "@/resources/teams/epl/liverpool.png";
 import EvertonIcon from "@/resources/teams/epl/everton.png";
+import BournemouthIcon from "@/resources/teams/epl/bournemouth.png";
+import CrystalPalaceIcon from "@/resources/teams/epl/crytalpalace.png";
+import SpursIcon from "@/resources/teams/epl/spurs.png";
+import NewcastleIcon from "@/resources/teams/epl/newcastle.png";
+import NottinghamForestIcon from "@/resources/teams/epl/nottingham.png";
+import LutonTownIcon from "@/resources/teams/epl/luton.png";
+import ChelseaIcon from "@/resources/teams/epl/chelsea.png";
 
 import BarcelonaIcon from "@/resources/teams/laliga/barcelona.png";
 import AtleticoMadridIcon from "@/resources/teams/laliga/atleticomadrid.png";
@@ -34,6 +41,12 @@ import GenoaIcon from "@/resources/teams/seriea/genoa.png";
 import JuventusIcon from "@/resources/teams/seriea/juventus.png";
 import LazioIcon from "@/resources/teams/seriea/lazio.png";
 import NapoliIcon from "@/resources/teams/seriea/napoli.png";
+
+import BayernMunichIcon from "@/resources/teams/bundesliga/bayern.png";
+import DortmundIcon from "@/resources/teams/bundesliga/dortmund.png";
+import StuttgartIcon from "@/resources/teams/bundesliga/stuttgart.png";
+import BayerLeverkusenIcon from "@/resources/teams/bundesliga/leverkusen.png";
+import FCKolnIcon from "@/resources/teams/bundesliga/fckoln.png";
 
 export const leagueIcons: { [key: string]: string } = {
   "LaLiga Santander": LaLigaIcon.src,
@@ -58,6 +71,13 @@ export const teamIcons: { [key: string]: string } = {
   Liverpool: LiverpoolIcon.src,
   "Wolverhampton Wanderers": WolvesIcon.src,
   Everton: EvertonIcon.src,
+  "AFC Bournemouth": BournemouthIcon.src,
+  "Crystal Palace": CrystalPalaceIcon.src,
+  "Tottenham Hotspur": SpursIcon.src,
+  "Newcastle United": NewcastleIcon.src,
+  "Nottingham Forest": NottinghamForestIcon.src,
+  "Luton Town": LutonTownIcon.src,
+  Chelsea: ChelseaIcon.src,
 
   // serie a
   Inter: InterMilanIcon.src,
@@ -80,4 +100,9 @@ export const teamIcons: { [key: string]: string } = {
   Monaco: MonacoIcon.src,
 
   // bundesliga
+  "Bayern Munich": BayernMunichIcon.src,
+  "Borussia Dortmund": DortmundIcon.src,
+  "VfB Stuttgart": StuttgartIcon.src,
+  "Bayer Leverkusen": BayerLeverkusenIcon.src,
+  "FC Cologne": FCKolnIcon.src,
 };
