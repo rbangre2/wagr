@@ -136,9 +136,6 @@ const FriendsTable: React.FC = () => {
       headerName: "Actions",
       renderCell: () => (
         <>
-          <IconButton aria-label="challenge">
-            <ChallengeIcon />
-          </IconButton>
           <IconButton aria-label="remove">
             <PersonRemoveIcon />
           </IconButton>
