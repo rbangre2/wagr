@@ -20,6 +20,8 @@ interface DepositCardProps {
       value: any;
     };
   }) => void;
+  handleDeposit: (depositAmount: number) => void;
+  handleClear: () => void;
 }
 
 export default function DepositCard({
@@ -27,9 +29,16 @@ export default function DepositCard({
   handleDepositDetailsFormChange,
   creditCardDetailsForm,
   handleCreditCardDetailsFormChange,
+  handleDeposit,
+  handleClear,
 }: DepositCardProps) {
-  const onSubmit = async () => {};
-  const onClear = async () => {};
+  const onSubmit = async () => {
+    const depositAmount = depositDetailsForm.amount;
+    if (!isNaN(depositAmount)) {
+      handleDeposit(depositAmount);
+    }
+  };
+
   return (
     <Box className={styles.container}>
       <Box className={styles.topRow}>
@@ -47,16 +56,17 @@ export default function DepositCard({
           variant="contained"
           className={styles.saveButton}
           onClick={onSubmit}
-          disabled={Object.values(depositDetailsForm).some(
-            (value) => value === ""
-          )}
+          disabled={
+            Object.values(depositDetailsForm).some((value) => value === "") &&
+            Object.values(creditCardDetailsForm).some((value) => value === "")
+          }
         >
           Deposit
         </Button>
         <Button
           variant="contained"
           className={styles.cancelButton}
-          onClick={onClear}
+          onClick={handleClear}
         >
           Clear
         </Button>
