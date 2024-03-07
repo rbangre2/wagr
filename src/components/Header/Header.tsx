@@ -1,4 +1,3 @@
-// Header.tsx
 import React, { useState } from "react";
 import {
   AppBar,
@@ -47,6 +46,10 @@ const Header: React.FC<HeaderProps> = ({
     } catch (error: any) {
       console.log("signout error");
     }
+  };
+
+  const handleOpenProfile = () => {
+    router.push("/account/profile");
   };
 
   const handleDeposit = async () => {
@@ -119,7 +122,7 @@ const Header: React.FC<HeaderProps> = ({
             onClick={handleProfileMenuOpen}
             sx={{ color: "#31383F" }}
           >
-            <AccountCircleIcon />
+            <AccountCircleIcon sx={{ fontSize: "2.5rem" }} />
           </IconButton>
         </Box>
 
@@ -144,7 +147,7 @@ const Header: React.FC<HeaderProps> = ({
           open={Boolean(anchorEl)}
           onClose={handleMenuClose}
         >
-          <MenuItem onClick={handleMenuClose} className={styles.menu_item}>
+          <MenuItem onClick={handleOpenProfile} className={styles.menu_item}>
             Profile
           </MenuItem>
           <MenuItem onClick={handleDeposit} className={styles.menu_item}>

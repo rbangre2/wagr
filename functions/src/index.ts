@@ -2,6 +2,8 @@ import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import axios from "axios";
 import {parse} from "date-fns";
+import {FieldValue, Timestamp} from "firebase-admin/firestore";
+
 
 const apiKey = functions.config().livescore.apikey;
 const apiSecret = functions.config().livescore.apisecret;
@@ -17,7 +19,7 @@ export interface Event {
   awayId: number;
   league: string;
   location: string;
-  date: admin.firestore.Timestamp;
+  date: Timestamp;
   time: string;
   status: "upcoming" | "live" | "finished";
   competitionId: number;
@@ -210,7 +212,7 @@ const resolveEventResults = async (fetchedEvents: Event[]) => {
 
   const pastEvents = fetchedEvents.filter((fetchedEvent) => {
     const eventDate = new Date(
-      (fetchedEvent.date as admin.firestore.Timestamp).toDate()
+      (fetchedEvent.date as Timestamp).toDate()
     );
     return eventDate < fiveHoursAgo && fetchedEvent.status === "upcoming";
   });
@@ -247,3 +249,119 @@ exports.resolveEvents = functions.pubsub
     const events = await getDBEvents();
     await resolveEventResults(events);
   });
+
+exports.scheduledBetResolution = functions.pubsub
+  .schedule("every 8 hours")
+  .onRun(async (context) => {
+    const finishedEventsQuery = admin
+      .firestore()
+      .collection("events")
+      .where("status", "==", "finished");
+    const finishedEventsSnapshot = await finishedEventsQuery.get();
+
+    if (finishedEventsSnapshot.empty) {
+      console.log("No finished events found.");
+      return null;
+    }
+    const finishedEvents: Event[] = finishedEventsSnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...(doc.data() as Omit<Event, "id">),
+    }));
+    console.log(`${finishedEvents.length} finished events found`);
+
+
+    const batch = admin.firestore().batch();
+
+    for (const event of finishedEvents) {
+      const eventId = event.id.toString();
+      const eventResult = event.result;
+      console.log(`resolving ${event.homeTeam} vs. 
+        
+      ''${event.awayTeam}: ${event.id} `);
+
+      if (eventResult) {
+        const betsQuery = admin
+          .firestore()
+          .collection("bets")
+          .where("eventId", "==", Number(eventId))
+          .where("status", "==", "Accepted");
+        const betsSnapshot = await betsQuery.get();
+
+        console.log(`found ${betsSnapshot.size} related bets to event`);
+
+        for (const betDoc of betsSnapshot.docs) {
+          const bet = betDoc.data() as Bet;
+          const outcome = determineBetOutcome(bet, event);
+          const betRef = betDoc.ref;
+
+          console.log(`resolving bet ${bet.id}`);
+
+          batch.update(betRef, {
+            status: "Resolved",
+            result: outcome,
+            resolvedAt: FieldValue.serverTimestamp(),
+          });
+
+          // Determine the winning and losing amounts and users
+          const winnerId = outcome === "Won" ? bet.senderId : bet.receiverId;
+          const loserId = outcome === "Won" ? bet.receiverId : bet.senderId;
+          const winnerProfit =
+            outcome === "Won" ?
+              bet.senderPotentialWin - bet.senderStake :
+              bet.receiverPotentialWin - bet.receiverStake;
+
+          // For the loser, the net result is simply the negative of their stake
+          const loserLoss =
+            outcome === "Won" ? -bet.receiverStake : -bet.senderStake;
+
+          // Fetch both user documents and update balances
+          const winnerRef = admin.firestore().doc(`users/${winnerId}`);
+          const loserRef = admin.firestore().doc(`users/${loserId}`);
+
+          // Update the winner's balance by their profit
+          batch.update(winnerRef, {
+            balance: admin.firestore.FieldValue.increment(winnerProfit),
+          });
+
+          // Update the loser's balance by their loss (subtract the stake)
+          batch.update(loserRef, {
+            balance: admin.firestore.FieldValue.increment(loserLoss),
+          });
+
+          // Update net result in the friends subcollection for the winner
+          console.log("updating friends subcollection net results for winner");
+          const friendRefWinner = winnerRef.collection("friends").doc(loserId);
+          batch.set(
+            friendRefWinner,
+            {netResult: admin.firestore.FieldValue.increment(winnerProfit)},
+            {merge: true}
+          );
+
+          // Update net result in the friends subcollection for the loser
+          console.log("updating friends subcollection net results for loser");
+          const friendRefLoser = loserRef.collection("friends").doc(winnerId);
+          batch.set(
+            friendRefLoser,
+            {netResult: admin.firestore.FieldValue.increment(loserLoss)},
+            {merge: true}
+          );
+        }
+      }
+    }
+
+    // Commit the batch
+    await batch.commit();
+    console.log("Resolved bets for finished events.");
+    return null;
+  });
+
+const determineBetOutcome = (bet: Bet, event: Event): "Won" | "Lost" => {
+  if (
+    (event.result === "Win" && bet.senderSelection === event.homeTeam) ||
+    (event.result === "Lose" && bet.senderSelection === event.awayTeam)
+  ) {
+    return "Won";
+  } else {
+    return "Lost";
+  }
+};

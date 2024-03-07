@@ -1,9 +1,7 @@
 "use client";
-import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import GamesLayout from "../GamesLayout";
-import { Event } from "@/models/Event";
-import { getAllEvents } from "@/services/sportsService";
+import { getEvents } from "@/services/sportsService";
 import SportsTable from "@/components/SportsTable/SportsTable";
 import {
   GridValueFormatterParams,
@@ -15,7 +13,7 @@ import { Box } from "@mui/material";
 import styles from "./page.module.css";
 
 export default function SoccerGames() {
-  const { data: events, isLoading, error } = useQuery("events", getAllEvents);
+  const { data: events, isLoading, error } = useQuery("events", getEvents);
   const tableTitle = "Upcoming Fixtures";
 
   const soccerColumns = [

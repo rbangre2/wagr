@@ -1,7 +1,6 @@
 import { Bet } from "@/models/Bet";
 import { db } from "@/utils/firebase/firebaseConfig";
 import { BetWithDetails } from "@/models/Bet";
-import { Event } from "@/models/Event";
 import { getEventById } from "./eventService";
 import {
   doc,
@@ -12,8 +11,6 @@ import {
   where,
   getDoc,
   getDocs,
-  writeBatch,
-  increment,
 } from "firebase/firestore";
 
 interface BetCreationData
@@ -54,67 +51,6 @@ export async function declineBet(betId: string) {
     console.log("bet declined");
   } catch (error) {
     console.error("error declining bet: ", error);
-  }
-}
-
-// more work to be done with managing user balances
-export async function resolveBet(
-  betId: string,
-  outcome: "Won" | "Lost"
-): Promise<void> {
-  const betRef = doc(db, "bets", betId);
-  try {
-    // Begin a batched write to ensure atomic operations
-    const batch = writeBatch(db);
-
-    // Fetch the bet details
-    const betSnap = await getDoc(betRef);
-    if (!betSnap.exists()) {
-      throw new Error(`No bet found with the ID: ${betId}`);
-    }
-    const betData = betSnap.data() as Bet;
-
-    // Update the bet status and resolved time
-    batch.update(betRef, {
-      status: "Resolved",
-      result: outcome,
-      resolvedAt: new Date(),
-    });
-
-    // Determine the winning and losing amounts and users
-    let winnerId: string, loserId: string, amount: number;
-    if (outcome === "Won") {
-      winnerId = betData.senderId;
-      loserId = betData.receiverId;
-      amount = betData.senderPotentialWin;
-    } else {
-      winnerId = betData.receiverId;
-      loserId = betData.senderId;
-      amount = betData.receiverPotentialWin;
-    }
-
-    // Fetch both user documents
-    const winnerRef = doc(db, "users", winnerId);
-    const loserRef = doc(db, "users", loserId);
-
-    // Deposit the winnings to the winner
-    batch.update(winnerRef, {
-      balance: increment(amount),
-    });
-
-    // Deduct the stake from the loser
-    batch.update(loserRef, {
-      balance: increment(-amount),
-    });
-
-    // Commit the batch
-    await batch.commit();
-    console.log(
-      `Bet ${betId} resolved as ${outcome}, users' balances updated.`
-    );
-  } catch (error) {
-    console.error("Error resolving bet: ", error);
-    throw error;
   }
 }
 
@@ -568,9 +504,9 @@ export async function getResolvedBetsByUserId(
               style: "currency",
               currency: "USD",
             }).format(
-              senderOutcome === "WIN"
-                ? bet.senderPotentialWin - bet.senderStake
-                : -1 * bet.senderStake
+              receiverOutcome === "WIN"
+                ? bet.receiverPotentialWin - bet.receiverStake
+                : -1 * bet.receiverStake
             ),
           };
           return receiverBet;
