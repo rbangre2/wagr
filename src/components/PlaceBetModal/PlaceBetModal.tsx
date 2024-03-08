@@ -20,6 +20,7 @@ import { getFriends } from "@/services/friendService";
 import styles from "./PlaceBetModal.module.css";
 import { createBet } from "@/services/betService";
 import { getUserById, updateUserBalance } from "@/services/userService";
+import { getReceiverSelection } from "@/utils/sportsUtils";
 
 interface PlaceBetProps {
   open: boolean;
@@ -88,8 +89,10 @@ const PlaceBet: React.FC<PlaceBetProps> = ({ open, onClose, event }) => {
         receiverName: `${opponent?.firstName} ${opponent?.lastName}`,
         receiverStake: potentialPayout - parseFloat(amount),
         receiverOdds: potentialPayout / (potentialPayout - parseFloat(amount)),
-        receiverSelection:
-          selectedTeam === event.homeTeam ? event.awayTeam : event.homeTeam,
+        receiverSelection: getReceiverSelection(selectedTeam, {
+          homeTeam: event.homeTeam,
+          awayTeam: event.awayTeam,
+        }),
         receiverPotentialWin: potentialPayout,
       };
 

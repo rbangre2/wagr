@@ -358,7 +358,8 @@ exports.scheduledBetResolution = functions.pubsub
 const determineBetOutcome = (bet: Bet, event: Event): "Won" | "Lost" => {
   if (
     (event.result === "Win" && bet.senderSelection === event.homeTeam) ||
-    (event.result === "Lose" && bet.senderSelection === event.awayTeam)
+    (event.result === "Lose" && bet.senderSelection === event.awayTeam) ||
+    (event.result === "Draw" && bet.senderSelection === "Draw")
   ) {
     return "Won";
   } else {

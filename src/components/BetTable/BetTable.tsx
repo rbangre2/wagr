@@ -209,7 +209,7 @@ const BetTable = () => {
     {
       field: "event",
       headerName: "Event",
-      width: 200,
+      width: 250,
       renderCell: renderEventCell,
     },
     {
