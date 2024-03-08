@@ -1,0 +1,43 @@
+.container {
+    width: 100%;
+    border-radius: 10px;
+    border: 1px solid rgb(229, 234, 239);
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.titleContainer {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    margin-bottom: 10px;
+}
+
+.title {
+    font-size: 18px;
+    font-family: var(--font);
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.formContainer {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.twoBox {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.spacer {
+    width: 40px
+}

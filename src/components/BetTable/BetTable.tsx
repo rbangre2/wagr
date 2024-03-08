@@ -57,21 +57,13 @@ const BetTable = () => {
     return (
       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
         {homeIconSrc && (
-          <Image
-            src={homeIconSrc}
-            alt={homeTeam}
-            style={{ width: "24px", height: "24px" }}
-          />
+          <Image src={homeIconSrc} alt={homeTeam} width={24} height={24} />
         )}
         <span>{homeTeam}</span>
         <span>vs.</span>
         <span>{awayTeam}</span>
         {awayIconSrc && (
-          <Image
-            src={awayIconSrc}
-            alt={awayTeam}
-            style={{ width: "24px", height: "24px" }}
-          />
+          <Image src={awayIconSrc} alt={awayTeam} width={24} height={24} />
         )}
       </Box>
     );
@@ -98,11 +90,7 @@ const BetTable = () => {
       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
         <span>{params.value}</span>
         {teamIconSrc && (
-          <Image
-            src={teamIconSrc}
-            alt={params.value}
-            style={{ width: "24px", height: "24px" }}
-          />
+          <Image src={teamIconSrc} alt={params.value} width={24} height={24} />
         )}
       </Box>
     );
