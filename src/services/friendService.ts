@@ -4,6 +4,7 @@ import { db } from "@/utils/firebase/firebaseConfig";
 import {
   collection,
   addDoc,
+  writeBatch,
   query,
   where,
   getDoc,
@@ -14,6 +15,7 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 import { Friend } from "@/models/User";
+
 
 export async function sendFriendRequest(sender: string, receiver: string) {
   const friendRequest: Omit<FriendRequest, "id"> = {
@@ -54,7 +56,6 @@ export async function acceptFriendRequest(
   console.log(`Friend request ${requestId} accepted and friends added.`);
 }
 
-// funcion to reject a friend request
 export async function rejectFriendRequest(requestId: string) {
   try {
     const requestRef = doc(db, "FriendRequests", requestId);
@@ -116,7 +117,6 @@ export async function getOutgoingFriendRequests(
   }
 }
 
-/* TODO: when additional Friend fields are implemented, adjust friend creation */
 export async function getFriends(userId: string) {
   const userFriendsRef = collection(db, "users", userId, "friends");
   const snapshot = await getDocs(userFriendsRef);
@@ -127,22 +127,20 @@ export async function getFriends(userId: string) {
     const friendSnap = await getDoc(friendRef);
 
     if (friendSnap.exists()) {
-      // Assuming firstName and lastName fields exist in the user document
       const friendData = friendSnap.data();
       const name = `${friendData.firstName} ${friendData.lastName}`;
 
-      // Constructing the friend object with required fields
       return {
         id: friendId,
         name: name,
         profilePicture:
           friendData.profilePicture || "https://placeimg.com/67/10/any",
-        status: "Online", // Assuming we default to "online"
-        lastActive: friendData.lastActive || new Date().toISOString(), // Assuming lastActive is stored in ISO string format
-        netResult: docSnapshot.data().netResult || 0, // Using the netResult from the friends subcollection, defaulting to 0
+        status: "Online",
+        lastActive: friendData.lastActive || new Date().toISOString(),
+        netResult: docSnapshot.data().netResult || 0,
       };
     } else {
-      return null; // Or handle this case as needed
+      return null;
     }
   });
 
@@ -166,9 +164,33 @@ export async function updateFriendData(
 }
 
 export async function removeFriend(userId: string, friendId: string) {
-  await deleteDoc(doc(db, "users", userId, "friends", friendId));
-  await deleteDoc(doc(db, "users", friendId, "friends", userId));
+  const batch = writeBatch(db);
+
+  batch.delete(doc(db, "users", userId, "friends", friendId));
+  batch.delete(doc(db, "users", friendId, "friends", userId));
+
+  const friendRequestQuery = query(
+    collection(db, "FriendRequests"),
+    where("sender", "in", [userId, friendId]),
+    where("receiver", "in", [userId, friendId])
+  );
+
+  try {
+    const querySnapshot = await getDocs(friendRequestQuery);
+    querySnapshot.forEach((doc) => {
+      batch.delete(doc.ref);
+    });
+
+    await batch.commit();
+    console.log('Friendship and any related friend requests successfully removed.');
+  } catch (error) {
+    console.error('Error removing friendship and related friend requests:', error);
+    throw new Error('Failed to remove friendship.');
+  }
 }
+
+
+
 
 
 export async function checkFriendRequestStatus( sender: string, receiver: string) {
@@ -187,4 +209,3 @@ export async function checkFriendRequestStatus( sender: string, receiver: string
   );
   return { exists: friendRequests.length > 0, id: friendRequests[0]?.id };
 }
-

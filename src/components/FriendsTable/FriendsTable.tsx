@@ -6,16 +6,15 @@ import ChallengeIcon from "@mui/icons-material/SportsMma";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { DataGrid } from "@mui/x-data-grid";
-import { Tabs, Tab, Box, Typography, setRef } from "@mui/material";
-import { TabPanelProps } from "./types";
-import { Friend } from "@/models/User";
-import { formatDistanceToNow } from "date-fns";
-import StatusIndicator from "../StatusIndicator/StatusIndicator";
+import { Tabs, Tab, Box } from "@mui/material";
 import { GridRenderCellParams, GridAlignment } from "@mui/x-data-grid";
-import { formatCurrency } from "@/utils/designUtils";
-import { FriendRequest } from "@/models/FriendRequest";
-import { getUserById } from "@/services/userService";
+import { formatDistanceToNow } from "date-fns";
+import Typography from '@mui/material/Typography';
+import { Friend } from "@/models/User";
+import StatusIndicator from "../StatusIndicator/StatusIndicator";
+import { FriendRequest } from "@/models/FriendRequest"; // Assuming Friend is also exported from FriendRequest for simplification
 import {
+  removeFriend,
   getIncomingFriendRequestsForUser,
   getOutgoingFriendRequests,
   acceptFriendRequest,
@@ -23,6 +22,16 @@ import {
   getFriends,
 } from "@/services/friendService";
 import { useUser } from "@/contexts/UserContext";
+import { TabPanelProps } from "./types";
+import { getUserById } from "@/services/userService";
+import { formatCurrency } from "@/utils/designUtils";
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import Button from '@mui/material/Button';
+
 
 function TabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
@@ -46,6 +55,8 @@ const FriendsTable: React.FC = () => {
   const [incomingRequests, setIncomingRequests] = useState<FriendRequest[]>([]);
   const [outgoingRequests, setOutgoingRequests] = useState<FriendRequest[]>([]);
   const [refreshRequests, setRefreshRequests] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false); // Added missing state for dialog
+  const [friendToRemove, setFriendToRemove] = useState<Friend | null>(null); // Added missing state for friend to remove
   const user = useUser().user;
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -60,7 +71,19 @@ const FriendsTable: React.FC = () => {
         setRefreshRequests((prevState) => !prevState);
       }
     } catch (error) {
-      console.error("error accepting friend request ", error);
+      console.error("error accepting friend request", error);
+    }
+  };
+
+  const handleRemoveFriend = async (friendId: string) => { // Modified to accept friendId
+    try {
+      if (user && user.id && friendId) {
+        await removeFriend(user.id, friendId);
+        setRefreshRequests((prevState) => !prevState);
+        setOpenDialog(false);
+      }
+    } catch (error) {
+      console.error("Error removing friend:", error);
     }
   };
 
@@ -71,9 +94,16 @@ const FriendsTable: React.FC = () => {
         setRefreshRequests((prevState) => !prevState);
       }
     } catch (error) {
-      console.error("error rejecting friend request");
+      console.error("error rejecting friend request", error);
     }
   };
+
+  const promptRemoveFriend = (friend: Friend) => {
+    console.log("Attempting to remove friend:", friend.name);
+    setFriendToRemove(friend);
+    setOpenDialog(true);
+  };
+  
 
   const columns = [
     {
@@ -134,9 +164,12 @@ const FriendsTable: React.FC = () => {
     {
       field: "actions",
       headerName: "Actions",
-      renderCell: () => (
+      renderCell: (params: GridRenderCellParams) => (
         <>
-          <IconButton aria-label="remove">
+          <IconButton aria-label="challenge">
+            <ChallengeIcon />
+          </IconButton>
+          <IconButton aria-label="remove"  onClick={() => promptRemoveFriend(params.row)} >
             <PersonRemoveIcon />
           </IconButton>
         </>
@@ -368,7 +401,28 @@ const FriendsTable: React.FC = () => {
           />
         </div>
       </TabPanel>
-    </>
+      <Dialog
+      open={openDialog}
+      onClose={() => setOpenDialog(false)}
+      aria-labelledby="alert-dialog-title"
+      aria-describedby="alert-dialog-description"
+    >
+      <DialogTitle id="alert-dialog-title">{"Remove Friend"}</DialogTitle>
+      <DialogContent>
+        <DialogContentText id="alert-dialog-description">
+          {`Are you sure you want to remove ${friendToRemove?.name} as a friend?`}
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
+        <Button onClick={() => {
+          handleRemoveFriend(friendToRemove?.id || "");
+        }} autoFocus>
+          Remove
+        </Button>
+      </DialogActions>
+    </Dialog>
+  </>
   );
 };
 
