@@ -140,6 +140,7 @@ const getAllEvents = async () => {
   events = events.concat(await fetchEventsFromAPI(3)); // la liga
   events = events.concat(await fetchEventsFromAPI(4)); // serie a
   events = events.concat(await fetchEventsFromAPI(5)); // ligue 1
+  events = events.concat(await fetchEventsFromAPI(244)); // champions league
   // do more later
   return events;
 };

@@ -3,6 +3,7 @@ import SerieAIcon from "@/resources/leagues/seriea.png";
 import EPLIcon from "@/resources/leagues/epl.png";
 import BundesligaIcon from "@/resources/leagues/bundesliga.png";
 import Ligue1Icon from "@/resources/leagues/ligue1.png";
+import ChampionsLeagueIcon from "@/resources/leagues/championsleague.png";
 
 import ArsenalIcon from "@/resources/teams/epl/arsenal.png";
 import WestHamUnitedIcon from "@/resources/teams/epl/westham.png";
@@ -54,6 +55,7 @@ export const leagueIcons: { [key: string]: string } = {
   "Premier League": EPLIcon.src,
   Bundesliga: BundesligaIcon.src,
   "Ligue 1": Ligue1Icon.src,
+  "Champions League": ChampionsLeagueIcon.src,
 };
 
 export const teamIcons: { [key: string]: string } = {
