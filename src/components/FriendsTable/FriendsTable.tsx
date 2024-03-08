@@ -248,7 +248,7 @@ const FriendsTable: React.FC = () => {
     {
       field: "sent to",
       headerName: "To",
-      width: 200,
+      width: 275,
       renderCell: (params: GridRenderCellParams) => (
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <Avatar

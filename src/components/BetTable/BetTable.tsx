@@ -120,17 +120,17 @@ const BetTable = () => {
     );
   };
   const incomingBetsColumn: GridColDef[] = [
-    { field: "opponent", headerName: "Opponent", width: 150 },
+    { field: "opponent", headerName: "Opponent", width: 125 },
     {
       field: "event",
       headerName: "Event",
-      width: 200,
+      width: 250,
       renderCell: renderEventCell,
     },
     {
       field: "selection",
       headerName: "Selection",
-      width: 150,
+      width: 200,
       renderCell: renderSelectionCell,
     },
     { field: "staked", headerName: "Stake", width: 110 },
@@ -176,7 +176,7 @@ const BetTable = () => {
     {
       field: "selection",
       headerName: "Selection",
-      width: 150,
+      width: 200,
       renderCell: renderSelectionCell,
     },
     { field: "staked", headerName: "Stake", width: 110 },
@@ -215,7 +215,7 @@ const BetTable = () => {
     {
       field: "selection",
       headerName: "Selection",
-      width: 150,
+      width: 200,
       renderCell: renderSelectionCell,
     },
     { field: "staked", headerName: "Stake", width: 110 },
