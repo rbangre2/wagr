@@ -14,7 +14,7 @@ export default function Friends() {
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
-            gap: 89,
+            gap: 90,
           }}
         >
           <Typography
@@ -25,7 +25,7 @@ export default function Friends() {
               fontWeight: 700,
             }}
           >
-            Friends!
+            Friends
           </Typography>
           <AddFriend />
         </Box>
