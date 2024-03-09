@@ -21,6 +21,8 @@ import styles from "./PlaceBetModal.module.css";
 import { createBet } from "@/services/betService";
 import { getUserById, updateUserBalance } from "@/services/userService";
 import { getReceiverSelection } from "@/utils/sportsUtils";
+import { createNotification } from "@/services/notificationService";
+import { ActivityType } from "@/models/Notification";
 
 interface PlaceBetProps {
   open: boolean;
@@ -98,16 +100,27 @@ const PlaceBet: React.FC<PlaceBetProps> = ({ open, onClose, event }) => {
 
       try {
         await createBet(newBet);
+
+        const message = `${user.firstName} ${user.lastName} has sent you a bet. Tap to view details.`;
+        await createNotification(
+          selectedFriend,
+          ActivityType.NEW_BET_CHALLENGE,
+          message
+        );
+
         onClose();
       } catch (error) {
         console.error("error placing bet: ", error);
-        await updateUserBalance(user.id, user.balance); // add back balance in case of errors
+        await updateUserBalance(user.id, user.balance);
       }
     }
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(amount);
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency,
+    }).format(amount);
   };
 
   return (

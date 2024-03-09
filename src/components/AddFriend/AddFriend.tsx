@@ -7,10 +7,12 @@ import {
   IconButton,
   InputAdornment,
 } from "@mui/material";
+import { Notification, ActivityType } from "@/models/Notification";
 import SendIcon from "@mui/icons-material/Send";
 import { sendFriendRequest } from "@/services/friendService";
 import { getUserByEmail } from "@/services/userService";
 import { useUser } from "@/contexts/UserContext";
+import { createNotification } from "@/services/notificationService";
 
 const AddFriend: React.FC = () => {
   const [emailInput, setEmailInput] = useState("");
@@ -24,7 +26,16 @@ const AddFriend: React.FC = () => {
       const receiver = await getUserByEmail(emailInput);
       if (user && user.id && receiver && receiver.id) {
         await sendFriendRequest(user.id, receiver.id);
-        console.log("Invite sent successfully.");
+        console.log("invite sent successfully.");
+
+        const message = `${user.firstName} ${user.lastName} has sent you a friend request!`;
+
+        await createNotification(
+          receiver.id,
+          ActivityType.NEW_FRIEND_REQUEST,
+          message
+        );
+
         setEmailInput("");
         setError(false);
         setHelperText("");

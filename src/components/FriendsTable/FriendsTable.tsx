@@ -31,7 +31,8 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Button from '@mui/material/Button';
-
+import { createNotification } from "@/services/notificationService";
+import { ActivityType } from "@/models/Notification";
 
 function TabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
@@ -67,6 +68,14 @@ const FriendsTable: React.FC = () => {
     try {
       if (user && user.id) {
         await acceptFriendRequest(requestId, senderId, user.id);
+
+        const message = `${user.firstName} ${user.lastName} has accepted your friend request`;
+        await createNotification(
+          senderId,
+          ActivityType.FRIEND_REQUEST_ACCEPTED,
+          message
+        );
+
         setTabValue(0);
         setRefreshRequests((prevState) => !prevState);
       }
@@ -75,7 +84,8 @@ const FriendsTable: React.FC = () => {
     }
   };
 
-  const handleRemoveFriend = async (friendId: string) => { // Modified to accept friendId
+  const handleRemoveFriend = async (friendId: string) => {
+    // Modified to accept friendId
     try {
       if (user && user.id && friendId) {
         await removeFriend(user.id, friendId);
@@ -103,7 +113,6 @@ const FriendsTable: React.FC = () => {
     setFriendToRemove(friend);
     setOpenDialog(true);
   };
-  
 
   const columns = [
     {
@@ -169,7 +178,10 @@ const FriendsTable: React.FC = () => {
           <IconButton aria-label="challenge">
             <ChallengeIcon />
           </IconButton>
-          <IconButton aria-label="remove"  onClick={() => promptRemoveFriend(params.row)} >
+          <IconButton
+            aria-label="remove"
+            onClick={() => promptRemoveFriend(params.row)}
+          >
             <PersonRemoveIcon />
           </IconButton>
         </>
@@ -402,27 +414,30 @@ const FriendsTable: React.FC = () => {
         </div>
       </TabPanel>
       <Dialog
-      open={openDialog}
-      onClose={() => setOpenDialog(false)}
-      aria-labelledby="alert-dialog-title"
-      aria-describedby="alert-dialog-description"
-    >
-      <DialogTitle id="alert-dialog-title">{"Remove Friend"}</DialogTitle>
-      <DialogContent>
-        <DialogContentText id="alert-dialog-description">
-          {`Are you sure you want to remove ${friendToRemove?.name} as a friend?`}
-        </DialogContentText>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
-        <Button onClick={() => {
-          handleRemoveFriend(friendToRemove?.id || "");
-        }} autoFocus>
-          Remove
-        </Button>
-      </DialogActions>
-    </Dialog>
-  </>
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Remove Friend"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            {`Are you sure you want to remove ${friendToRemove?.name} as a friend?`}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
+          <Button
+            onClick={() => {
+              handleRemoveFriend(friendToRemove?.id || "");
+            }}
+            autoFocus
+          >
+            Remove
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 };
 
