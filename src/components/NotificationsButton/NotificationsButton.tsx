@@ -95,7 +95,10 @@ const NotificationsButton: React.FC = () => {
         className={styles.badge}
       >
         <Badge badgeContent={unreadCount} color="error">
-          <NotificationsIcon className={styles.notificationIcon} />
+          <NotificationsIcon
+            className={styles.notificationIcon}
+            sx={{ fontSize: "1.8rem" }}
+          />
         </Badge>
       </IconButton>
       <Menu
