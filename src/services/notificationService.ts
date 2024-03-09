@@ -2,7 +2,7 @@ import {
   doc,
   collection,
   query,
-  where,
+  updateDoc,
   getDocs,
   addDoc,
   Timestamp,
@@ -32,9 +32,12 @@ export const createNotification = async (
 };
 
 export const getUserNotifications = async (
-  userId: string,
+  userId: string | undefined,
   numNotifs: number
 ): Promise<Notification[]> => {
+  if (!userId) {
+    return [];
+  }
   const userNotificationsRef = collection(db, "users", userId, "notifications");
   const notificationsQuery = query(
     userNotificationsRef,
@@ -54,3 +57,21 @@ export const getUserNotifications = async (
     throw new Error("Failed to get user notifications");
   }
 };
+
+export const readNotification = async ({
+  userId,
+  notificationId,
+}: {
+  userId: string;
+  notificationId: string;
+}) => {
+  const notificationRef = doc(
+    db,
+    "users",
+    userId,
+    "notifications",
+    notificationId
+  );
+  await updateDoc(notificationRef, { read: true });
+};
+

@@ -12,6 +12,7 @@ import {
 import styles from "./Header.module.css";
 import { useRouter } from "next/navigation";
 import { logout } from "@/services/userService";
+import { useQueryClient } from "react-query";
 import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import NotificationsButton from "../NotificationsButton/NotificationsButton";
@@ -31,6 +32,7 @@ const Header: React.FC<HeaderProps> = ({
 }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -43,6 +45,7 @@ const Header: React.FC<HeaderProps> = ({
   const handleLogout = async () => {
     try {
       await logout();
+      queryClient.clear();
       router.push("/auth/signin");
     } catch (error: any) {
       console.log("signout error");

@@ -8,72 +8,61 @@ import {
   Typography,
   Box,
 } from "@mui/material";
+import { useQuery, useMutation, useQueryClient } from "react-query";
+import {
+  getUserNotifications,
+  readNotification,
+} from "@/services/notificationService";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import { useRouter } from "next/navigation";
-import { ActivityType, Notification } from "@/models/Notification";
+import { useUser } from "@/contexts/UserContext";
 import { formatDistanceToNow } from "date-fns";
 import styles from "./NotificationsButton.module.css";
 
 const MAX_NOTIFICATIONS_DISPLAY = 5;
 
-const mockNotifications: Notification[] = [
-  {
-    id: "1",
-    type: ActivityType.NEW_FRIEND_REQUEST,
-    message: "You have a new friend request from Alice.",
-    read: false,
-    date: new Date(),
-  },
-  {
-    id: "2",
-    type: ActivityType.FRIEND_REQUEST_ACCEPTED,
-    message: "Alice has accepted your friend request.",
-    read: false,
-    date: new Date(new Date().getTime() - 1 * 60000), // 1 minute ago
-  },
-  {
-    id: "3",
-    type: ActivityType.NEW_BET_CHALLENGE,
-    message: "Charlie invited you to a bet.",
-    read: false,
-    date: new Date(new Date().getTime() - 2 * 60000), // 2 minutes ago
-  },
-  {
-    id: "4",
-    type: ActivityType.MARKET_ORDER_FILLED,
-    message: "Your market order has been filled.",
-    read: false,
-    date: new Date(new Date().getTime() - 5 * 60000), // 5 minutes ago
-  },
-  {
-    id: "5",
-    type: ActivityType.EVENT_SETTLED,
-    message: "The event you bet on has settled.",
-    read: false,
-    date: new Date(new Date().getTime() - 10 * 60000), // 10 minutes ago
-  },
-  {
-    id: "6",
-    type: ActivityType.EVENT_SETTLED,
-    message: "The event you bet on has settled.",
-    read: false,
-    date: new Date(new Date().getTime() - 10 * 60000), // 10 minutes ago
-  },
-];
-
 const NotificationsButton: React.FC = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [notifications, setNotifications] =
-    useState<Notification[]>(mockNotifications);
+  const queryClient = useQueryClient();
+  let unreadCount = 0;
+  const { user } = useUser();
+  const { data: notifications } = useQuery(
+    "notifications",
+    () => getUserNotifications(user?.id, MAX_NOTIFICATIONS_DISPLAY),
+    {
+      staleTime: 300000,
+      enabled: !!user?.id,
+    }
+  );
+
+  const mutation = useMutation(readNotification, {
+    onSuccess: () => {
+      queryClient.invalidateQueries("notifications");
+    },
+  });
+
   const router = useRouter();
 
-  const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
+  const handleOpen = async (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
-    setNotifications(
-      notifications.map((notification) => ({ ...notification, read: true }))
-    );
-  };
 
+    // Ensure user and user.id are not undefined before proceeding
+    if (user && user.id && notifications) {
+      const userId = user.id;
+      try {
+        await Promise.all(
+          notifications.map((notification) =>
+            mutation.mutateAsync({
+              userId: userId,
+              notificationId: notification.id,
+            })
+          )
+        );
+      } catch (error) {
+        console.error("failed to update notifications", error);
+      }
+    }
+  };
   const handleClose = () => {
     setAnchorEl(null);
   };
@@ -88,10 +77,15 @@ const NotificationsButton: React.FC = () => {
   };
 
   // Calculate unread count
-  const unreadCount = notifications.filter(
-    (notification) => !notification.read
-  ).length;
-
+  let noNotificationsMessage = null;
+  if (notifications) {
+    unreadCount = notifications.filter(
+      (notification) => !notification.read
+    ).length;
+    if (notifications.length === 0) {
+      noNotificationsMessage = "No notifications";
+    }
+  }
   return (
     <div>
       <IconButton
@@ -112,24 +106,32 @@ const NotificationsButton: React.FC = () => {
         onClose={handleClose}
         classes={{ paper: styles.menu }}
       >
-        {notifications.map((notification) => (
-          <MenuItem
-            key={notification.id}
-            onClick={handleClose}
-            className={styles.menuItem}
-          >
-            <Box>
-              <Typography variant="body1">{notification.message}</Typography>
-              <Typography
-                variant="caption"
-                style={{ color: "#aaa", marginTop: "4px" }}
-              >
-                {formatRelativeTime(notification.date)}{" "}
-              </Typography>
-            </Box>
+        {notifications &&
+          notifications.map((notification) => (
+            <MenuItem
+              key={notification.id}
+              onClick={handleClose}
+              className={styles.menuItem}
+            >
+              <Box>
+                <Typography variant="body1">{notification.message}</Typography>
+                <Typography
+                  variant="caption"
+                  style={{ color: "#aaa", marginTop: "4px" }}
+                >
+                  {formatRelativeTime(notification.date)}{" "}
+                </Typography>
+              </Box>
+            </MenuItem>
+          ))}
+        {noNotificationsMessage && (
+          <MenuItem className={styles.menuItem}>
+            <Typography color="textSecondary" style={{ margin: "auto" }}>
+              {noNotificationsMessage}
+            </Typography>
           </MenuItem>
-        ))}
-        {notifications.length > MAX_NOTIFICATIONS_DISPLAY && (
+        )}
+        {notifications && notifications.length > MAX_NOTIFICATIONS_DISPLAY && (
           <div>
             <Divider />
             <MenuItem onClick={handleViewAll} className={styles.menuItem}>
