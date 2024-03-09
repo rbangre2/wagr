@@ -175,9 +175,6 @@ const FriendsTable: React.FC = () => {
       headerName: "Actions",
       renderCell: (params: GridRenderCellParams) => (
         <>
-          <IconButton aria-label="challenge">
-            <ChallengeIcon />
-          </IconButton>
           <IconButton
             aria-label="remove"
             onClick={() => promptRemoveFriend(params.row)}
