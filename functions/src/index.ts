@@ -54,6 +54,24 @@ export interface Bet {
   result?: string; // winner of the bet
 }
 
+export enum ActivityType {
+  NEW_FRIEND_REQUEST = "new_friend_request",
+  FRIEND_REQUEST_ACCEPTED = "friend_request_accepted",
+  NEW_BET_CHALLENGE = "new_bet_challenge",
+  BET_CHALLENGE_ACCEPTED = "bet_challenge_accepted",
+  BET_RESOLVED = "bet_resolved",
+  MARKET_ORDER_FILLED = "market_order_filled",
+  ORDER_PARTIALLY_FILLED = "order_partially_filled",
+}
+
+export interface Notification {
+  id: string;
+  type: ActivityType;
+  message: string;
+  read: boolean;
+  date: Date;
+}
+
 const fetchFixturesPage = async (url: string): Promise<any[]> => {
   const response = await axios.get(url);
   return response.data.data.fixtures;
@@ -212,9 +230,7 @@ const resolveEventResults = async (fetchedEvents: Event[]) => {
   const fiveHoursAgo = new Date(now.getTime() - 5 * 60 * 60 * 1000);
 
   const pastEvents = fetchedEvents.filter((fetchedEvent) => {
-    const eventDate = new Date(
-      (fetchedEvent.date as Timestamp).toDate()
-    );
+    const eventDate = new Date((fetchedEvent.date as Timestamp).toDate());
     return eventDate < fiveHoursAgo && fetchedEvent.status === "upcoming";
   });
 
@@ -251,6 +267,23 @@ exports.resolveEvents = functions.pubsub
     await resolveEventResults(events);
   });
 
+const createNotification = async (
+  userId: string,
+  type: ActivityType,
+  message: string
+): Promise<void> => {
+  const userNotificationsRef = db
+    .collection("users")
+    .doc(userId)
+    .collection("notifications");
+  await userNotificationsRef.add({
+    type: type,
+    message: message,
+    read: false,
+    date: admin.firestore.FieldValue.serverTimestamp(),
+  });
+};
+
 exports.scheduledBetResolution = functions.pubsub
   .schedule("every 8 hours")
   .onRun(async (context) => {
@@ -269,7 +302,6 @@ exports.scheduledBetResolution = functions.pubsub
       ...(doc.data() as Omit<Event, "id">),
     }));
     console.log(`${finishedEvents.length} finished events found`);
-
 
     const batch = admin.firestore().batch();
 
@@ -315,6 +347,23 @@ exports.scheduledBetResolution = functions.pubsub
           const loserLoss =
             outcome === "Won" ? -bet.receiverStake : -bet.senderStake;
 
+          const winnerMessage = `Congratulations! You won
+            your bet on ${event.homeTeam} vs. ${event.awayTeam}.`;
+          const loserMessage = `You lost your bet on ${event.homeTeam} vs. 
+            ${event.awayTeam}. Better luck next time!`;
+
+          await createNotification(
+            winnerId,
+            ActivityType.BET_RESOLVED,
+            winnerMessage
+          );
+
+          await createNotification(
+            loserId,
+            ActivityType.BET_RESOLVED,
+            loserMessage
+          );
+
           // Fetch both user documents and update balances
           const winnerRef = admin.firestore().doc(`users/${winnerId}`);
           const loserRef = admin.firestore().doc(`users/${loserId}`);
@@ -334,7 +383,9 @@ exports.scheduledBetResolution = functions.pubsub
           const friendRefWinner = winnerRef.collection("friends").doc(loserId);
           batch.set(
             friendRefWinner,
-            {netResult: admin.firestore.FieldValue.increment(winnerProfit)},
+            {
+              netResult: admin.firestore.FieldValue.increment(winnerProfit),
+            },
             {merge: true}
           );
 
@@ -343,7 +394,9 @@ exports.scheduledBetResolution = functions.pubsub
           const friendRefLoser = loserRef.collection("friends").doc(winnerId);
           batch.set(
             friendRefLoser,
-            {netResult: admin.firestore.FieldValue.increment(loserLoss)},
+            {
+              netResult: admin.firestore.FieldValue.increment(loserLoss),
+            },
             {merge: true}
           );
         }

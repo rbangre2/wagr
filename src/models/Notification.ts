@@ -3,6 +3,7 @@ export enum ActivityType {
   FRIEND_REQUEST_ACCEPTED = "friend_request_accepted",
   NEW_BET_CHALLENGE = "new_bet_challenge",
   BET_CHALLENGE_ACCEPTED = "bet_challenge_accepted",
+  BET_RESOLVED = "bet_resolved",
   MARKET_ORDER_FILLED = "market_order_filled",
   ORDER_PARTIALLY_FILLED = "order_partially_filled",
 }
