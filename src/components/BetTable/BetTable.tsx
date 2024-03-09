@@ -14,12 +14,13 @@ import { getUserById, updateUserBalance } from "@/services/userService";
 import { teamIcons } from "@/app/dashboard/games/soccer/types";
 import { GridRenderCellParams } from "@mui/x-data-grid";
 import Image from "next/image";
+import { createNotification } from "@/services/notificationService";
+import { ActivityType } from "@/models/Notification";
 
 const BetTable = () => {
   const [tabValue, setTabValue] = useState(0);
   const { user, setUser } = useUser();
 
-  // React Query hooks to fetch bets based on the tab
   const { data: bets, refetch: refetchBets } = useBets(user?.id);
   const { data: incomingBets, refetch: refetchIncomingBets } = useIncomingBets(
     user?.id
@@ -98,7 +99,7 @@ const BetTable = () => {
 
   const renderNetResultCell = (params: GridRenderCellParams) => {
     const netResultValue = params.value
-      ? params.value.replace(/[^0-9.-]+/g, "") // regex to parse value from currency string
+      ? params.value.replace(/[^0-9.-]+/g, "")
       : "0";
     const netResult = parseFloat(netResultValue);
 
@@ -292,6 +293,13 @@ const BetTable = () => {
         await acceptBet(id);
         await updateUserBalance(user.id, user.balance - bet.receiverStake);
         setUser({ ...user, balance: user.balance - bet.receiverStake });
+
+        const message = `${user.firstName} ${user.lastName} has accepted your bet.`;
+        await createNotification(
+          bet.senderId,
+          ActivityType.BET_CHALLENGE_ACCEPTED,
+          message
+        );
         refetchIncomingBets();
         refetchBets();
       }

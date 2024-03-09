@@ -30,7 +30,7 @@ const NotificationsButton: React.FC = () => {
     "notifications",
     () => getUserNotifications(user?.id, MAX_NOTIFICATIONS_DISPLAY),
     {
-      staleTime: 300000,
+      staleTime: 300000, // 5 minutes
       enabled: !!user?.id,
     }
   );

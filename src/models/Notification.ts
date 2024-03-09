@@ -5,7 +5,6 @@ export enum ActivityType {
   BET_CHALLENGE_ACCEPTED = "bet_challenge_accepted",
   MARKET_ORDER_FILLED = "market_order_filled",
   ORDER_PARTIALLY_FILLED = "order_partially_filled",
-  EVENT_SETTLED = "event_settled",
 }
 
 export interface Notification {
