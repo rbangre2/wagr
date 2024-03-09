@@ -10,7 +10,7 @@ export interface Event {
   location: string;
   date: firebase.Timestamp;
   time: string;
-  status: "upcoming" | "live" | "finished";
+  status: "upcoming" | "live" | "recently finished" | "finished";
   competitionId: number;
   score?: string;
   result?: string;
