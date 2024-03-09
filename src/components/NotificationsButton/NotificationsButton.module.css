@@ -1,0 +1,30 @@
+.menu {
+  font-family: 'Roboto', sans-serif;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  transition: background-color 0.2s;
+}
+
+.menuItem:hover {
+  background-color: #f5f5f5;
+}
+
+.notificationIcon {
+  color: "#31383F";
+}
+
+.menuItemNew {
+  background-color: #fff4e5;
+}
+
+.menuItemNew:hover {
+  background-color: #ffe0b2;
+}

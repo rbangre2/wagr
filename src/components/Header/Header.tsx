@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 import { logout } from "@/services/userService";
 import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import NotificationsButton from "../NotificationsButton/NotificationsButton";
 
 interface HeaderProps {
   handleDrawerOpen: () => void;
@@ -113,6 +114,7 @@ const Header: React.FC<HeaderProps> = ({
               maximumFractionDigits: 2,
             })}`}
           </Typography>
+          <NotificationsButton />
           <IconButton
             size="large"
             edge="end"
