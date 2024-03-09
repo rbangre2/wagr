@@ -373,11 +373,6 @@ exports.scheduledBetResolution = functions.pubsub
             balance: admin.firestore.FieldValue.increment(winnerProfit),
           });
 
-          // Update the loser's balance by their loss (subtract the stake)
-          batch.update(loserRef, {
-            balance: admin.firestore.FieldValue.increment(loserLoss),
-          });
-
           // Update net result in the friends subcollection for the winner
           console.log("updating friends subcollection net results for winner");
           const friendRefWinner = winnerRef.collection("friends").doc(loserId);
