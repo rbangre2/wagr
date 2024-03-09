@@ -3,7 +3,6 @@ import {
   Badge,
   IconButton,
   Menu,
-  Popover,
   MenuItem,
   Divider,
   Typography,
@@ -20,7 +19,6 @@ const MAX_NOTIFICATIONS_DISPLAY = 5;
 const mockNotifications: Notification[] = [
   {
     id: "1",
-    userId: "user_01",
     type: ActivityType.NEW_FRIEND_REQUEST,
     message: "You have a new friend request from Alice.",
     read: false,
@@ -28,7 +26,6 @@ const mockNotifications: Notification[] = [
   },
   {
     id: "2",
-    userId: "user_01",
     type: ActivityType.FRIEND_REQUEST_ACCEPTED,
     message: "Alice has accepted your friend request.",
     read: false,
@@ -36,7 +33,6 @@ const mockNotifications: Notification[] = [
   },
   {
     id: "3",
-    userId: "user_01",
     type: ActivityType.NEW_BET_CHALLENGE,
     message: "Charlie invited you to a bet.",
     read: false,
@@ -44,7 +40,6 @@ const mockNotifications: Notification[] = [
   },
   {
     id: "4",
-    userId: "user_01",
     type: ActivityType.MARKET_ORDER_FILLED,
     message: "Your market order has been filled.",
     read: false,
@@ -52,7 +47,6 @@ const mockNotifications: Notification[] = [
   },
   {
     id: "5",
-    userId: "user_01",
     type: ActivityType.EVENT_SETTLED,
     message: "The event you bet on has settled.",
     read: false,
@@ -60,7 +54,6 @@ const mockNotifications: Notification[] = [
   },
   {
     id: "6",
-    userId: "user_01",
     type: ActivityType.EVENT_SETTLED,
     message: "The event you bet on has settled.",
     read: false,

@@ -10,7 +10,6 @@ export enum ActivityType {
 
 export interface Notification {
   id: string;
-  userId: string;
   type: ActivityType;
   message: string;
   read: boolean;
