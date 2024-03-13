@@ -4,7 +4,6 @@ import axios from "axios";
 import {parse} from "date-fns";
 import {FieldValue, Timestamp} from "firebase-admin/firestore";
 
-
 const apiKey = functions.config().livescore.apikey;
 const apiSecret = functions.config().livescore.apisecret;
 
@@ -210,15 +209,14 @@ const determineMatchResult = (ftScore: string): string => {
 const updateEventResult = async (
   eventId: string,
   score: string,
-  result: string,
-  status: string,
+  result: string
 ): Promise<void> => {
   const eventRef = db.doc(`events/${eventId}`);
   try {
     await eventRef.update({
       score,
       result,
-      status: status,
+      status: "finished",
     });
   } catch (error) {
     console.error(`error updating event ${eventId}:`, error);
@@ -239,7 +237,7 @@ const resolveEventResults = async (fetchedEvents: Event[]) => {
     const ftScore = await getResultForEvent(event);
     if (ftScore) {
       const result = determineMatchResult(ftScore);
-      await updateEventResult(event.id, ftScore, result, "recently finished");
+      await updateEventResult(event.id, ftScore, result);
     }
   }
 };
@@ -291,7 +289,7 @@ exports.scheduledBetResolution = functions.pubsub
     const finishedEventsQuery = admin
       .firestore()
       .collection("events")
-      .where("status", "==", "recently finished");
+      .where("status", "==", "finished");
     const finishedEventsSnapshot = await finishedEventsQuery.get();
 
     if (finishedEventsSnapshot.empty) {
@@ -310,7 +308,7 @@ exports.scheduledBetResolution = functions.pubsub
       const eventId = event.id.toString();
       const eventResult = event.result;
       console.log(`resolving ${event.homeTeam} vs. 
-        ${event.awayTeam}: ${event.id} `);
+        ''${event.awayTeam}: ${event.id} `);
 
       if (eventResult) {
         const betsQuery = admin
@@ -395,11 +393,7 @@ exports.scheduledBetResolution = functions.pubsub
             {merge: true}
           );
         }
-        if (event.score && event.result) {
-          await updateEventResult(eventId, event.score, event.result, "finished"); 
-        }
       }
-      // update the event to finished 
     }
 
     // Commit the batch
