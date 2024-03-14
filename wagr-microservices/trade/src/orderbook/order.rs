@@ -1,10 +1,10 @@
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum BidOrAsk {
     Bid,
     Ask,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Order {
     pub size: f64,
     pub bid_or_ask: BidOrAsk,
