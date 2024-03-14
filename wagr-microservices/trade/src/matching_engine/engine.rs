@@ -1,22 +1,8 @@
-use super::orderbook::{Order, OrderBook};
+use super::trade_pair::TradingPair;
+use crate::orderbook::order::Order;
+use crate::orderbook::orderbook::OrderBook;
 use rust_decimal::Decimal;
 use std::collections::HashMap;
-
-#[derive(Debug, Eq, PartialEq, Hash, Clone)]
-pub struct TradingPair {
-    base: String,
-    quote: String,
-}
-
-impl TradingPair {
-    pub fn new(base: String, quote: String) -> TradingPair {
-        TradingPair { base, quote }
-    }
-
-    pub fn to_string(self) -> String {
-        format!("{}_{}", self.base, self.quote)
-    }
-}
 
 pub struct MatchingEngine {
     orderbooks: HashMap<TradingPair, OrderBook>,

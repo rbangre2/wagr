@@ -1,6 +1,10 @@
-mod matching_engine;
-use matching_engine::engine::{MatchingEngine, TradingPair};
-use matching_engine::orderbook::{BidOrAsk, Order};
+pub mod matching_engine;
+pub mod orderbook;
+
+use crate::matching_engine::trade_pair::TradingPair;
+use crate::orderbook::order::BidOrAsk;
+use crate::orderbook::order::Order;
+use matching_engine::engine::MatchingEngine;
 use rust_decimal_macros::dec;
 
 fn main() {
