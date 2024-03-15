@@ -1,5 +1,7 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
+Peer to peer wagering app that allows betting between friends on real events and keeps track of results between you and your friends to settle as you please later!
+
 ## Getting Started
 
 First, run the development server:
