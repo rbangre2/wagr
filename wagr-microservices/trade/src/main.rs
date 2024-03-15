@@ -1,17 +1,18 @@
-pub mod matching_engine;
-pub mod orderbook;
+use dotenv::dotenv;
+use mongodb::{bson::doc, options::ClientOptions, Client};
 
-use crate::matching_engine::trade_pair::TradingPair;
-use crate::orderbook::order::BidOrAsk;
-use crate::orderbook::order::Order;
-use matching_engine::engine::MatchingEngine;
-use rust_decimal_macros::dec;
-
-fn main() {
-    let mut engine = MatchingEngine::new();
-    let pair = TradingPair::new("ARS".to_string(), "CHL".to_string());
-    engine.add_new_market(pair.clone());
-
-    let buy_order = Order::new(BidOrAsk::Bid, 6.5);
-    engine.place_limit_order(pair, dec!(10), buy_order).unwrap();
+#[tokio::main]
+async fn main() -> mongodb::error::Result<()> {
+    dotenv().ok();
+    let mongo_connection_uri = std::env::var("DATABASE_URI").expect("DATABASE_URI must be set.");
+    let client_options = ClientOptions::parse(mongo_connection_uri).await?;
+    // Get a handle to the cluster
+    let client = Client::with_options(client_options)?;
+    // Ping the server to see if you can connect to the cluster
+    client
+        .database("admin")
+        .run_command(doc! {"ping": 1}, None)
+        .await?;
+    println!("Pinged your deployment. You successfully connected to MongoDB!");
+    Ok(())
 }
